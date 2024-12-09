@@ -1,0 +1,22 @@
+{
+  "name": "vwt-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "msmrobin",
+  "license": "ISC",
+  "description": "Volt Wave Tech's online platform will serve as an interactive website for showcasing and selling electrical and electronics accessories while offering service bookings. It will have a Single Page Application (SPA) design for the public interface, along with an admin panel to manage content and operations efficiently.",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "mongoose": "^8.8.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
