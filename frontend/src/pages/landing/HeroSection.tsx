@@ -1,5 +1,5 @@
 import React from 'react';
-import heroBgAbstract from '../assets/img/hero-bg-abstract.jpg';
+import heroBgAbstract from '../../assets/img/hero-bg-abstract.jpg';
 
 const HeroSection: React.FC = () => {
   return (

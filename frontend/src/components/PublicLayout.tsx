@@ -1,7 +1,7 @@
 import React from "react";
 import Header from "./Header.tsx";
 import Footer from "./Footer.tsx";
-import HeroSection from "../pages/HeroSection.tsx";
+import HeroSection from "../pages/landing/HeroSection.tsx";
 
 const PublicLayout: React.FC = () => {
   return (
