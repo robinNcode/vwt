@@ -1,4 +1,4 @@
-module github.com/robinncode/voltwavetech
+module github.com/robinncode/vwt
 
 go 1.22
 
