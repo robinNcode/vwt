@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/robinncode/voltwavetech/migrations/models"
+	"github.com/robinncode/vwt/migrations/models"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -411,15 +411,15 @@ func seedServices(db *gorm.DB) {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-func strPtr(s string) *string     { return &s }
+func strPtr(s string) *string       { return &s }
 func float64Ptr(f float64) *float64 { return &f }
 
 func buildDSN() string {
-	host     := getEnv("DB_HOST", "127.0.0.1")
-	port     := getEnv("DB_PORT", "3306")
-	user     := getEnv("DB_USER", "root")
+	host := getEnv("DB_HOST", "127.0.0.1")
+	port := getEnv("DB_PORT", "3306")
+	user := getEnv("DB_USER", "root")
 	password := getEnv("DB_PASSWORD", "")
-	dbname   := getEnv("DB_NAME", "voltwavetech")
+	dbname := getEnv("DB_NAME", "voltwavetech")
 	return fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		user, password, host, port, dbname,

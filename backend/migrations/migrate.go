@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/robinncode/voltwavetech/migrations/models"
+	"github.com/robinncode/vwt/migrations/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -94,11 +94,11 @@ func main() {
 }
 
 func buildDSN() string {
-	host     := getEnv("DB_HOST", "127.0.0.1")
-	port     := getEnv("DB_PORT", "3306")
-	user     := getEnv("DB_USER", "root")
+	host := getEnv("DB_HOST", "127.0.0.1")
+	port := getEnv("DB_PORT", "3306")
+	user := getEnv("DB_USER", "root")
 	password := getEnv("DB_PASSWORD", "")
-	dbname   := getEnv("DB_NAME", "voltwavetech")
+	dbname := getEnv("DB_NAME", "voltwavetech")
 
 	return fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
