@@ -1,581 +1,397 @@
-# Production-Grade Database Design Prompt for International Garments & Factory ERP System
+# Production-Grade Database Design Prompt (Advanced E-commerce + CMS | MySQL)
 
-Act as a world-class Enterprise Database Architect and ERP Solution Designer specialized in designing large-scale industrial ERP systems for:
+Act as a Principal Database Architect and System Designer specialized in designing scalable, normalized, and high-performance relational database systems for enterprise-grade e-commerce platforms using MySQL 8+.
 
-* International Garments Manufacturing
-* Textile Industries
-* Industrial Factories
-* Machinery Management
-* Accessories & Raw Materials
-* Supply Chain & Procurement
-* Inventory & Warehouse Systems
-* Production Planning
-* Multi-company Enterprise Systems
+Your task is to design a complete database schema for a **single-brand advanced e-commerce platform with CMS and admin customization features**, focused on:
 
-Your responsibility is to design a scalable, normalized, enterprise-grade relational database architecture using MySQL 8+ for a modern Garments & Factory ERP platform.
+* International garments products
+* Industrial accessories
+* Machinery catalog (factory equipment)
+* Pricing variations (multi-currency ready)
+* CMS-driven content management
+* Admin-controlled operations
 
-The database must support:
+⚠️ IMPORTANT CONSTRAINTS:
 
-* International business operations
-* Multi-company architecture
-* Multi-factory management
-* Multi-language support
-* Large-scale inventory
-* Machinery management
-* Product pricing
-* Accessories pricing
-* Procurement workflows
-* Production tracking
-* Auditability
-* Financial integrations
-* Future scalability
+* This is NOT an ERP system
+* This is NOT a multi-vendor marketplace
+* This is NOT a distributed supply chain system
+* This IS a single business / single organization e-commerce + CMS platform
 
 ---
 
 # Core System Objective
 
-Design a highly scalable ERP database architecture capable of managing:
+Design a database that supports:
 
-* Garments manufacturing operations
-* Textile production
-* Accessories inventory
-* Industrial machinery inventory
-* Factory assets
-* Procurement
-* Vendor management
-* Production planning
-* Warehouse operations
-* International pricing
-* Multi-currency transactions
-* Localization
-* Role-based access
-* Reporting & analytics
+## E-commerce Core
 
-The architecture should be comparable to:
+* Product catalog (garments + machinery + accessories)
+* Product variants (size, color, specification, model, capacity, etc.)
+* Pricing management (dynamic + region-aware ready)
+* Inventory tracking (simple warehouse-level)
+* Orders and order lifecycle
+* Customers and authentication
 
-* SAP
-* Oracle ERP
-* Odoo Enterprise
-* Microsoft Dynamics
-* Infor ERP
+## Industrial Extension Layer
 
----
+* Machinery catalog (technical specs heavy)
+* Accessories linked to machines or products
+* Technical specification attributes system
+* Maintenance-friendly product structure (optional metadata extensibility)
 
-# Database Technology Requirements
+## CMS Layer
 
-Use:
+* Pages (About, Terms, Policies, Landing pages)
+* Banners / sliders
+* Blog / articles
+* Dynamic content blocks
 
-* MySQL 8+
-* InnoDB engine
-* UTF8MB4 character set
-* Proper indexing strategy
-* Foreign key constraints
-* UUID support where needed
-* Partition-ready architecture
+## Admin Panel System
+
+* Role-based access control (RBAC)
+* Audit logs
+* Admin activity tracking
+* Settings management
 
 ---
 
-# Localization Requirements
+# Architecture Principles
 
-IMPORTANT:
-The database must support multilingual operations.
+You must design the database following:
 
-## Supported Languages
+* Third Normal Form (3NF) minimum
+* Selective denormalization for performance only where justified
+* High query performance design
+* Index-first thinking
+* Extensible schema design (future-proofing)
+* Strong relational integrity (foreign keys required)
+* Soft delete strategy
+* Auditability
 
-1. Bengali (Default)
-2. English
+---
 
-All master entities must support translations.
+# Core Domain Design Requirements
+
+## 1. Product System (Critical)
+
+Products must support:
+
+### Product Types
+
+* Garments (shirts, pants, uniforms, etc.)
+* Industrial Machinery
+* Accessories (machine parts, garment accessories, tools)
+
+### Product Attributes System (VERY IMPORTANT)
+
+Design a flexible attribute system:
+
+* Attribute groups (e.g., Fabric, Engine Type, Voltage, Size)
+* Attribute values (e.g., Cotton, Diesel, 220V, XL)
+* Dynamic attributes per product type
+* JSON fallback only if necessary (prefer relational)
+
+### Variants System
+
+* SKU-based variants
+* Multiple attributes per variant
+* Price per variant
+* Stock per variant
 
 Example:
 
-```sql id="jlwm3c"
-products
-product_translations
-machineries
-machinery_translations
-categories
-category_translations
-```
-
-Translation table example:
-
-```sql id="3nkxha"
-product_translations
-- id
-- product_id
-- locale
-- name
-- description
-```
-
-Locales:
-
-* bn
-* en
+* Shirt → Size: M, Color: Blue
+* Machine → Power: 5HP, Phase: 3-phase
 
 ---
 
-# Multi-Company & Multi-Factory Architecture
+## 2. Pricing System (Advanced Requirement)
 
-The system must support:
+Must support:
 
-* Multiple companies
-* Multiple factories
-* Multiple warehouses
-* Multiple branches
-
-Structure example:
-
-```text id="8z8h5y"
-Company
- ├── Factories
- │    ├── Departments
- │    ├── Production Lines
- │    ├── Warehouses
- │    └── Machinery
-```
+* Base price
+* Discount price
+* Tier pricing (optional)
+* Region-based pricing ready (future-proof)
+* Currency abstraction layer
+* Price history tracking
 
 ---
 
-# Core ERP Modules
+## 3. Machinery & Technical Products
 
-Design normalized database schemas for the following modules:
+Machinery must support:
+
+* Model number
+* Technical specifications
+* Power, voltage, capacity
+* Manufacturer details (internal reference only)
+* Maintenance notes (optional CMS-like metadata)
+
+Accessories must support:
+
+* Compatibility mapping with machines/products
+* One-to-many and many-to-many relationships
 
 ---
 
-# 1. User & Access Management
+## 4. Inventory System
 
-Tables:
+Simple but scalable:
+
+* Warehouse table (optional single warehouse default)
+* Stock by SKU
+* Reserved stock (for orders)
+* Stock adjustment logs
+
+---
+
+## 5. Order System
+
+Design full order lifecycle:
+
+* Pending
+* Confirmed
+* Processing
+* Shipped
+* Delivered
+* Cancelled
+
+Order structure must include:
+
+* Order items (variant-based)
+* Snapshot pricing (immutable after order)
+* Shipping address
+* Billing address
+* Payment status
+
+---
+
+## 6. Customer System
+
+* Customer authentication
+* Profile management
+* Order history
+* Address book
+
+---
+
+## 7. CMS System
+
+Design flexible CMS tables for:
+
+* Pages (slug-based)
+* Dynamic sections
+* Banners
+* Homepage layout blocks
+* Blog posts
+* SEO metadata
+
+CMS must support:
+
+* Multi-language content (BN default, EN secondary)
+* Rich text content
+* Slugs
+* Publish/draft states
+
+---
+
+## 8. Admin & RBAC System
+
+Must include:
+
+* Users (admin staff)
+* Roles
+* Permissions
+* Role-permission mapping
+
+Also include:
+
+* Activity logs
+* Audit trail for critical operations
+* Admin action history
+
+---
+
+## 9. Localization Support (Database Level)
+
+System must support:
+
+* Bengali (default)
+* English
+
+Design considerations:
+
+* Separate translation tables OR
+* Structured JSON with indexing strategy
+
+Ensure:
+
+* Product names
+* CMS content
+* UI-facing content
+
+---
+
+## 10. Audit & Logging System
+
+Track:
+
+* Created by
+* Updated by
+* Deleted by
+* Action logs
+* Entity change logs (optional advanced feature)
+
+---
+
+# Required Tables (High-Level Expectation)
+
+You must design at least:
+
+### Core
 
 * users
 * roles
 * permissions
-* role_permissions
-* user_roles
-* sessions
-* audit_logs
+* role_permission_map
 
-Features:
+### Product Domain
 
-* RBAC
-* Login tracking
-* Activity logs
-* Localization preference
-* Multi-company access
-
----
-
-# 2. Company Management
-
-Tables:
-
-* companies
-* company_settings
-* factories
-* factory_departments
-* production_lines
-* warehouses
-* warehouse_locations
-
-Features:
-
-* Multi-company support
-* Factory hierarchy
-* Warehouse hierarchy
-* Localization support
-
----
-
-# 3. Product & Accessories Management
-
-IMPORTANT:
-The system must support international garments accessories and machinery products.
-
-Products may include:
-
-* Sewing accessories
-* Fabrics
-* Threads
-* Buttons
-* Zippers
-* Packaging materials
-* Industrial machine parts
-* Needles
-* Motors
-* Belts
-* Lubricants
-* Textile chemicals
-
-Tables:
-
-* product_categories
-* product_subcategories
-* brands
-* units
 * products
+* product_categories
 * product_variants
-* product_translations
+* product_attributes
+* product_attribute_values
+* product_variant_attributes
 * product_images
-* product_specifications
-* product_pricing
-* product_price_history
-* product_barcodes
 
-Features:
+### Pricing
 
-* SKU management
-* Barcode support
-* QR support
-* Multi-unit support
-* Variant support
-* International pricing
-* Supplier-specific pricing
-* Currency conversion
-* Cost tracking
-* Accessories classification
+* product_prices
+* price_history (optional but recommended)
 
----
+### Inventory
 
-# 4. Machinery Management System
-
-IMPORTANT:
-Support international factory machinery inventory.
-
-Example machinery:
-
-* Juki Sewing Machine
-* Brother Industrial Machine
-* Automatic Cutting Machine
-* Embroidery Machine
-* Boiler Machine
-* Generator
-* Compressor
-* Conveyor Systems
-
-Tables:
-
-* machinery_categories
-* machinery_brands
-* machineries
-* machinery_models
-* machinery_parts
-* machinery_maintenance
-* machinery_service_logs
-* machinery_assignments
-* machinery_depreciation
-* machinery_purchase_history
-* machinery_pricing
-* machinery_documents
-
-Features:
-
-* Asset tracking
-* Serial numbers
-* Warranty tracking
-* Maintenance schedules
-* Spare parts management
-* Service history
-* Factory assignments
-* Depreciation tracking
-* Import cost tracking
-* International pricing
-
----
-
-# 5. Supplier & Vendor Management
-
-Tables:
-
-* suppliers
-* supplier_contacts
-* supplier_addresses
-* supplier_products
-* supplier_pricing
-* supplier_documents
-
-Features:
-
-* International suppliers
-* Multiple currencies
-* Country-specific data
-* Supplier rating
-* Purchase history
-
----
-
-# 6. Procurement & Purchase System
-
-Tables:
-
-* purchase_requisitions
-* purchase_requisition_items
-* purchase_orders
-* purchase_order_items
-* goods_receipts
-* goods_receipt_items
-* purchase_returns
-* supplier_invoices
-
-Features:
-
-* Approval workflows
-* Partial receiving
-* Tax/VAT support
-* Multi-currency
-* Import purchases
-* Accessories procurement
-* Machinery procurement
-
----
-
-# 7. Inventory & Warehouse Management
-
-Tables:
-
-* inventories
-* inventory_transactions
+* warehouses
+* stock
 * stock_movements
-* stock_adjustments
-* warehouse_transfers
-* inventory_batches
-* inventory_serials
 
-Features:
+### Orders
 
-* Real-time stock
-* FIFO/LIFO
-* Batch tracking
-* Serial tracking
-* Warehouse transfers
-* Low stock alerts
-* Damage tracking
+* orders
+* order_items
+* order_status_history
 
----
+### Customers
 
-# 8. Production Management
+* customers
+* customer_addresses
 
-Tables:
+### CMS
 
-* production_orders
-* production_order_items
-* bill_of_materials
-* production_stages
-* work_orders
-* production_outputs
-* production_losses
-* line_assignments
+* pages
+* page_blocks
+* banners
+* blog_posts
+* seo_metadata
 
-Features:
+### System
 
-* BOM support
-* Accessories consumption
-* Machinery allocation
-* Production efficiency
-* Waste calculation
-* Line management
+* audit_logs
+* activity_logs
+* settings
 
 ---
 
-# 9. Pricing & Financial Structure
+# Indexing Requirements
 
-IMPORTANT:
-The database must support international pricing structures.
+You must define:
 
-Tables:
+* Primary keys (UUID or BIGINT carefully justified)
+* Foreign keys
+* Composite indexes for:
 
-* currencies
-* exchange_rates
-* pricing_rules
-* tax_rules
-* discounts
-* costing
-* landed_costs
+  * product filtering
+  * SKU lookup
+  * category browsing
+  * order queries
+* Full-text search indexes for:
 
-Features:
-
-* Multi-currency
-* Import cost
-* Supplier pricing
-* Dynamic pricing
-* Factory costing
-* Accessories pricing
-* Machinery pricing
-* Historical pricing
-
----
-
-# 10. Maintenance & Engineering
-
-Tables:
-
-* maintenance_requests
-* maintenance_tasks
-* maintenance_engineers
-* spare_parts_usage
-* maintenance_schedules
-
-Features:
-
-* Preventive maintenance
-* Corrective maintenance
-* Spare part usage
-* Downtime tracking
-
----
-
-# 11. Reporting & Analytics
-
-Design optimized reporting tables/materialized patterns for:
-
-* Production reports
-* Inventory valuation
-* Machinery utilization
-* Purchase analytics
-* Supplier analytics
-* Costing reports
-* Profitability reports
-
----
-
-# Database Design Standards
-
-The schema must:
-
-* Be fully normalized (3NF minimum)
-* Avoid redundant data
-* Use proper foreign keys
-* Use cascading carefully
-* Include optimized indexing
-* Support high concurrency
-* Support millions of records
-
----
-
-# Audit & Tracking Requirements
-
-Every important table should contain:
-
-```sql id="lzz1j3"
-created_at
-updated_at
-deleted_at
-created_by
-updated_by
-deleted_by
-```
-
-Implement:
-
-* Soft deletes
-* Audit logs
-* Change history
-* Activity tracking
+  * product name
+  * CMS content
 
 ---
 
 # Performance Requirements
 
-Optimize for:
+Design must optimize for:
 
-* High-volume inventory operations
-* Fast reporting
-* Large production data
-* Real-time stock queries
-
-Implement:
-
-* Composite indexes
-* Query optimization
-* Partition-ready tables
-* Read-heavy optimization
+* High read traffic (product browsing)
+* Moderate write operations (orders)
+* Fast filtering/search
+* Pagination at scale
+* Minimal join overhead in hot paths
 
 ---
 
-# Security Requirements
+# Data Integrity Rules
 
-The database design must support:
+Must enforce:
 
-* Role-based permissions
-* Row-level ownership patterns
-* Auditability
-* Sensitive data isolation
-
-Never expose:
-
-* Internal credentials
-* Raw secrets
-* Unsafe logs
+* Referential integrity
+* No orphan records
+* Safe deletion strategy (soft delete)
+* Transaction-safe order placement
+* Immutable order snapshots
 
 ---
 
-# Documentation Expectations
+# Scalability Considerations
 
-For every table:
+Design should be future-ready for:
 
-1. Explain business purpose
-2. Explain relationships
-3. Explain normalization logic
-4. Explain indexing strategy
-5. Explain scalability considerations
+* Caching layer (Redis)
+* Read replicas
+* Partitioning (orders table future)
+* Search engine integration (ElasticSearch optional)
+* Event-driven architecture (optional)
 
 ---
 
 # Output Requirements
 
-Generate:
+When generating schema:
 
-* ERD-style relationships
-* Full table schemas
-* Foreign key relationships
-* Recommended indexes
-* Migration-ready SQL
-* Naming conventions
-* Data type recommendations
-* Scalability notes
-
----
-
-# Naming Convention Standards
-
-Use:
-
-* snake_case
-* singular/plural consistency
-* clear naming
-* business-friendly terminology
-
-Example:
-
-```sql id="1ikc8r"
-purchase_orders
-purchase_order_items
-machinery_service_logs
-inventory_transactions
-```
+1. Explain high-level architecture first
+2. Provide ERD-style logical grouping
+3. Provide full MySQL DDL (CREATE TABLE statements)
+4. Explain indexing strategy
+5. Explain trade-offs (normalization vs performance)
+6. Explain extensibility design
+7. Highlight future scaling improvements
 
 ---
 
-# Final Quality Benchmark
+# Final Benchmark
 
-The database architecture must feel:
+The database design must be:
 
-* Enterprise-grade
-* ERP-ready
-* Industrial-scale
-* International business ready
-* Production-safe
-* Scalable for millions of records
+* Production-grade
+* Highly scalable
+* Clean and normalized
+* Performance optimized
+* CMS-ready
+* E-commerce optimized
+* Flexible for industrial product catalog expansion
 
-Never generate beginner-level schemas or poorly normalized structures.
+Avoid:
 
-Always prioritize:
+* Over-engineering ERP features
+* Multi-vendor complexity
+* Unnecessary micro-optimization
+* Poor relational modeling
 
-* scalability
-* maintainability
-* normalization
-* performance
-* auditability
-* extensibility
-* internationalization
-* industrial ERP standards
+Focus on:
+clarity + scalability + maintainability + performance + extensibility
