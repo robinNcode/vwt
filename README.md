@@ -14,11 +14,12 @@ The platform will focus on:
 
 - Public Pages (Customer-Facing)
     Home:
+        Hero Sections with Centaral Search Bar.
         Overview of Volt Wave Tech.
         Highlighted accessories and services.
         Promotions or featured items.
 
-    Accessories:
+    Accessories/Products:
         List of available accessories with details (name, price, description, image).
         Search and filter functionality.
 
@@ -38,6 +39,9 @@ The platform will focus on:
     Order Tracking:
         Enter order ID to track status.
 
+    Qutation Builder:
+        User able to build his own qutation with accessories, products and services
+
 - Admin Panel
 
     Manage Accessories:
@@ -48,9 +52,16 @@ The platform will focus on:
 
     Manage Orders:
         View and update the status of orders (e.g., Pending, Processing, Completed).
+    
+    Manage Invoice:
+         Add, update, delete, and view invoice details.
 
     Dashboard:
         Overview of orders, sales, and inventory statistics.
+
+    Configurations:
+        General Configurations
+        Invoice Template Configurations
 
 ### Functional Requirements
 - Public User
@@ -121,19 +132,25 @@ The platform will focus on:
 
 ### Tech Stack
 - Frontend
-    - React.js
-    - Redux (State Management)
-    - React Router (Navigation)
-    - Axios (HTTP Requests)
-    - Bootstrap (Styling)
+    - Next.js
+    - Tailwindcss (Styling)
 
 - Backend
-    - Node.js
-    - Express.js
-    - MongoDB (Database)
-    - Mongoose (ODM)
+    - Go Lang
+    - Gin
+    - MySql
     - JWT (Authentication)
     - Nodemailer (Email Notifications)
+
+### SDLC Principles
+    - SOLID
+    - DRY
+    - Clean Code
+    - Service/Repository Pattern
+
+### Localization
+    - Bengali Default
+    - English
 
 
 ### Developer

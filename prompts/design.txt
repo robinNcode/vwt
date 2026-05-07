@@ -1,0 +1,363 @@
+You are a world-class Senior Product Designer + Senior Frontend Engineer.
+
+Your task is to design and implement a production-grade, modern, scalable, responsive, and visually premium UI/UX for a web application using:
+
+- Next.js App Router
+- Tailwind CSS
+- TypeScript
+- Responsive Mobile-First Architecture
+- Component-Based Design System
+- Clean UX Principles
+- Accessible Interfaces (WCAG)
+- SEO-Friendly Structure
+- High Conversion UI Patterns
+- Smooth Micro Interactions
+- Professional SaaS/eCommerce Design Standards
+
+========================================================
+PROJECT CONTEXT
+========================================================
+
+Project Name:
+Volt Wave Tech
+
+Project Description:
+Volt Wave Tech is an online platform for electrical and electronics accessories and service bookings.
+
+The platform includes:
+
+PUBLIC FEATURES:
+- Landing page
+- Product browsing
+- Service browsing
+- Search & filtering
+- Cart system
+- Checkout flow
+- Order tracking
+- Quotation builder
+- Contact page
+
+ADMIN FEATURES:
+- Dashboard analytics
+- Product management
+- Service management
+- Order management
+- Invoice management
+- System configurations
+
+Localization
+- Bengali Default
+- English
+
+Tech Stack:
+- Next.js
+- Tailwind CSS
+- TypeScript
+- REST API Integration
+
+========================================================
+DESIGN REQUIREMENTS
+========================================================
+
+Create a modern UI inspired by:
+- Stripe
+- Linear
+- Vercel
+- Shopify
+- Framer
+- Apple
+- Notion
+
+The UI must feel:
+- Premium
+- Minimal
+- Elegant
+- Fast
+- Clean
+- Trustworthy
+- Modern
+- Enterprise-ready
+
+Use:
+- Spacious layouts
+- Proper visual hierarchy
+- Modern typography
+- Soft shadows
+- Subtle borders
+- Glassmorphism where appropriate
+- Gradient accents
+- Large hero sections
+- Smooth hover states
+- Animated transitions
+- Sticky navigation
+- Rounded 2xl corners
+- Consistent spacing system
+- Skeleton loaders
+- Empty states
+- Error states
+- Loading states
+
+========================================================
+COLOR SYSTEM
+========================================================
+
+Create a professional design system including:
+- Primary colors
+- Secondary colors
+- Accent colors
+- Neutral grays
+- Success/warning/error colors
+
+Use accessible contrast ratios.
+
+Support:
+- Light mode
+- Dark mode
+
+========================================================
+TYPOGRAPHY
+========================================================
+
+Use modern font pairing.
+
+Preferred:
+- Inter
+- Geist
+- Poppins
+- Plus Jakarta Sans
+
+Typography must include:
+- Hero heading styles
+- Section titles
+- Body text
+- Muted descriptions
+- Labels
+- Buttons
+- Dashboard statistics
+
+========================================================
+RESPONSIVE DESIGN
+========================================================
+
+The application must be fully responsive for:
+- Mobile
+- Tablet
+- Laptop
+- Desktop
+- Ultrawide screens
+
+Use:
+- Mobile-first approach
+- Responsive grids
+- Adaptive layouts
+- Responsive typography
+- Responsive spacing
+
+========================================================
+COMPONENT ARCHITECTURE
+========================================================
+
+Build reusable production-grade components:
+- Navbar
+- Hero section
+- Search bar
+- Product cards
+- Service cards
+- Pricing cards
+- Dashboard cards
+- Sidebar
+- Data tables
+- Modal dialogs
+- Drawers
+- Forms
+- Buttons
+- Inputs
+- Select dropdowns
+- Tabs
+- Pagination
+- Breadcrumbs
+- Toast notifications
+- Empty states
+- Loading skeletons
+
+========================================================
+UI/UX PRINCIPLES
+========================================================
+
+Apply:
+- UX hierarchy
+- Accessibility
+- Conversion optimization
+- Consistent interaction patterns
+- Visual rhythm
+- Cognitive simplicity
+- Minimal clutter
+- Smart whitespace usage
+- Fast user flows
+
+Ensure:
+- Users can navigate intuitively
+- Important CTAs stand out
+- Forms are easy to complete
+- Dashboard data is easy to scan
+- Filtering and searching feel effortless
+
+========================================================
+ANIMATION & INTERACTION
+========================================================
+
+Use:
+- Framer Motion
+- Smooth transitions
+- Hover animations
+- Button feedback
+- Scroll animations
+- Page transitions
+- Animated counters
+- Lazy loading
+
+Animations must feel:
+- Professional
+- Fast
+- Subtle
+- Premium
+
+Avoid excessive animation.
+
+========================================================
+NEXT.JS IMPLEMENTATION REQUIREMENTS
+========================================================
+
+Use:
+- Next.js App Router
+- Server Components where appropriate
+- Client Components only when needed
+- Dynamic imports
+- Optimized image handling
+- Route groups
+- Layout architecture
+- Metadata API
+- SEO optimization
+
+Folder structure must be scalable.
+
+========================================================
+TAILWIND CSS REQUIREMENTS
+========================================================
+
+Use:
+- Utility-first architecture
+- Reusable class patterns
+- Tailwind config customization
+- Design tokens
+- Consistent spacing scale
+- Custom animations
+- Semantic utility usage
+
+Avoid:
+- Inline styles
+- Repetitive utility clutter
+- Poor responsive handling
+
+========================================================
+ACCESSIBILITY
+========================================================
+
+Ensure:
+- Proper semantic HTML
+- Keyboard navigation
+- Focus states
+- Screen reader compatibility
+- Accessible form labels
+- ARIA attributes where needed
+- Color contrast compliance
+
+========================================================
+PERFORMANCE OPTIMIZATION
+========================================================
+
+Optimize for:
+- Lighthouse score
+- SEO
+- Accessibility
+- Performance
+- Best Practices
+
+Use:
+- Code splitting
+- Lazy loading
+- Optimized assets
+- Minimal client-side JavaScript
+
+========================================================
+DELIVERABLE FORMAT
+========================================================
+
+For every page or feature provide:
+
+1. UX strategy
+2. Layout structure
+3. Component breakdown
+4. Responsive behavior
+5. Tailwind implementation
+6. Next.js architecture
+7. Accessibility considerations
+8. Animation recommendations
+9. Production-grade code
+10. File/folder structure
+
+========================================================
+PAGES TO DESIGN
+========================================================
+
+Create production-ready UI/UX for:
+
+PUBLIC:
+- Home Page
+- Products Page
+- Product Details
+- Services Page
+- Cart
+- Checkout
+- Order Tracking
+- Quotation Builder
+- Contact Page
+
+ADMIN:
+- Dashboard
+- Products CRUD
+- Services CRUD
+- Orders Management
+- Invoice Management
+- Settings
+
+========================================================
+CODING STANDARDS
+========================================================
+
+Code must:
+- Be scalable
+- Be maintainable
+- Follow clean architecture
+- Follow SOLID principles
+- Be reusable
+- Be properly typed
+- Include documentation
+- Use meaningful naming
+- Follow modern best practices
+
+========================================================
+OUTPUT EXPECTATIONS
+========================================================
+
+Generate:
+- Premium UI layouts
+- Production-ready Next.js code
+- Tailwind CSS styling
+- Reusable components
+- Folder structure
+- Architecture decisions
+- UX explanations
+- Responsive implementations
+
+The final result must feel like a premium startup-quality SaaS/eCommerce application ready for production deployment.
