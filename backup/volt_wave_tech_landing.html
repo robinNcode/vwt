@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --volt:#F5C518;
+  --volt-dim:#C49B0F;
+  --volt-glow:rgba(245,197,24,0.15);
+  --dark:#0A0C10;
+  --dark-2:#0F1219;
+  --dark-3:#151820;
+  --dark-4:#1C2030;
+  --surface:#1E2230;
+  --surface-2:#252840;
+  --border:rgba(255,255,255,0.07);
+  --border-volt:rgba(245,197,24,0.25);
+  --text:#F0F2F8;
+  --text-2:#8B90A8;
+  --text-3:#5A5F77;
+  --font-display:'Syne',sans-serif;
+  --font-body:'DM Sans',sans-serif;
+  --radius:12px;
+  --radius-lg:20px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--dark);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.6;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 2rem;height:64px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--border);background:rgba(10,12,16,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-mark{width:32px;height:32px;background:var(--volt);border-radius:8px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.logo-bolt{width:12px;height:18px;fill:var(--dark)}
+.logo-text{font-family:var(--font-display);font-weight:700;font-size:15px;color:var(--text);letter-spacing:-0.3px}
+.logo-text span{color:var(--volt)}
+.nav-links{display:flex;align-items:center;gap:2rem}
+.nav-links a{text-decoration:none;color:var(--text-2);font-size:14px;font-weight:400;transition:color 0.2s;letter-spacing:0.1px}
+.nav-links a:hover{color:var(--text)}
+.nav-actions{display:flex;align-items:center;gap:12px}
+.btn-ghost{background:transparent;border:0.5px solid var(--border);color:var(--text-2);padding:7px 16px;border-radius:8px;font-size:13px;font-family:var(--font-body);cursor:pointer;transition:all 0.2s}
+.btn-ghost:hover{border-color:rgba(255,255,255,0.2);color:var(--text);background:var(--surface)}
+.btn-volt{background:var(--volt);border:none;color:var(--dark);padding:7px 18px;border-radius:8px;font-size:13px;font-weight:500;font-family:var(--font-display);cursor:pointer;transition:all 0.2s;letter-spacing:0.1px}
+.btn-volt:hover{background:#ffd42a;transform:translateY(-1px)}
+
+/* HERO */
+.hero{min-height:100vh;padding:120px 2rem 80px;display:flex;align-items:center;position:relative;overflow:hidden}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;opacity:0.5}
+.hero-glow{position:absolute;top:20%;left:50%;transform:translateX(-50%);width:600px;height:300px;background:radial-gradient(ellipse,rgba(245,197,24,0.08) 0%,transparent 70%);pointer-events:none}
+.hero-content{position:relative;z-index:1;max-width:1200px;margin:0 auto;width:100%}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(245,197,24,0.1);border:0.5px solid var(--border-volt);padding:6px 14px 6px 8px;border-radius:100px;margin-bottom:2rem}
+.badge-dot{width:6px;height:6px;background:var(--volt);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.badge-text{font-size:12px;color:var(--volt);font-weight:500;letter-spacing:0.5px;text-transform:uppercase}
+.hero-title{font-family:var(--font-display);font-size:clamp(42px,6vw,80px);font-weight:800;line-height:1.0;letter-spacing:-2px;margin-bottom:1.5rem;max-width:800px}
+.hero-title .line-2{color:var(--volt)}
+.hero-title .line-3{color:var(--text-2);font-weight:400}
+.hero-sub{font-size:17px;color:var(--text-2);max-width:520px;line-height:1.7;margin-bottom:2.5rem;font-weight:300}
+.hero-ctas{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:4rem}
+.btn-primary{background:var(--volt);border:none;color:var(--dark);padding:13px 28px;border-radius:var(--radius);font-size:15px;font-weight:600;font-family:var(--font-display);cursor:pointer;transition:all 0.25s;letter-spacing:0.2px;display:flex;align-items:center;gap:8px}
+.btn-primary:hover{background:#ffd42a;transform:translateY(-2px);box-shadow:0 8px 30px rgba(245,197,24,0.3)}
+.btn-secondary{background:transparent;border:0.5px solid rgba(255,255,255,0.15);color:var(--text);padding:13px 28px;border-radius:var(--radius);font-size:15px;font-family:var(--font-body);cursor:pointer;transition:all 0.25s;display:flex;align-items:center;gap:8px}
+.btn-secondary:hover{background:var(--surface);border-color:rgba(255,255,255,0.25)}
+.hero-stats{display:flex;gap:3rem;flex-wrap:wrap}
+.stat-item{display:flex;flex-direction:column}
+.stat-num{font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--text);letter-spacing:-1px}
+.stat-label{font-size:12px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.8px;margin-top:2px}
+
+/* SEARCH BAR */
+.search-section{padding:0 2rem 6rem;position:relative}
+.search-container{max-width:1200px;margin:0 auto}
+.search-bar{background:var(--dark-3);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:6px 6px 6px 20px;display:flex;align-items:center;gap:12px;transition:border-color 0.2s}
+.search-bar:focus-within{border-color:var(--border-volt);box-shadow:0 0 0 3px var(--volt-glow)}
+.search-icon{color:var(--text-3);font-size:18px;flex-shrink:0}
+.search-input{flex:1;background:transparent;border:none;outline:none;font-family:var(--font-body);font-size:15px;color:var(--text);padding:10px 0}
+.search-input::placeholder{color:var(--text-3)}
+.search-btn{background:var(--volt);border:none;color:var(--dark);padding:11px 24px;border-radius:10px;font-size:14px;font-weight:600;font-family:var(--font-display);cursor:pointer;white-space:nowrap}
+.search-filters{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.filter-chip{background:var(--dark-4);border:0.5px solid var(--border);color:var(--text-2);padding:6px 14px;border-radius:100px;font-size:12px;cursor:pointer;transition:all 0.2s;font-family:var(--font-body)}
+.filter-chip:hover,.filter-chip.active{background:rgba(245,197,24,0.1);border-color:var(--border-volt);color:var(--volt)}
+
+/* SECTION HEADER */
+.section{padding:6rem 2rem;position:relative}
+.section-inner{max-width:1200px;margin:0 auto}
+.section-tag{font-size:11px;font-weight:500;color:var(--volt);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.section-tag::before{content:'';display:block;width:24px;height:1px;background:var(--volt)}
+.section-title{font-family:var(--font-display);font-size:clamp(28px,3.5vw,44px);font-weight:700;letter-spacing:-1px;color:var(--text);margin-bottom:1rem}
+.section-sub{font-size:16px;color:var(--text-2);max-width:480px;line-height:1.7;font-weight:300}
+.section-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:3rem;gap:2rem;flex-wrap:wrap}
+
+/* PRODUCT GRID */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1px;background:var(--border)}
+.product-card{background:var(--dark-2);padding:1.5rem;transition:background 0.2s;cursor:pointer;position:relative;overflow:hidden}
+.product-card:hover{background:var(--dark-3)}
+.product-card:hover .card-arrow{opacity:1;transform:translate(0,0)}
+.card-img{width:100%;aspect-ratio:1;background:var(--dark-4);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;position:relative;overflow:hidden}
+.card-img svg{width:48px;height:48px;color:var(--volt);opacity:0.8}
+.card-badge{position:absolute;top:10px;left:10px;background:rgba(245,197,24,0.15);border:0.5px solid var(--border-volt);color:var(--volt);font-size:10px;padding:3px 8px;border-radius:100px;font-weight:500;letter-spacing:0.5px}
+.card-brand{font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px}
+.card-name{font-family:var(--font-display);font-weight:600;font-size:15px;color:var(--text);margin-bottom:8px;line-height:1.3}
+.card-price{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--volt)}
+.card-price-orig{font-size:13px;color:var(--text-3);text-decoration:line-through;margin-left:6px;font-weight:400}
+.card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:1rem;padding-top:1rem;border-top:0.5px solid var(--border)}
+.card-rating{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-2)}
+.card-arrow{width:28px;height:28px;background:var(--volt);border-radius:6px;display:flex;align-items:center;justify-content:center;opacity:0;transform:translate(4px,4px);transition:all 0.2s}
+.card-arrow svg{width:14px;height:14px;fill:var(--dark)}
+
+/* CATEGORIES */
+.categories-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1px;background:var(--border);border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.cat-item{background:var(--dark-2);padding:1.75rem 1.5rem;display:flex;flex-direction:column;align-items:flex-start;gap:1rem;cursor:pointer;transition:background 0.2s}
+.cat-item:hover{background:var(--dark-3)}
+.cat-icon{width:44px;height:44px;background:var(--dark-4);border-radius:10px;display:flex;align-items:center;justify-content:center;border:0.5px solid var(--border)}
+.cat-icon svg{width:22px;height:22px;stroke:var(--volt);fill:none;stroke-width:1.5}
+.cat-name{font-family:var(--font-display);font-size:14px;font-weight:600;color:var(--text)}
+.cat-count{font-size:12px;color:var(--text-3)}
+
+/* SERVICES */
+.services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.service-card{background:var(--dark-3);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:2rem;position:relative;overflow:hidden;cursor:pointer;transition:border-color 0.2s}
+.service-card:hover{border-color:var(--border-volt)}
+.service-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--volt),transparent);opacity:0;transition:opacity 0.2s}
+.service-card:hover::before{opacity:1}
+.service-num{font-family:var(--font-display);font-size:48px;font-weight:800;color:var(--dark-4);position:absolute;top:1.25rem;right:1.5rem;line-height:1;letter-spacing:-2px}
+.service-icon{width:48px;height:48px;background:rgba(245,197,24,0.1);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;margin-bottom:1.25rem;border:0.5px solid var(--border-volt)}
+.service-icon svg{width:24px;height:24px;stroke:var(--volt);fill:none;stroke-width:1.5}
+.service-title{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px}
+.service-desc{font-size:14px;color:var(--text-2);line-height:1.6;font-weight:300}
+.service-link{display:inline-flex;align-items:center;gap:6px;margin-top:1.25rem;font-size:13px;color:var(--volt);font-weight:500;cursor:pointer}
+.service-link svg{width:14px;height:14px;stroke:currentColor;transition:transform 0.2s}
+.service-card:hover .service-link svg{transform:translateX(3px)}
+
+/* PROMO BANNER */
+.promo-banner{background:var(--dark-3);border:0.5px solid var(--border-volt);border-radius:var(--radius-lg);padding:3rem;display:flex;align-items:center;justify-content:space-between;gap:2rem;flex-wrap:wrap;position:relative;overflow:hidden}
+.promo-banner::before{content:'';position:absolute;right:-60px;top:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(245,197,24,0.1),transparent 70%);pointer-events:none}
+.promo-text h2{font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--text);letter-spacing:-0.5px;margin-bottom:8px}
+.promo-text p{color:var(--text-2);font-size:15px;font-weight:300}
+.promo-badge{background:rgba(245,197,24,0.1);border:0.5px solid var(--border-volt);color:var(--volt);padding:4px 12px;border-radius:100px;font-size:12px;font-weight:500;letter-spacing:0.5px;margin-bottom:12px;display:inline-block}
+
+/* HOW IT WORKS */
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;position:relative}
+.step-item{padding:2rem;border-right:0.5px solid var(--border);border-bottom:0.5px solid var(--border)}
+.step-item:last-child{border-right:none}
+.step-num{font-family:var(--font-display);font-size:11px;font-weight:700;color:var(--volt);letter-spacing:2px;margin-bottom:1rem;opacity:0.8}
+.step-title{font-family:var(--font-display);font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px}
+.step-desc{font-size:13px;color:var(--text-2);line-height:1.6;font-weight:300}
+
+/* TESTIMONIAL */
+.testimonials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.testimonial-card{background:var(--dark-3);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:1.75rem}
+.testimonial-stars{display:flex;gap:3px;margin-bottom:1rem}
+.star{width:14px;height:14px;fill:var(--volt)}
+.testimonial-text{font-size:14px;color:var(--text-2);line-height:1.7;margin-bottom:1.25rem;font-style:italic;font-weight:300}
+.testimonial-author{display:flex;align-items:center;gap:10px}
+.author-avatar{width:36px;height:36px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--volt);border:0.5px solid var(--border-volt)}
+.author-name{font-family:var(--font-display);font-size:13px;font-weight:600;color:var(--text)}
+.author-title{font-size:12px;color:var(--text-3)}
+
+/* FOOTER */
+footer{border-top:0.5px solid var(--border);padding:4rem 2rem 2rem}
+.footer-inner{max-width:1200px;margin:0 auto}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:3rem;margin-bottom:3rem}
+.footer-brand p{font-size:14px;color:var(--text-2);margin-top:1rem;max-width:240px;line-height:1.7;font-weight:300}
+.footer-col h4{font-family:var(--font-display);font-size:12px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem}
+.footer-col a{display:block;font-size:14px;color:var(--text-3);text-decoration:none;margin-bottom:8px;transition:color 0.2s}
+.footer-col a:hover{color:var(--text)}
+.footer-bottom{border-top:0.5px solid var(--border);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.footer-bottom p{font-size:13px;color:var(--text-3)}
+.lang-btn{background:var(--dark-3);border:0.5px solid var(--border);color:var(--text-2);padding:5px 12px;border-radius:6px;font-size:12px;font-family:var(--font-body);cursor:pointer;display:flex;align-items:center;gap:6px}
+
+/* VIEW MORE BTN */
+.view-more{display:inline-flex;align-items:center;gap:8px;background:transparent;border:0.5px solid var(--border);color:var(--text-2);padding:10px 20px;border-radius:var(--radius);font-size:14px;font-family:var(--font-body);cursor:pointer;transition:all 0.2s}
+.view-more:hover{border-color:rgba(255,255,255,0.2);color:var(--text);background:var(--surface)}
+
+/* DIVIDER */
+.volt-divider{height:0.5px;background:linear-gradient(90deg,transparent,var(--border-volt),transparent)}
+
+/* SCROLL ANIMATIONS */
+.fade-up{opacity:0;transform:translateY(20px);transition:opacity 0.6s,transform 0.6s}
+.fade-up.visible{opacity:1;transform:none}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="logo-mark">
+      <svg class="logo-bolt" viewBox="0 0 12 18" xmlns="http://www.w3.org/2000/svg">
+        <path d="M7 0L0 10h5L5 18l7-10H7V0z"/>
+      </svg>
+    </div>
+    <span class="logo-text">Volt<span>Wave</span> Tech</span>
+  </a>
+  <div class="nav-links">
+    <a href="#products">Products</a>
+    <a href="#services">Services</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-ghost">বাংলা</button>
+    <button class="btn-ghost">Cart (0)</button>
+    <button class="btn-volt">Order Tracking</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-badge fade-up">
+      <span class="badge-dot"></span>
+      <span class="badge-text">Now shipping across Bangladesh</span>
+    </div>
+    <h1 class="hero-title fade-up">
+      <div>Power Your</div>
+      <div class="line-2">Electrical Projects</div>
+      <div class="line-3">with precision.</div>
+    </h1>
+    <p class="hero-sub fade-up">Premium electrical & electronics accessories, components, and professional services — all in one place. Built for engineers and businesses.</p>
+    <div class="hero-ctas fade-up">
+      <button class="btn-primary">
+        Browse Products
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0l6 8-6 8V0z"/></svg>
+      </button>
+      <button class="btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="7"/><path d="M6 5.5l4 2.5-4 2.5V5.5z"/></svg>
+        Watch Demo
+      </button>
+    </div>
+    <div class="hero-stats fade-up">
+      <div class="stat-item">
+        <span class="stat-num">2,400+</span>
+        <span class="stat-label">Products</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">98%</span>
+        <span class="stat-label">Satisfaction</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">12k+</span>
+        <span class="stat-label">Customers</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">48h</span>
+        <span class="stat-label">Avg Delivery</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SEARCH -->
+<section class="search-section">
+  <div class="search-container fade-up">
+    <div class="search-bar">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="search-input" placeholder="Search circuit breakers, cables, switches, transformers..." />
+      <button class="search-btn">Search</button>
+    </div>
+    <div class="search-filters">
+      <button class="filter-chip active">All</button>
+      <button class="filter-chip">Cables & Wiring</button>
+      <button class="filter-chip">Switches</button>
+      <button class="filter-chip">Breakers</button>
+      <button class="filter-chip">Transformers</button>
+      <button class="filter-chip">LED Lighting</button>
+      <button class="filter-chip">Industrial</button>
+      <button class="filter-chip">Solar</button>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section" style="padding-top:0">
+  <div class="section-inner fade-up">
+    <div class="section-header">
+      <div>
+        <div class="section-tag">Browse</div>
+        <h2 class="section-title">Shop by Category</h2>
+      </div>
+    </div>
+    <div class="categories-grid">
+      <div class="cat-item">
+        <div class="cat-icon">
+          <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div>
+          <div class="cat-name">Power Systems</div>
+          <div class="cat-count">342 items</div>
+        </div>
+      </div>
+      <div class="cat-item">
+        <div class="cat-icon">
+          <svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+        </div>
+        <div>
+          <div class="cat-name">Cables & Wiring</div>
+          <div class="cat-count">487 items</div>
+        </div>
+      </div>
+      <div class="cat-item">
+        <div class="cat-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        </div>
+        <div>
+          <div class="cat-name">Switchgear</div>
+          <div class="cat-count">218 items</div>
+        </div>
+      </div>
+      <div class="cat-item">
+        <div class="cat-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        </div>
+        <div>
+          <div class="cat-name">LED Lighting</div>
+          <div class="cat-count">165 items</div>
+        </div>
+      </div>
+      <div class="cat-item">
+        <div class="cat-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 22V12M12 12V2M12 12H2M12 12h10"/></svg>
+        </div>
+        <div>
+          <div class="cat-name">Solar & Renewable</div>
+          <div class="cat-count">93 items</div>
+        </div>
+      </div>
+      <div class="cat-item">
+        <div class="cat-icon">
+          <svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 7h6M9 12h6M9 17h4"/></svg>
+        </div>
+        <div>
+          <div class="cat-name">Control Panels</div>
+          <div class="cat-count">129 items</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section class="section" id="products" style="background:var(--dark-2)">
+  <div class="section-inner">
+    <div class="section-header fade-up">
+      <div>
+        <div class="section-tag">Featured</div>
+        <h2 class="section-title">Popular Products</h2>
+        <p class="section-sub">Top-selling electrical accessories, trusted by engineers across Bangladesh.</p>
+      </div>
+      <button class="view-more">View All Products <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 8h8M8 4l4 4-4 4"/></svg></button>
+    </div>
+    <div class="products-grid fade-up" style="border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+      <!-- Card 1 -->
+      <div class="product-card">
+        <div class="card-img">
+          <div class="card-badge">Bestseller</div>
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><rect x="8" y="12" width="32" height="24" rx="3"/><path d="M16 12V8M32 12V8M12 20h24M20 28h8"/></svg>
+        </div>
+        <div class="card-brand">Schneider</div>
+        <div class="card-name">MCB Circuit Breaker 32A Single Pole</div>
+        <div><span class="card-price">৳ 485</span><span class="card-price-orig">৳ 620</span></div>
+        <div class="card-footer">
+          <div class="card-rating">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="#F5C518"><path d="M6 1l1.4 2.8 3.1.4-2.2 2.2.5 3L6 8l-2.8 1.4.5-3L1.5 4.2l3.1-.4L6 1z"/></svg>
+            4.8 (124)
+          </div>
+          <div class="card-arrow"><svg viewBox="0 0 14 14" fill="currentColor"><path d="M5 2l5 5-5 5"/></svg></div>
+        </div>
+      </div>
+      <!-- Card 2 -->
+      <div class="product-card">
+        <div class="card-img">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M12 8h24v32H12z"/><path d="M18 8V4h12v4M18 24h12M18 30h8"/></svg>
+        </div>
+        <div class="card-brand">Legrand</div>
+        <div class="card-name">Modular Switch 6A with LED Indicator</div>
+        <div><span class="card-price">৳ 220</span></div>
+        <div class="card-footer">
+          <div class="card-rating">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="#F5C518"><path d="M6 1l1.4 2.8 3.1.4-2.2 2.2.5 3L6 8l-2.8 1.4.5-3L1.5 4.2l3.1-.4L6 1z"/></svg>
+            4.6 (89)
+          </div>
+          <div class="card-arrow"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 2l5 5-5 5"/></svg></div>
+        </div>
+      </div>
+      <!-- Card 3 -->
+      <div class="product-card">
+        <div class="card-img">
+          <div class="card-badge">New</div>
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><circle cx="24" cy="24" r="14"/><circle cx="24" cy="24" r="6"/><path d="M24 4v4M24 40v4M4 24h4M40 24h4"/></svg>
+        </div>
+        <div class="card-brand">Philips</div>
+        <div class="card-name">LED Panel Light 18W Slim Square</div>
+        <div><span class="card-price">৳ 750</span><span class="card-price-orig">৳ 950</span></div>
+        <div class="card-footer">
+          <div class="card-rating">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="#F5C518"><path d="M6 1l1.4 2.8 3.1.4-2.2 2.2.5 3L6 8l-2.8 1.4.5-3L1.5 4.2l3.1-.4L6 1z"/></svg>
+            4.9 (207)
+          </div>
+          <div class="card-arrow"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 2l5 5-5 5"/></svg></div>
+        </div>
+      </div>
+      <!-- Card 4 -->
+      <div class="product-card">
+        <div class="card-img">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M8 36V12l16-6 16 6v24l-16 6-16-6z"/><path d="M24 6v36M8 12l16 6 16-6"/></svg>
+        </div>
+        <div class="card-brand">Polycab</div>
+        <div class="card-name">FR-LSH Cable 2.5 sqmm (100m roll)</div>
+        <div><span class="card-price">৳ 3,200</span></div>
+        <div class="card-footer">
+          <div class="card-rating">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="#F5C518"><path d="M6 1l1.4 2.8 3.1.4-2.2 2.2.5 3L6 8l-2.8 1.4.5-3L1.5 4.2l3.1-.4L6 1z"/></svg>
+            4.7 (54)
+          </div>
+          <div class="card-arrow"><svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 2l5 5-5 5"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="section" id="services">
+  <div class="section-inner">
+    <div class="section-header fade-up">
+      <div>
+        <div class="section-tag">Services</div>
+        <h2 class="section-title">What we offer</h2>
+        <p class="section-sub">Professional electrical services for homes, offices, and industrial facilities.</p>
+      </div>
+    </div>
+    <div class="services-grid fade-up">
+      <div class="service-card">
+        <span class="service-num">01</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+        <div class="service-title">Installation & Wiring</div>
+        <div class="service-desc">Complete electrical installation for residential and commercial projects. Certified electricians, guaranteed workmanship.</div>
+        <div class="service-link">Learn more <svg viewBox="0 0 14 14" fill="none" stroke-width="1.5"><path d="M3 7h8M7 3l4 4-4 4"/></svg></div>
+      </div>
+      <div class="service-card">
+        <span class="service-num">02</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 1 1-14.14 0"/></svg>
+        </div>
+        <div class="service-title">Maintenance & Repair</div>
+        <div class="service-desc">Scheduled maintenance programs and emergency repair services. Fast response, minimal downtime.</div>
+        <div class="service-link">Learn more <svg viewBox="0 0 14 14" fill="none" stroke-width="1.5"><path d="M3 7h8M7 3l4 4-4 4"/></svg></div>
+      </div>
+      <div class="service-card">
+        <span class="service-num">03</span>
+        <div class="service-icon">
+          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+        </div>
+        <div class="service-title">System Design & Consultation</div>
+        <div class="service-desc">Expert consultation for industrial electrical system design, load calculations, and energy audits.</div>
+        <div class="service-link">Learn more <svg viewBox="0 0 14 14" fill="none" stroke-width="1.5"><path d="M3 7h8M7 3l4 4-4 4"/></svg></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROMO BANNER -->
+<section class="section" style="padding-top:0">
+  <div class="section-inner fade-up">
+    <div class="promo-banner">
+      <div class="promo-text">
+        <div class="promo-badge">Limited Time</div>
+        <h2>Get 15% off on bulk orders</h2>
+        <p>Order above ৳10,000 and unlock wholesale pricing. Valid for industrial and commercial clients.</p>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <div style="text-align:right;margin-right:1rem">
+          <div style="font-family:var(--font-display);font-size:36px;font-weight:800;color:var(--volt);line-height:1">15%</div>
+          <div style="font-size:12px;color:var(--text-3);text-transform:uppercase;letter-spacing:0.8px">Discount</div>
+        </div>
+        <button class="btn-primary">Claim Offer</button>
+        <button class="btn-secondary">Build Quotation</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" style="background:var(--dark-2)">
+  <div class="section-inner">
+    <div class="section-header fade-up">
+      <div>
+        <div class="section-tag">Process</div>
+        <h2 class="section-title">How it works</h2>
+      </div>
+    </div>
+    <div class="steps-grid fade-up" style="border:0.5px solid var(--border);border-radius:var(--radius-lg);overflow:hidden">
+      <div class="step-item">
+        <div class="step-num">STEP 01</div>
+        <div class="step-title">Browse & Select</div>
+        <div class="step-desc">Find the right product using our smart search and category filters.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">STEP 02</div>
+        <div class="step-title">Add to Cart</div>
+        <div class="step-desc">Build your cart or generate a quotation for bulk orders.</div>
+      </div>
+      <div class="step-item">
+        <div class="step-num">STEP 03</div>
+        <div class="step-title">Checkout</div>
+        <div class="step-desc">Secure payment with multiple options. Invoiced automatically.</div>
+      </div>
+      <div class="step-item" style="border-right:none">
+        <div class="step-num">STEP 04</div>
+        <div class="step-title">Track & Receive</div>
+        <div class="step-desc">Real-time order tracking from dispatch to your doorstep.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="section">
+  <div class="section-inner">
+    <div class="section-header fade-up">
+      <div>
+        <div class="section-tag">Reviews</div>
+        <h2 class="section-title">Trusted by engineers</h2>
+      </div>
+    </div>
+    <div class="testimonials-grid fade-up">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">
+          <svg class="star" viewBox="0 0 14 14"><path d="M7 1l1.6 3.3 3.6.5-2.6 2.5.6 3.5L7 9.2l-3.2 1.6.6-3.5L1.8 4.8l3.6-.5L7 1z"/></svg>
+          <svg class="star" viewBox="0 0 14 14"><path d="M7 1l1.6 3.3 3.6.5-2.6 2.5.6 3.5L7 9.2l-3.2 1.6.6-3.5L1.8 4.8l3.6-.5L7 1z"/></svg>
+          <svg class="star" viewBox="0 0 14 14"><path d="M7 1l1.6 3.3 3.6.5-2.6 2.5.6 3.5L7 9.2l-3.2 1.6.6-3.5L1.8 4.8l3.6-.5L7 1z"/></svg>
+          <svg class="star" viewBox="0 0 14 14"><path d="M7 1l1.6 3.3 3.6.5-2.6 2.5.6 3.5L7 9.2l-3.2 1.6.6-3.5L1.8 4.8l3.6-.5L7 1z"/></svg>
+          <svg class="star" viewBox="0 0 14 14"><path d="M7 1l1.6 3.3 3.6.5-2.6 2.5.6 3.5L7 9.2l-3.2 1.6.6-3.5L1.8 4.8l3.6-.5L7 1z"/></svg>
+        </div>
+        <div class="testimonial-text">"Best supplier for industrial electrical components in Dhaka. Fast delivery, genuine products, and excellent after-sales support."</div>
+        <div class="testimonial-author">
+          <div class="author-avatar">RA</div>
+          <div>
+            <div class="author-name">Rafiqul Ahmed</div>
+            <div class="author-title">Plant Manager, BSRM</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">
+          <svg class="star" viewBox="0 0 14 14"><path d="M7 1l1.6 3.3 3.6.5-2.6 2.5.6 3.5L7 9.2l-3.2 1.6.6-3.5L1.8 4.8l3.6-.5L7 1z"/></svg>
+          <svg class="star" viewBox="0 0 14 14"><path d="M7 1l1.6 3.3 3.6.5-2.6 2.5.6 3.5L7 9.2l-3.2 1.6.6-3.5L1.8 4.8l3.6-.5L7 1z"/></svg>
+          <svg class="star" viewBox="0 0 14 14"><path d="M7 1l1.6 3.3 3.6.5-2.6 2.5.6 3.5L7 9.2l-3.2 1.6.6-3.5L1.8 4.8l3.6-.5L7 1z"/></svg>
+          <svg class="star" viewBox="0 0 14 14"><path d="M7 1l1.6 3.3 3.6.5-2.6 2.5.6 3.5L7 9.2l-3.2 1.6.6-3.5L1.8 4.8l3.6-.5L7 1z"/></svg>
+          <svg class="star" viewBox="0 0 14 14"><path d="M7 1l1.6 3.3 3.6.5-2.6 2.5.6 3.5L7 9.2l-3.2 1.6.6-3.5L1.8 4.8l3.6-.5L7 1z"/></svg>
+        </div>
+        <div class="testimonial-text">"The quotation builder saved us hours. We were able to get accurate pricing for an entire office renovation project in minutes."</div>
+        <div class="testimonial-author">
+          <div class="author-avatar">SI</div>
+          <div>
+            <div class="author-name">Sumaiya Islam</div>
+            <div class="author-title">Electrical Engineer, BRAC</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">
+          <svg class="star" viewBox="0 0 14 14"><path d="M7 1l1.6 3.3 3.6.5-2.6 2.5.6 3.5L7 9.2l-3.2 1.6.6-3.5L1.8 4.8l3.6-.5L7 1z"/></svg>
+          <svg class="star" viewBox="0 0 14 14"><path d="M7 1l1.6 3.3 3.6.5-2.6 2.5.6 3.5L7 9.2l-3.2 1.6.6-3.5L1.8 4.8l3.6-.5L7 1z"/></svg>
+          <svg class="star" viewBox="0 0 14 14"><path d="M7 1l1.6 3.3 3.6.5-2.6 2.5.6 3.5L7 9.2l-3.2 1.6.6-3.5L1.8 4.8l3.6-.5L7 1z"/></svg>
+          <svg class="star" viewBox="0 0 14 14"><path d="M7 1l1.6 3.3 3.6.5-2.6 2.5.6 3.5L7 9.2l-3.2 1.6.6-3.5L1.8 4.8l3.6-.5L7 1z"/></svg>
+          <svg class="star" viewBox="0 0 14 14"><path d="M7 1l1.6 3.3 3.6.5-2.6 2.5.6 3.5L7 9.2l-3.2 1.6.6-3.5L1.8 4.8l3.6-.5L7 1z"/></svg>
+        </div>
+        <div class="testimonial-text">"Order tracking is seamless and the products arrived well-packaged. Will definitely use Volt Wave Tech for all future electrical procurement."</div>
+        <div class="testimonial-author">
+          <div class="author-avatar">MH</div>
+          <div>
+            <div class="author-name">Mahmud Hossain</div>
+            <div class="author-title">Contractor, MH Builders</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="nav-logo" style="text-decoration:none">
+          <div class="logo-mark">
+            <svg class="logo-bolt" viewBox="0 0 12 18"><path d="M7 0L0 10h5L5 18l7-10H7V0z"/></svg>
+          </div>
+          <span class="logo-text">Volt<span>Wave</span> Tech</span>
+        </a>
+        <p>Your trusted source for quality electrical and electronics accessories in Bangladesh. Serving engineers, contractors, and businesses since 2018.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Products</h4>
+        <a href="#">Power Systems</a>
+        <a href="#">Cables & Wiring</a>
+        <a href="#">Switchgear</a>
+        <a href="#">LED Lighting</a>
+        <a href="#">Solar Equipment</a>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <a href="#">Installation</a>
+        <a href="#">Maintenance</a>
+        <a href="#">Consultation</a>
+        <a href="#">Quotation</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="#">About us</a>
+        <a href="#">Contact</a>
+        <a href="#">Order Tracking</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Volt Wave Tech. All rights reserved.</p>
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="lang-btn">🌐 EN</button>
+        <button class="lang-btn">বাংলা</button>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting) e.target.classList.add('visible');
+  });
+}, {threshold:0.1, rootMargin:'0px 0px -40px 0px'});
+
+document.querySelectorAll('.fade-up').forEach((el, i) => {
+  el.style.transitionDelay = (i % 5) * 60 + 'ms';
+  observer.observe(el);
+});
+
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', function(){
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

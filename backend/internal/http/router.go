@@ -24,6 +24,7 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 		AllowCredentials: true,
 	}))
 
+	r.GET("/", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"message": "Volt Wave Tech API"}) })
 	r.GET("/health", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"ok": true}) })
 
 	v1 := r.Group("/api/v1")
@@ -34,6 +35,8 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	ordersH := handlers.NewOrdersHandler(db)
 	invoicesH := handlers.NewInvoicesHandler(db)
 	settingsH := handlers.NewSettingsHandler(db)
+	quotationsH := handlers.NewQuotationsHandler(db)
+	contactsH := handlers.NewContactsHandler(db)
 
 	v1.POST("/auth/login", authH.AdminLogin)
 	v1.POST("/auth/customers/register", authH.CustomerRegister)
@@ -44,6 +47,8 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	v1.GET("/orders/track/:id", ordersH.TrackByNumber)
 	v1.GET("/orders/:id", ordersH.GetByID)
 	v1.POST("/orders", ordersH.Create)
+	v1.POST("/quotations", quotationsH.Create)
+	v1.POST("/contact-messages", contactsH.Create)
 
 	// Admin
 	admin := v1.Group("")
@@ -69,6 +74,10 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	admin.POST("/settings", settingsH.Create)
 	admin.PUT("/settings/:id", settingsH.Update)
 	admin.DELETE("/settings/:id", settingsH.Delete)
+	admin.GET("/quotations", quotationsH.List)
+	admin.PUT("/quotations/:id/status", quotationsH.UpdateStatus)
+	admin.GET("/contact-messages", contactsH.List)
+	admin.PUT("/contact-messages/:id/read", contactsH.MarkRead)
 
 	return r
 }

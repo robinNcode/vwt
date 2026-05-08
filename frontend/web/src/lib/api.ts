@@ -14,7 +14,7 @@ export type ApiErr = {
 export type ApiResponse<T> = ApiOk<T> | ApiErr;
 
 function getBaseUrl() {
-  return process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, "") || "http://localhost:8080/api/v1";
+  return process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/+$/, "") || "http://localhost:8083/api/v1";
 }
 
 export class ApiError extends Error {

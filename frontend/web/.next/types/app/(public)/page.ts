@@ -1,4 +1,4 @@
-// File: /var/www/html/my_rnd/vwt/frontend/web/src/app/(public)/page.tsx
+// File: E:\xampp\htdocs\go_works\vwt\frontend\web\src\app\(public)\page.tsx
 import * as entry from '../../../../src/app/(public)/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
