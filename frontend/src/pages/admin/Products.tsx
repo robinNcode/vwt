@@ -11,11 +11,18 @@ import {
     X,
     ChevronLeft,
     ChevronRight,
-    Loader2
+    Loader2,
+    Upload,
+    Package
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Pagination from '@/components/Pagination';
+import { useTranslation } from 'react-i18next';
+
+interface ProductImage {
+    url: string;
+}
 
 interface Product {
     id: number;
@@ -24,11 +31,23 @@ interface Product {
     name_bn: string;
     name_en: string;
     slug: string;
+    sku: string;
+    price: number;
+    stock: number;
+    short_desc_en?: string;
+    short_desc_bn?: string;
+    description_en?: string;
+    description_bn?: string;
+    brand?: string;
+    model_number?: string;
+    manufacturer?: string;
     is_active: boolean;
     is_featured: boolean;
+    images?: ProductImage[];
 }
 
 const Products: React.FC = () => {
+    const { t, i18n } = useTranslation();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -37,14 +56,27 @@ const Products: React.FC = () => {
     const [totalItems, setTotalItems] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
     const [formData, setFormData] = useState({
         category_id: 1,
         product_type: 'accessory',
         name_bn: '',
         name_en: '',
         slug: '',
+        sku: '',
+        price: 0,
+        stock: 0,
+        brand: '',
+        model_number: '',
+        manufacturer: '',
         is_active: true,
-        is_featured: false
+        is_featured: false,
+        short_desc_en: '',
+        short_desc_bn: '',
+        description_en: '',
+        description_bn: ''
     });
 
     const fetchProducts = async () => {
@@ -77,6 +109,14 @@ const Products: React.FC = () => {
         return () => clearTimeout(timer);
     }, [searchTerm, currentPage]);
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            setSelectedFile(file);
+            setPreviewUrl(URL.createObjectURL(file));
+        }
+    };
+
     const handleUpsert = async (e: React.FormEvent) => {
         e.preventDefault();
         const url = editingProduct
@@ -84,30 +124,53 @@ const Products: React.FC = () => {
             : 'http://localhost:8083/api/v1/products';
         const method = editingProduct ? 'PUT' : 'POST';
 
+        const data = new FormData();
+        Object.entries(formData).forEach(([key, value]) => {
+            data.append(key, String(value));
+        });
+        if (selectedFile) {
+            data.append('image', selectedFile);
+        }
+
         try {
             const res = await fetch(url, {
                 method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                body: data
             });
-            const data = await res.json();
-            if (data.success) {
-                setIsModalOpen(false);
-                setEditingProduct(null);
-                setFormData({
-                    category_id: 1,
-                    product_type: 'accessory',
-                    name_bn: '',
-                    name_en: '',
-                    slug: '',
-                    is_active: true,
-                    is_featured: false
-                });
+            const result = await res.json();
+            if (result.success) {
+                resetForm();
                 fetchProducts();
             }
         } catch (error) {
             console.error('Failed to save product:', error);
         }
+    };
+
+    const resetForm = () => {
+        setIsModalOpen(false);
+        setEditingProduct(null);
+        setSelectedFile(null);
+        setPreviewUrl(null);
+        setFormData({
+            category_id: 1,
+            product_type: 'accessory',
+            name_bn: '',
+            name_en: '',
+            slug: '',
+            sku: '',
+            price: 0,
+            stock: 0,
+            brand: '',
+            model_number: '',
+            manufacturer: '',
+            is_active: true,
+            is_featured: false,
+            short_desc_en: '',
+            short_desc_bn: '',
+            description_en: '',
+            description_bn: ''
+        });
     };
 
     const handleDelete = async (id: number) => {
@@ -128,14 +191,25 @@ const Products: React.FC = () => {
     const openEditModal = (product: Product) => {
         setEditingProduct(product);
         setFormData({
-            category_id: product.category_id,
+            category_id: product.category_id || 1,
             product_type: product.product_type,
             name_bn: product.name_bn,
             name_en: product.name_en,
             slug: product.slug,
+            sku: product.sku || '',
+            price: product.price || 0,
+            stock: product.stock || 0,
+            brand: product.brand || '',
+            model_number: product.model_number || '',
+            manufacturer: product.manufacturer || '',
             is_active: product.is_active,
-            is_featured: product.is_featured
+            is_featured: product.is_featured,
+            short_desc_en: product.short_desc_en || '',
+            short_desc_bn: product.short_desc_bn || '',
+            description_en: product.description_en || '',
+            description_bn: product.description_bn || ''
         });
+        setPreviewUrl(product.images?.[0]?.url ? `http://localhost:8083${product.images[0].url}` : null);
         setIsModalOpen(true);
     };
 
@@ -143,7 +217,7 @@ const Products: React.FC = () => {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="font-sora text-2xl font-extrabold text-[#5C4D3C] dark:text-white">Product Management</h1>
+                    <h1 className="font-sora text-2xl font-extrabold text-[#5C4D3C] dark:text-white">{t('admin_nav.products')}</h1>
                     <p className="text-sm text-[#8B7355] dark:text-[#8A8FA8] mt-1">Manage your catalog, stock, and pricing models.</p>
                 </div>
                 <button
@@ -161,20 +235,11 @@ const Products: React.FC = () => {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B7355] dark:text-[#4D526A]" size={18} />
                     <input
                         type="text"
-                        placeholder="Search products..."
+                        placeholder={t('admin_nav.search_placeholder')}
                         className="bg-white dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-[#F5A623]/50 w-full transition-all text-[#5C4D3C] dark:text-white"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
-                </div>
-                <div className="flex items-center gap-3 w-full md:w-auto">
-                    <button className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white dark:bg-white/5 border border-[#E8DCC4] dark:border-white/5 text-sm font-semibold text-[#8B7355] dark:text-[#8A8FA8] hover:bg-[#F8F3E6] dark:hover:bg-white/10 transition-all">
-                        <Filter size={18} />
-                        Filter
-                    </button>
-                    <button className="flex-1 md:flex-none px-4 py-2.5 rounded-xl bg-white dark:bg-white/5 border border-[#E8DCC4] dark:border-white/5 text-sm font-semibold text-[#8B7355] dark:text-[#8A8FA8] hover:bg-[#F8F3E6] dark:hover:bg-white/10 transition-all">
-                        Sort
-                    </button>
                 </div>
             </div>
 
@@ -185,10 +250,10 @@ const Products: React.FC = () => {
                         <thead className="bg-[#F8F3E6] dark:bg-[#13161E]/50">
                             <tr>
                                 <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">Product Info</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">Type</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">SKU & Price</th>
                                 <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">Status</th>
                                 <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">Featured</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">Created</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">Stock</th>
                                 <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
@@ -196,58 +261,58 @@ const Products: React.FC = () => {
                             {loading ? (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-12 text-center">
-                                        <div className="flex flex-col items-center gap-3">
-                                            <Loader2 className="animate-spin text-[#F5A623]" size={32} />
-                                            <p className="text-sm text-[#4D526A]">Loading products...</p>
-                                        </div>
+                                        <Loader2 className="animate-spin text-[#F5A623] mx-auto" size={32} />
                                     </td>
-                                </tr>
-                            ) : products.length === 0 ? (
-                                <tr>
-                                    <td colSpan={6} className="px-6 py-12 text-center text-[#8B7355] dark:text-[#4D526A]">No products found.</td>
                                 </tr>
                             ) : products.map((product) => (
                                 <tr key={product.id} className="hover:bg-[#F8F3E6]/60 dark:hover:bg-white/[0.02] transition-all group">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-xl bg-[#F5A623]/10 dark:bg-white/5 flex items-center justify-center text-[#d48e1d] dark:text-[#4D526A] group-hover:text-[#F5A623] transition-all overflow-hidden">
-                                                <ImageIcon size={20} />
+                                            <div className="w-12 h-12 rounded-xl bg-[#F5A623]/10 flex items-center justify-center text-[#d48e1d] overflow-hidden border border-[#F5A623]/20">
+                                                {product.images?.length ? (
+                                                    <img src={`http://localhost:8083${product.images[0].url}`} alt="" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <ImageIcon size={20} />
+                                                )}
                                             </div>
                                             <div>
-                                                <p className="text-sm font-bold text-[#5C4D3C] dark:text-[#F0F2F7]">{product.name_en}</p>
-                                                <p className="text-xs text-[#8B7355] dark:text-[#4D526A] mt-0.5">{product.name_bn}</p>
+                                                <p className="text-sm font-bold text-[#5C4D3C] dark:text-[#F0F2F7]">{i18n.language === 'en' ? product.name_en : product.name_bn}</p>
+                                                <p className="text-[10px] text-[#8B7355] dark:text-[#4D526A] uppercase font-bold tracking-tight">{product.brand || 'No Brand'}</p>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <span className="px-2.5 py-1 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-extrabold uppercase tracking-tight">
-                                            {product.product_type}
-                                        </span>
+                                        <div className="space-y-1">
+                                            <p className="text-xs font-mono font-bold text-[#F5A623]">{product.sku}</p>
+                                            <p className="text-xs font-bold text-[#5C4D3C] dark:text-[#8A8FA8]">৳ {product.price}</p>
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4">
-                                        <div className="flex items-center gap-2">
-                                            <div className={cn("w-1.5 h-1.5 rounded-full", product.is_active ? "bg-emerald-500" : "bg-red-500")} />
-                                            <span className="text-xs font-semibold text-[#8A8FA8]">{product.is_active ? 'Active' : 'Inactive'}</span>
+                                        <div className={cn(
+                                            "inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-tight",
+                                            product.is_active ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : "bg-red-500/10 text-red-500 border border-red-500/20"
+                                        )}>
+                                            <div className={cn("w-1 h-1 rounded-full", product.is_active ? "bg-emerald-500" : "bg-red-500")} />
+                                            {product.is_active ? 'Active' : 'Hidden'}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-center">
                                         {product.is_featured ? <Check className="text-emerald-500 mx-auto" size={18} /> : <X className="text-[#8B7355] dark:text-[#4D526A] mx-auto" size={18} />}
                                     </td>
                                     <td className="px-6 py-4">
-                                        <p className="text-xs text-[#8B7355] dark:text-[#4D526A]">May 09, 2026</p>
+                                        <span className={cn(
+                                            "text-xs font-bold",
+                                            product.stock > 10 ? "text-slate-500" : "text-amber-500"
+                                        )}>
+                                            {product.stock} pcs
+                                        </span>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={() => openEditModal(product)}
-                                                className="p-2 rounded-lg hover:bg-blue-500/10 hover:text-blue-400 transition-all text-[#8B7355] dark:text-[#4D526A]"
-                                            >
+                                            <button onClick={() => openEditModal(product)} className="p-2 rounded-lg hover:bg-amber-500/10 hover:text-amber-500 transition-all text-[#8B7355] dark:text-[#4D526A]">
                                                 <Edit2 size={16} />
                                             </button>
-                                            <button
-                                                onClick={() => handleDelete(product.id)}
-                                                className="p-2 rounded-lg hover:bg-red-500/10 hover:text-red-400 transition-all text-[#8B7355] dark:text-[#4D526A]"
-                                            >
+                                            <button onClick={() => handleDelete(product.id)} className="p-2 rounded-lg hover:bg-red-500/10 hover:text-red-400 transition-all text-[#8B7355] dark:text-[#4D526A]">
                                                 <Trash2 size={16} />
                                             </button>
                                         </div>
@@ -257,142 +322,113 @@ const Products: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
-
-                {/* Pagination */}
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    totalItems={totalItems}
-                    onPageChange={setCurrentPage}
-                />
+                <Pagination currentPage={currentPage} totalPages={totalPages} totalItems={totalItems} onPageChange={setCurrentPage} />
             </div>
 
             {/* Upsert Modal */}
             <AnimatePresence>
                 {isModalOpen && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setIsModalOpen(false)}
-                            className="absolute inset-0 bg-[#0D0F14]/80 backdrop-blur-sm"
-                        />
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="bg-[#1A1E29] border border-white/5 w-full max-w-2xl rounded-3xl overflow-hidden relative z-10 shadow-2xl"
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 overflow-y-auto">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={resetForm} className="fixed inset-0 bg-[#0D0F14]/80 backdrop-blur-sm" />
+                        <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="bg-[#1A1E29] border border-white/5 w-full max-w-4xl rounded-3xl overflow-hidden relative z-10 shadow-2xl my-auto"
                         >
                             <div className="p-6 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
                                 <h3 className="font-sora font-extrabold text-xl text-white">{editingProduct ? 'Edit Product' : 'Add New Product'}</h3>
-                                <button onClick={() => setIsModalOpen(false)} className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
-                                    <X size={20} />
-                                </button>
+                                <button onClick={resetForm} className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition-all text-white"><X size={20} /></button>
                             </div>
-                            <form onSubmit={handleUpsert} className="p-8 space-y-6">
+                            <form onSubmit={handleUpsert} className="p-8 space-y-6 max-h-[75vh] overflow-y-auto custom-scrollbar">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="md:col-span-2 flex flex-col items-center justify-center p-8 border-2 border-dashed border-white/10 rounded-2xl bg-white/5 hover:bg-white/[0.08] transition-all relative overflow-hidden group">
+                                        {previewUrl ? (
+                                            <div className="relative w-full h-48 flex items-center justify-center">
+                                                <img src={previewUrl} alt="Preview" className="h-full object-contain rounded-xl" />
+                                                <button type="button" onClick={() => { setSelectedFile(null); setPreviewUrl(null); }} className="absolute top-2 right-2 p-2 bg-red-500 rounded-lg text-white shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="text-center group">
+                                                <div className="w-16 h-16 rounded-2xl bg-[#F5A623]/20 flex items-center justify-center text-[#F5A623] mx-auto mb-4 group-hover:scale-110 transition-transform">
+                                                    <Upload size={32} />
+                                                </div>
+                                                <p className="text-sm font-bold text-white">Click to Upload Industrial View</p>
+                                                <p className="text-[10px] text-[#4D526A] mt-1 uppercase tracking-widest font-bold">Max size: 5MB (PNG, JPG)</p>
+                                            </div>
+                                        )}
+                                        <input type="file" onChange={handleFileChange} className="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" />
+                                    </div>
+
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-[#8A8FA8] uppercase tracking-wider">Name (English)</label>
-                                        <input
-                                            required
-                                            type="text"
-                                            className="w-full bg-[#13161E] border border-white/5 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#F5A623]/50 text-white transition-all"
-                                            placeholder="e.g. Copper Wire 1.5mm"
-                                            value={formData.name_en}
-                                            onChange={(e) => {
+                                        <input required type="text" className="w-full bg-[#13161E] border border-white/5 rounded-xl px-4 py-3 text-sm focus:border-[#F5A623]/50 text-white"
+                                            value={formData.name_en} onChange={(e) => {
                                                 const val = e.target.value;
-                                                setFormData({
-                                                    ...formData,
-                                                    name_en: val,
-                                                    slug: val.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '')
-                                                });
-                                            }}
-                                        />
+                                                setFormData({ ...formData, name_en: val, slug: val.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '') });
+                                            }} />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold text-[#8A8FA8] uppercase tracking-wider">Name (Bengali)</label>
-                                        <input
-                                            required
-                                            type="text"
-                                            className="w-full bg-[#13161E] border border-white/5 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#F5A623]/50 text-white transition-all"
-                                            placeholder="উদা: কপার ওয়্যার ১.৫মিমি"
-                                            value={formData.name_bn}
-                                            onChange={(e) => setFormData({ ...formData, name_bn: e.target.value })}
-                                        />
+                                        <input required type="text" className="w-full bg-[#13161E] border border-white/5 rounded-xl px-4 py-3 text-sm focus:border-[#F5A623]/50 text-white"
+                                            value={formData.name_bn} onChange={(e) => setFormData({ ...formData, name_bn: e.target.value })} />
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-[#8A8FA8] uppercase tracking-wider">Price (BDT)</label>
+                                            <input required type="number" className="w-full bg-[#13161E] border border-white/5 rounded-xl px-4 py-3 text-sm focus:border-[#F5A623]/50 text-white"
+                                                value={formData.price} onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-[#8A8FA8] uppercase tracking-wider">Stock Qty</label>
+                                            <input required type="number" className="w-full bg-[#13161E] border border-white/5 rounded-xl px-4 py-3 text-sm focus:border-[#F5A623]/50 text-white"
+                                                value={formData.stock} onChange={(e) => setFormData({ ...formData, stock: Number(e.target.value) })} />
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-[#8A8FA8] uppercase tracking-wider">SKU Code</label>
+                                            <input required type="text" className="w-full bg-[#13161E] border border-white/5 rounded-xl px-4 py-3 text-sm focus:border-[#F5A623]/50 text-[#F5A623] font-mono"
+                                                value={formData.sku} onChange={(e) => setFormData({ ...formData, sku: e.target.value })} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-bold text-[#8A8FA8] uppercase tracking-wider">Brand</label>
+                                            <input type="text" className="w-full bg-[#13161E] border border-white/5 rounded-xl px-4 py-3 text-sm focus:border-[#F5A623]/50 text-white"
+                                                value={formData.brand} onChange={(e) => setFormData({ ...formData, brand: e.target.value })} />
+                                        </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-[#8A8FA8] uppercase tracking-wider">Product Slug</label>
-                                        <input
-                                            required
-                                            type="text"
-                                            className="w-full bg-[#13161E] border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#F5A623]/50 text-[#F5A623] transition-all font-mono"
-                                            placeholder="copper-wire-15"
-                                            value={formData.slug}
-                                            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                                        />
+                                        <label className="text-xs font-bold text-[#8A8FA8] uppercase tracking-wider">Short Description (EN)</label>
+                                        <textarea className="w-full bg-[#13161E] border border-white/5 rounded-xl px-4 py-3 text-sm focus:border-[#F5A623]/50 text-white min-h-[100px]"
+                                            value={formData.short_desc_en} onChange={(e) => setFormData({ ...formData, short_desc_en: e.target.value })} />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-xs font-bold text-[#8A8FA8] uppercase tracking-wider">Product Type</label>
-                                        <select
-                                            className="w-full bg-[#13161E] border border-white/5 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#F5A623]/50 text-white transition-all appearance-none"
-                                            value={formData.product_type}
-                                            onChange={(e) => setFormData({ ...formData, product_type: e.target.value })}
-                                        >
-                                            <option value="accessory">Accessory</option>
-                                            <option value="equipment">Equipment</option>
-                                            <option value="part">Spare Part</option>
-                                        </select>
+                                        <label className="text-xs font-bold text-[#8A8FA8] uppercase tracking-wider">Short Description (BN)</label>
+                                        <textarea className="w-full bg-[#13161E] border border-white/5 rounded-xl px-4 py-3 text-sm focus:border-[#F5A623]/50 text-white min-h-[100px]"
+                                            value={formData.short_desc_bn} onChange={(e) => setFormData({ ...formData, short_desc_bn: e.target.value })} />
                                     </div>
                                 </div>
 
-                                <div className="flex items-center gap-8 py-4">
+                                <div className="flex items-center gap-8 py-4 border-t border-white/5">
                                     <label className="flex items-center gap-3 cursor-pointer group">
-                                        <div
-                                            onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
-                                            className={cn(
-                                                "w-12 h-6 rounded-full transition-all relative",
-                                                formData.is_active ? "bg-[#F5A623]" : "bg-[#4D526A]"
-                                            )}
-                                        >
-                                            <div className={cn(
-                                                "absolute top-1 w-4 h-4 rounded-full bg-white transition-all",
-                                                formData.is_active ? "right-1" : "left-1"
-                                            )} />
+                                        <div onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
+                                            className={cn("w-12 h-6 rounded-full transition-all relative", formData.is_active ? "bg-[#F5A623]" : "bg-[#4D526A]")}>
+                                            <div className={cn("absolute top-1 w-4 h-4 rounded-full bg-white transition-all", formData.is_active ? "right-1" : "left-1")} />
                                         </div>
-                                        <span className="text-sm font-bold text-[#F0F2F7]">Active in Catalog</span>
+                                        <span className="text-sm font-bold text-white">Active Catalog Status</span>
                                     </label>
-
                                     <label className="flex items-center gap-3 cursor-pointer group">
-                                        <div
-                                            onClick={() => setFormData({ ...formData, is_featured: !formData.is_featured })}
-                                            className={cn(
-                                                "w-12 h-6 rounded-full transition-all relative",
-                                                formData.is_featured ? "bg-[#F5A623]" : "bg-[#4D526A]"
-                                            )}
-                                        >
-                                            <div className={cn(
-                                                "absolute top-1 w-4 h-4 rounded-full bg-white transition-all",
-                                                formData.is_featured ? "right-1" : "left-1"
-                                            )} />
+                                        <div onClick={() => setFormData({ ...formData, is_featured: !formData.is_featured })}
+                                            className={cn("w-12 h-6 rounded-full transition-all relative", formData.is_featured ? "bg-[#F5A623]" : "bg-[#4D526A]")}>
+                                            <div className={cn("absolute top-1 w-4 h-4 rounded-full bg-white transition-all", formData.is_featured ? "right-1" : "left-1")} />
                                         </div>
-                                        <span className="text-sm font-bold text-[#F0F2F7]">Featured Product</span>
+                                        <span className="text-sm font-bold text-white">Featured Promo</span>
                                     </label>
                                 </div>
 
-                                <div className="flex items-center gap-4 pt-4 border-t border-white/5">
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsModalOpen(false)}
-                                        className="flex-1 px-6 py-3 rounded-xl bg-white/5 border border-white/5 text-sm font-bold text-[#8A8FA8] hover:bg-white/10 transition-all"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="submit"
-                                        className="flex-1 px-6 py-3 rounded-xl bg-[#F5A623] hover:bg-[#D48E1D] text-[#0D0F14] text-sm font-bold transition-all shadow-lg shadow-[#F5A623]/20"
-                                    >
-                                        {editingProduct ? 'Update Product' : 'Create Product'}
+                                <div className="flex items-center gap-4 pt-4">
+                                    <button type="button" onClick={resetForm} className="flex-1 px-6 py-3 rounded-xl bg-white/5 border border-white/5 text-sm font-bold text-[#8A8FA8] hover:bg-white/10 transition-all">Cancel</button>
+                                    <button type="submit" className="flex-1 px-6 py-3 rounded-xl bg-[#F5A623] hover:bg-[#D48E1D] text-[#0D0F14] text-sm font-bold transition-all shadow-lg shadow-[#F5A623]/20">
+                                        {editingProduct ? 'Update Industrial Asset' : 'Register New Asset'}
                                     </button>
                                 </div>
                             </form>

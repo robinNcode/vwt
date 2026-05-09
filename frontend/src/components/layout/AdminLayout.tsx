@@ -15,7 +15,12 @@ import {
     LogOut,
     ChevronRight,
     Search,
-    FileSearch
+    FileSearch,
+    ChevronDown,
+    DollarSign,
+    TrendingUp,
+    CreditCard,
+    Briefcase
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,8 +30,16 @@ import { useTranslation } from 'react-i18next';
 import finalLogo from '@/assets/images/final_logo.png';
 import finalIcon from '@/assets/images/final_icon.png';
 
+interface MenuItem {
+    icon: any;
+    label: string;
+    path: string;
+    subItems?: { label: string; path: string; icon: any }[];
+}
+
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
     const location = useLocation();
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
@@ -36,20 +49,39 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         i18n.changeLanguage(newLang);
     };
 
-    const menuItems = [
+    const menuItems: MenuItem[] = [
         { icon: LayoutDashboard, label: t('admin_nav.dashboard'), path: '/admin/dashboard' },
         { icon: Package, label: t('admin_nav.products'), path: '/admin/products' },
         { icon: Wrench, label: t('admin_nav.services'), path: '/admin/services' },
         { icon: ShoppingCart, label: t('admin_nav.orders'), path: '/admin/orders' },
         { icon: FileSearch, label: t('admin_nav.quotations'), path: '/admin/quotations' },
         { icon: FileText, label: t('admin_nav.invoices'), path: '/admin/invoices' },
-        { icon: BarChart3, label: t('admin_nav.accounting'), path: '/admin/reports' },
+        {
+            icon: BarChart3,
+            label: t('admin_nav.accounting'),
+            path: '/admin/reports',
+            subItems: [
+                { icon: TrendingUp, label: t('admin_nav.accounting_sales'), path: '/admin/accounting-sales' },
+                { icon: ShoppingCart, label: t('admin_nav.accounting_purchases'), path: '/admin/accounting-purchases' },
+                { icon: CreditCard, label: t('admin_nav.accounting_expenses'), path: '/admin/accounting-expenses' },
+                { icon: Briefcase, label: t('admin_nav.accounting_revenue'), path: '/admin/accounting-revenues' },
+            ]
+        },
         { icon: SettingsIcon, label: t('admin_nav.settings'), path: '/admin/settings' },
     ];
 
     const handleLogout = () => {
         authService.logout();
         navigate('/login');
+    };
+
+    const toggleSubmenu = (label: string) => {
+        if (openSubmenu === label) {
+            setOpenSubmenu(null);
+        } else {
+            setOpenSubmenu(label);
+            if (!isSidebarOpen) setIsSidebarOpen(true);
+        }
     };
 
     return (
@@ -62,17 +94,67 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 )}
             >
                 <div className="p-6 flex items-center gap-3">
-                    {isSidebarOpen && (
-                        <img src={finalLogo} alt="Logo" className="w-full h-full object-cover" />
-                    )}
-                    {!isSidebarOpen && (
-                        <img src={finalIcon} alt="Logo" className="w-full h-full object-cover" />
-                    )}
+                    <img src={isSidebarOpen ? finalLogo : finalIcon} alt="Logo" className={cn("object-cover", isSidebarOpen ? "w-full h-full" : "w-8 h-8 mx-auto")} />
                 </div>
 
-                <nav className="mt-6 px-3 flex flex-col gap-1 text-slate-900 dark:text-white">
+                <nav className="mt-6 px-3 flex flex-col gap-1 text-slate-900 dark:text-white overflow-y-auto max-h-[calc(100vh-200px)] custom-scrollbar">
                     {menuItems.map((item) => {
-                        const isActive = location.pathname === item.path;
+                        const isActive = location.pathname === item.path || (item.subItems?.some(s => location.pathname === s.path));
+                        const isSubmenuOpen = openSubmenu === item.label;
+
+                        if (item.subItems) {
+                            return (
+                                <div key={item.label} className="flex flex-col gap-1">
+                                    <button
+                                        onClick={() => toggleSubmenu(item.label)}
+                                        className={cn(
+                                            "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all group",
+                                            isActive
+                                                ? "bg-[#F5A623]/10 border border-[#F5A623]/20 text-[#F5A623]"
+                                                : "text-slate-500 dark:text-[#8A8FA8] hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-[#F0F2F7]"
+                                        )}
+                                    >
+                                        <item.icon className={cn("shrink-0", isActive ? "text-[#F5A623]" : "group-hover:text-slate-900 dark:group-hover:text-[#F0F2F7]")} size={20} />
+                                        {isSidebarOpen && (
+                                            <>
+                                                <span className="text-sm font-semibold">{item.label}</span>
+                                                <ChevronDown size={14} className={cn("ml-auto transition-transform", isSubmenuOpen && "rotate-180")} />
+                                            </>
+                                        )}
+                                    </button>
+                                    <AnimatePresence>
+                                        {isSubmenuOpen && isSidebarOpen && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: 'auto', opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                className="overflow-hidden flex flex-col gap-1 ml-4"
+                                            >
+                                                {item.subItems.map((sub) => {
+                                                    const isSubActive = location.pathname === sub.path;
+                                                    return (
+                                                        <Link
+                                                            key={sub.path}
+                                                            to={sub.path}
+                                                            className={cn(
+                                                                "flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all text-sm font-medium",
+                                                                isSubActive
+                                                                    ? "text-[#F5A623] bg-[#F5A623]/5"
+                                                                    : "text-slate-400 dark:text-[#41475E] hover:text-slate-900 dark:hover:text-white"
+                                                            )}
+                                                        >
+                                                            <sub.icon size={16} />
+                                                            <span>{sub.label}</span>
+                                                        </Link>
+                                                    );
+                                                })}
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            );
+                        }
+
                         return (
                             <Link
                                 key={item.path}

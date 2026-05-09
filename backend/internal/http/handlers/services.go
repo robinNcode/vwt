@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/robinncode/vwt/internal/http/response"
@@ -30,19 +31,19 @@ func (h *ServicesHandler) List(c *gin.Context) {
 }
 
 type serviceUpsertReq struct {
-	NameBN        string   `json:"name_bn"`
-	NameEN        string   `json:"name_en"`
-	Slug          string   `json:"slug"`
-	DescriptionBN *string  `json:"description_bn"`
-	DescriptionEN *string  `json:"description_en"`
-	Price         *float64 `json:"price"`
-	IsActive      bool     `json:"is_active"`
-	SortOrder     int      `json:"sort_order"`
+	NameBN        string   `form:"name_bn"`
+	NameEN        string   `form:"name_en"`
+	Slug          string   `form:"slug"`
+	DescriptionBN *string  `form:"description_bn"`
+	DescriptionEN *string  `form:"description_en"`
+	Price         *float64 `form:"price"`
+	IsActive      bool     `form:"is_active"`
+	SortOrder     int      `form:"sort_order"`
 }
 
 func (h *ServicesHandler) Create(c *gin.Context) {
 	var req serviceUpsertReq
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		response.Fail(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
@@ -62,6 +63,18 @@ func (h *ServicesHandler) Create(c *gin.Context) {
 		IsActive:      req.IsActive,
 		SortOrder:     req.SortOrder,
 	}
+
+	// Handle Image Upload
+	file, _ := c.FormFile("image")
+	if file != nil {
+		filename := "service_" + strconv.FormatInt(time.Now().Unix(), 10) + "_" + file.Filename
+		filepath := "public/uploads/services/" + filename
+		if err := c.SaveUploadedFile(file, filepath); err == nil {
+			url := "/" + filepath
+			s.ImageURL = &url
+		}
+	}
+
 	if err := h.svc.CreateService(&s); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to create service", nil)
 		return
@@ -77,7 +90,7 @@ func (h *ServicesHandler) Update(c *gin.Context) {
 	}
 
 	var req serviceUpsertReq
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		response.Fail(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
@@ -102,6 +115,17 @@ func (h *ServicesHandler) Update(c *gin.Context) {
 	s.Price = req.Price
 	s.IsActive = req.IsActive
 	s.SortOrder = req.SortOrder
+
+	// Handle Image Upload Replace
+	file, _ := c.FormFile("image")
+	if file != nil {
+		filename := "service_" + strconv.FormatInt(time.Now().Unix(), 10) + "_" + file.Filename
+		filepath := "public/uploads/services/" + filename
+		if err := c.SaveUploadedFile(file, filepath); err == nil {
+			url := "/" + filepath
+			s.ImageURL = &url
+		}
+	}
 
 	if err := h.svc.UpdateService(s); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to update service", nil)

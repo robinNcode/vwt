@@ -19,6 +19,10 @@ import AdminInvoices from './pages/admin/Invoices'
 import AdminQuotations from './pages/admin/Quotations'
 import AdminReports from './pages/admin/Reports'
 import AdminSettings from './pages/admin/Settings'
+import AdminSales from './pages/admin/Sales'
+import AdminPurchases from './pages/admin/Purchases'
+import AdminExpenses from './pages/admin/Expenses'
+import AdminServiceRevenues from './pages/admin/ServiceRevenues'
 
 function App() {
     return (
@@ -70,6 +74,10 @@ function App() {
                     <Route path="/admin/quotations" element={<AdminLayout children={<AdminQuotations />} />} />
                     <Route path="/admin/reports" element={<AdminLayout children={<AdminReports />} />} />
                     <Route path="/admin/settings" element={<AdminLayout children={<AdminSettings />} />} />
+                    <Route path="/admin/accounting/sales" element={<AdminLayout children={<AdminSales />} />} />
+                    <Route path="/admin/accounting/purchases" element={<AdminLayout children={<AdminPurchases />} />} />
+                    <Route path="/admin/accounting/expenses" element={<AdminLayout children={<AdminExpenses />} />} />
+                    <Route path="/admin/accounting/service-revenues" element={<AdminLayout children={<AdminServiceRevenues />} />} />
                 </Routes>
             </Suspense>
         </Router>
