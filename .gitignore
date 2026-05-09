@@ -3,3 +3,4 @@ frontend/web/node_modules/
 .idea/
 frontend/backup/
 frontend/.next/
+frontend/vwt-frontend/node_modules/

@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/robinncode/vwt/migrations/models"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/mysql"
@@ -14,6 +15,11 @@ import (
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Printf("warning: could not load .env file: %v", err)
+	}
+
 	dsn := buildDSN()
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Warn),

@@ -1,0 +1,15 @@
+{
+    "nav": {
+        "home": "Home",
+        "products": "Products",
+        "services": "Services",
+        "about": "About",
+        "contact": "Contact"
+    },
+    "hero": {
+        "title": "Welcome to Volt Wave Tech",
+        "subtitle": "Your destination for electronics and power solutions. We ensure quality products and services.",
+        "cta_products": "View Products",
+        "cta_services": "Book Services"
+    }
+}

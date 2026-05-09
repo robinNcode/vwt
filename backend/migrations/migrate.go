@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/robinncode/vwt/migrations/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -12,6 +13,11 @@ import (
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Printf("warning: could not load .env file: %v", err)
+	}
+
 	dsn := buildDSN()
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
@@ -82,12 +88,6 @@ func main() {
 	)
 	if err != nil {
 		log.Fatalf("auto-migrate failed: %v", err)
-	}
-
-	// Many-to-many join table for role_permission_map
-	err = db.SetupJoinTable(&models.Role{}, "Permissions", &models.Permission{})
-	if err != nil {
-		log.Printf("warning: could not set up join table: %v", err)
 	}
 
 	fmt.Println("✅ Migrations completed successfully.")
