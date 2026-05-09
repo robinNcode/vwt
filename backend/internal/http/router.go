@@ -29,25 +29,49 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	r.GET("/", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"message": "Volt Wave Tech API"}) })
 	r.GET("/health", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"ok": true}) })
 
+	// Serve Static Files
+	r.Static("/uploads", "./public/uploads")
+
 	v1 := r.Group("/api/v1")
 
 	authH := handlers.NewAuthHandler(cfg, db)
 	productRepo := repository.NewProductRepository(db)
 	productSvc := service.NewProductService(productRepo)
 	productsH := handlers.NewProductsHandler(productSvc)
-	servicesH := handlers.NewServicesHandler(db)
-	ordersH := handlers.NewOrdersHandler(db)
-	invoicesH := handlers.NewInvoicesHandler(db)
-	settingsH := handlers.NewSettingsHandler(db)
-	quotationsH := handlers.NewQuotationsHandler(db)
-	contactsH := handlers.NewContactsHandler(db)
-	accountingH := handlers.NewAccountingHandler(db)
+
+	serviceRepo := repository.NewServiceRepository(db)
+	serviceSvc := service.NewServiceService(serviceRepo)
+	servicesH := handlers.NewServicesHandler(serviceSvc)
+
+	contactRepo := repository.NewContactRepository(db)
+	contactSvc := service.NewContactService(contactRepo)
+	contactsH := handlers.NewContactsHandler(contactSvc)
+
+	settingRepo := repository.NewSettingRepository(db)
+	settingSvc := service.NewSettingService(settingRepo)
+	settingsH := handlers.NewSettingsHandler(settingSvc)
+
+	orderRepo := repository.NewOrderRepository(db)
+	orderSvc := service.NewOrderService(orderRepo)
+	ordersH := handlers.NewOrdersHandler(orderSvc)
+
+	quotationRepo := repository.NewQuotationRepository(db)
+	quotationSvc := service.NewQuotationService(quotationRepo)
+	quotationsH := handlers.NewQuotationsHandler(quotationSvc)
+
+	invoiceRepo := repository.NewInvoiceRepository(db)
+	invoiceSvc := service.NewInvoiceService(invoiceRepo)
+	invoicesH := handlers.NewInvoicesHandler(invoiceSvc)
+
+	accountingRepo := repository.NewAccountingRepository(db)
+	accountingSvc := service.NewAccountingService(accountingRepo)
+	accountingH := handlers.NewAccountingHandler(accountingSvc)
 
 	v1.POST("/auth/login", authH.AdminLogin)
 	v1.POST("/auth/customers/register", authH.CustomerRegister)
 
 	// Public reads
-	v1.GET("/products", productsH.List)
+	v1.GET("/products", productsH.ListPublic)
 	v1.GET("/services", servicesH.List)
 	v1.GET("/orders/track/:id", ordersH.TrackByNumber)
 	v1.GET("/orders/:id", ordersH.GetByID)
@@ -59,6 +83,7 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	admin := v1.Group("")
 	admin.Use(middleware.RequireAuth(cfg), middleware.RequireAdmin())
 
+	admin.GET("/products", productsH.List)
 	admin.POST("/products", productsH.Create)
 	admin.PUT("/products/:id", productsH.Update)
 	admin.DELETE("/products/:id", productsH.Delete)

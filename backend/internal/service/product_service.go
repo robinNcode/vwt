@@ -7,6 +7,7 @@ import (
 
 type ProductService interface {
 	ListProducts(search string) ([]models.Product, error)
+	ListPublicProducts(search string) ([]models.Product, error)
 	CreateProduct(p *models.Product) error
 	GetProductByID(id uint) (*models.Product, error)
 	UpdateProduct(p *models.Product) error
@@ -23,6 +24,10 @@ func NewProductService(repo repository.ProductRepository) ProductService {
 
 func (s *productService) ListProducts(search string) ([]models.Product, error) {
 	return s.repo.List(search)
+}
+
+func (s *productService) ListPublicProducts(search string) ([]models.Product, error) {
+	return s.repo.ListPublic(search)
 }
 
 func (s *productService) CreateProduct(p *models.Product) error {

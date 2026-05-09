@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/robinncode/vwt/internal/http/response"
@@ -29,19 +30,39 @@ func (h *ProductsHandler) List(c *gin.Context) {
 	response.OK(c, "Products fetched successfully", out)
 }
 
+func (h *ProductsHandler) ListPublic(c *gin.Context) {
+	s := strings.TrimSpace(c.Query("search"))
+	out, err := h.svc.ListPublicProducts(s)
+	if err != nil {
+		response.Fail(c, http.StatusInternalServerError, "Failed to fetch public products", nil)
+		return
+	}
+	response.OK(c, "Products fetched successfully", out)
+}
+
 type productUpsertReq struct {
-	CategoryID  uint   `json:"category_id"`
-	ProductType string `json:"product_type"`
-	NameBN      string `json:"name_bn"`
-	NameEN      string `json:"name_en"`
-	Slug        string `json:"slug"`
-	IsActive    bool   `json:"is_active"`
-	IsFeatured  bool   `json:"is_featured"`
+	CategoryID    uint    `form:"category_id"`
+	ProductType   string  `form:"product_type"`
+	NameBN        string  `form:"name_bn"`
+	NameEN        string  `form:"name_en"`
+	Slug          string  `form:"slug"`
+	SKU           string  `form:"sku"`
+	Price         float64 `form:"price"`
+	Stock         int     `form:"stock"`
+	ShortDescBN   *string `form:"short_desc_bn"`
+	ShortDescEN   *string `form:"short_desc_en"`
+	DescriptionBN *string `form:"description_bn"`
+	DescriptionEN *string `form:"description_en"`
+	Brand         *string `form:"brand"`
+	ModelNumber   *string `form:"model_number"`
+	Manufacturer  *string `form:"manufacturer"`
+	IsActive      bool    `form:"is_active"`
+	IsFeatured    bool    `form:"is_featured"`
 }
 
 func (h *ProductsHandler) Create(c *gin.Context) {
 	var req productUpsertReq
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		response.Fail(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
@@ -52,14 +73,35 @@ func (h *ProductsHandler) Create(c *gin.Context) {
 	}
 
 	p := models.Product{
-		CategoryID:  req.CategoryID,
-		ProductType: req.ProductType,
-		NameBN:      req.NameBN,
-		NameEN:      req.NameEN,
-		Slug:        req.Slug,
-		IsActive:    req.IsActive,
-		IsFeatured:  req.IsFeatured,
+		CategoryID:    req.CategoryID,
+		ProductType:   req.ProductType,
+		NameBN:        req.NameBN,
+		NameEN:        req.NameEN,
+		Slug:          req.Slug,
+		SKU:           req.SKU,
+		Price:         req.Price,
+		Stock:         req.Stock,
+		ShortDescBN:   req.ShortDescBN,
+		ShortDescEN:   req.ShortDescEN,
+		DescriptionBN: req.DescriptionBN,
+		DescriptionEN: req.DescriptionEN,
+		Brand:         req.Brand,
+		ModelNumber:   req.ModelNumber,
+		Manufacturer:  req.Manufacturer,
+		IsActive:      req.IsActive,
+		IsFeatured:    req.IsFeatured,
 	}
+
+	// Handle Image Upload
+	file, _ := c.FormFile("image")
+	if file != nil {
+		filename := "product_" + strconv.FormatInt(time.Now().Unix(), 10) + "_" + file.Filename
+		filepath := "public/uploads/products/" + filename
+		if err := c.SaveUploadedFile(file, filepath); err == nil {
+			p.Images = []models.ProductImage{{URL: "/" + filepath, IsPrimary: true}}
+		}
+	}
+
 	if err := h.svc.CreateProduct(&p); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to create product", nil)
 		return
@@ -75,7 +117,7 @@ func (h *ProductsHandler) Update(c *gin.Context) {
 	}
 
 	var req productUpsertReq
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		response.Fail(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
@@ -93,13 +135,38 @@ func (h *ProductsHandler) Update(c *gin.Context) {
 		return
 	}
 
+	// Update fields
 	p.CategoryID = req.CategoryID
 	p.ProductType = req.ProductType
 	p.NameBN = req.NameBN
 	p.NameEN = req.NameEN
 	p.Slug = req.Slug
+	p.SKU = req.SKU
+	p.Price = req.Price
+	p.Stock = req.Stock
+	p.ShortDescBN = req.ShortDescBN
+	p.ShortDescEN = req.ShortDescEN
+	p.DescriptionBN = req.DescriptionBN
+	p.DescriptionEN = req.DescriptionEN
+	p.Brand = req.Brand
+	p.ModelNumber = req.ModelNumber
+	p.Manufacturer = req.Manufacturer
 	p.IsActive = req.IsActive
 	p.IsFeatured = req.IsFeatured
+
+	// Handle Image Upload Replace
+	file, _ := c.FormFile("image")
+	if file != nil {
+		filename := "product_" + strconv.FormatInt(time.Now().Unix(), 10) + "_" + file.Filename
+		filepath := "public/uploads/products/" + filename
+		if err := c.SaveUploadedFile(file, filepath); err == nil {
+			if len(p.Images) > 0 {
+				p.Images[0].URL = "/" + filepath
+			} else {
+				p.Images = []models.ProductImage{{URL: "/" + filepath, IsPrimary: true, ProductID: p.ID}}
+			}
+		}
+	}
 
 	if err := h.svc.UpdateProduct(p); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to update product", nil)

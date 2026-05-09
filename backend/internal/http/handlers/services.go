@@ -8,23 +8,21 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/robinncode/vwt/internal/http/response"
 	"github.com/robinncode/vwt/internal/models"
-	"gorm.io/gorm"
+	"github.com/robinncode/vwt/internal/service"
 )
 
 type ServicesHandler struct {
-	db *gorm.DB
+	svc service.ServiceService
 }
 
-func NewServicesHandler(db *gorm.DB) *ServicesHandler { return &ServicesHandler{db: db} }
+func NewServicesHandler(svc service.ServiceService) *ServicesHandler {
+	return &ServicesHandler{svc: svc}
+}
 
 func (h *ServicesHandler) List(c *gin.Context) {
-	var out []models.Service
-	q := h.db.Where("deleted_at IS NULL")
-	if s := strings.TrimSpace(c.Query("search")); s != "" {
-		like := "%" + s + "%"
-		q = q.Where("name_bn LIKE ? OR name_en LIKE ? OR slug LIKE ?", like, like, like)
-	}
-	if err := q.Order("sort_order ASC, id DESC").Find(&out).Error; err != nil {
+	s := strings.TrimSpace(c.Query("search"))
+	out, err := h.svc.ListServices(s)
+	if err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to fetch services", nil)
 		return
 	}
@@ -32,12 +30,14 @@ func (h *ServicesHandler) List(c *gin.Context) {
 }
 
 type serviceUpsertReq struct {
-	NameBN    string   `json:"name_bn"`
-	NameEN    string   `json:"name_en"`
-	Slug      string   `json:"slug"`
-	Price     *float64 `json:"price"`
-	IsActive  bool     `json:"is_active"`
-	SortOrder int      `json:"sort_order"`
+	NameBN        string   `json:"name_bn"`
+	NameEN        string   `json:"name_en"`
+	Slug          string   `json:"slug"`
+	DescriptionBN *string  `json:"description_bn"`
+	DescriptionEN *string  `json:"description_en"`
+	Price         *float64 `json:"price"`
+	IsActive      bool     `json:"is_active"`
+	SortOrder     int      `json:"sort_order"`
 }
 
 func (h *ServicesHandler) Create(c *gin.Context) {
@@ -52,19 +52,21 @@ func (h *ServicesHandler) Create(c *gin.Context) {
 		return
 	}
 
-	svc := models.Service{
-		NameBN:    req.NameBN,
-		NameEN:    req.NameEN,
-		Slug:      req.Slug,
-		Price:     req.Price,
-		IsActive:  req.IsActive,
-		SortOrder: req.SortOrder,
+	s := models.Service{
+		NameBN:        req.NameBN,
+		NameEN:        req.NameEN,
+		Slug:          req.Slug,
+		DescriptionBN: req.DescriptionBN,
+		DescriptionEN: req.DescriptionEN,
+		Price:         req.Price,
+		IsActive:      req.IsActive,
+		SortOrder:     req.SortOrder,
 	}
-	if err := h.db.Create(&svc).Error; err != nil {
+	if err := h.svc.CreateService(&s); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to create service", nil)
 		return
 	}
-	response.Created(c, "Service created successfully", svc)
+	response.Created(c, "Service created successfully", s)
 }
 
 func (h *ServicesHandler) Update(c *gin.Context) {
@@ -80,8 +82,8 @@ func (h *ServicesHandler) Update(c *gin.Context) {
 		return
 	}
 
-	var svc models.Service
-	if err := h.db.Where("id = ? AND deleted_at IS NULL", uint(id64)).First(&svc).Error; err != nil {
+	s, err := h.svc.GetServiceByID(uint(id64))
+	if err != nil || s == nil {
 		response.Fail(c, http.StatusNotFound, "Service not found", nil)
 		return
 	}
@@ -92,18 +94,20 @@ func (h *ServicesHandler) Update(c *gin.Context) {
 		return
 	}
 
-	svc.NameBN = req.NameBN
-	svc.NameEN = req.NameEN
-	svc.Slug = req.Slug
-	svc.Price = req.Price
-	svc.IsActive = req.IsActive
-	svc.SortOrder = req.SortOrder
+	s.NameBN = req.NameBN
+	s.NameEN = req.NameEN
+	s.Slug = req.Slug
+	s.DescriptionBN = req.DescriptionBN
+	s.DescriptionEN = req.DescriptionEN
+	s.Price = req.Price
+	s.IsActive = req.IsActive
+	s.SortOrder = req.SortOrder
 
-	if err := h.db.Save(&svc).Error; err != nil {
+	if err := h.svc.UpdateService(s); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to update service", nil)
 		return
 	}
-	response.OK(c, "Service updated successfully", svc)
+	response.OK(c, "Service updated successfully", s)
 }
 
 func (h *ServicesHandler) Delete(c *gin.Context) {
@@ -112,8 +116,7 @@ func (h *ServicesHandler) Delete(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "Invalid id", nil)
 		return
 	}
-
-	if err := h.db.Where("id = ? AND deleted_at IS NULL", uint(id64)).Delete(&models.Service{}).Error; err != nil {
+	if err := h.svc.DeleteService(uint(id64)); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to delete service", nil)
 		return
 	}

@@ -4,31 +4,32 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/robinncode/vwt/internal/http/response"
 	"github.com/robinncode/vwt/internal/models"
-	"gorm.io/gorm"
+	"github.com/robinncode/vwt/internal/service"
 )
 
 type ContactsHandler struct {
-	db *gorm.DB
+	svc service.ContactService
 }
 
-func NewContactsHandler(db *gorm.DB) *ContactsHandler { return &ContactsHandler{db: db} }
+func NewContactsHandler(svc service.ContactService) *ContactsHandler {
+	return &ContactsHandler{svc: svc}
+}
 
 type contactCreateReq struct {
-	Name    string  `json:"name"`
-	Email   string  `json:"email"`
-	Phone   *string `json:"phone"`
-	Subject *string `json:"subject"`
-	Message string  `json:"message"`
+	Name    string  `form:"name" json:"name"`
+	Email   string  `form:"email" json:"email"`
+	Phone   *string `form:"phone" json:"phone"`
+	Subject *string `form:"subject" json:"subject"`
+	Message string  `form:"message" json:"message"`
 }
 
 func (h *ContactsHandler) Create(c *gin.Context) {
 	var req contactCreateReq
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := c.ShouldBind(&req); err != nil {
 		response.Fail(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
@@ -48,7 +49,7 @@ func (h *ContactsHandler) Create(c *gin.Context) {
 		Message: req.Message,
 		IsRead:  false,
 	}
-	if err := h.db.Create(&msg).Error; err != nil {
+	if err := h.svc.CreateMessage(&msg); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to submit message", nil)
 		return
 	}
@@ -56,8 +57,9 @@ func (h *ContactsHandler) Create(c *gin.Context) {
 }
 
 func (h *ContactsHandler) List(c *gin.Context) {
-	var out []models.ContactMessage
-	if err := h.db.Order("id DESC").Find(&out).Error; err != nil {
+	s := strings.TrimSpace(c.Query("search"))
+	out, err := h.svc.ListMessages(s)
+	if err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to fetch messages", nil)
 		return
 	}
@@ -70,12 +72,8 @@ func (h *ContactsHandler) MarkRead(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "Invalid id", nil)
 		return
 	}
-	now := time.Now()
-	updates := map[string]interface{}{
-		"is_read":    true,
-		"replied_at": &now,
-	}
-	if err := h.db.Model(&models.ContactMessage{}).Where("id = ?", uint(id64)).Updates(updates).Error; err != nil {
+
+	if err := h.svc.MarkAsRead(uint(id64)); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to update message", nil)
 		return
 	}

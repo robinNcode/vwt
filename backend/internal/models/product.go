@@ -75,6 +75,9 @@ type Product struct {
 	NameBN         string         `gorm:"column:name_bn;size:300;not null" json:"name_bn"`
 	NameEN         string         `gorm:"column:name_en;size:300;not null" json:"name_en"`
 	Slug           string         `gorm:"size:320;not null;uniqueIndex" json:"slug"`
+	SKU            string         `gorm:"size:100;uniqueIndex" json:"sku"`
+	Price          float64        `gorm:"not null;default:0" json:"price"`
+	Stock          int            `gorm:"not null;default:0" json:"stock"`
 	ShortDescBN    *string        `gorm:"column:short_desc_bn;type:text" json:"short_desc_bn,omitempty"`
 	ShortDescEN    *string        `gorm:"column:short_desc_en;type:text" json:"short_desc_en,omitempty"`
 	DescriptionBN  *string        `gorm:"column:description_bn;type:longtext" json:"description_bn,omitempty"`

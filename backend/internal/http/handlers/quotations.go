@@ -8,14 +8,16 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/robinncode/vwt/internal/http/response"
 	"github.com/robinncode/vwt/internal/models"
-	"gorm.io/gorm"
+	"github.com/robinncode/vwt/internal/service"
 )
 
 type QuotationsHandler struct {
-	db *gorm.DB
+	svc service.QuotationService
 }
 
-func NewQuotationsHandler(db *gorm.DB) *QuotationsHandler { return &QuotationsHandler{db: db} }
+func NewQuotationsHandler(svc service.QuotationService) *QuotationsHandler {
+	return &QuotationsHandler{svc: svc}
+}
 
 type quotationCreateReq struct {
 	CustomerName  *string `json:"customer_name"`
@@ -42,53 +44,38 @@ func (h *QuotationsHandler) Create(c *gin.Context) {
 		return
 	}
 
-	var created models.Quotation
-	txErr := h.db.Transaction(func(tx *gorm.DB) error {
-		q := models.Quotation{
-			CustomerName:  req.CustomerName,
-			CustomerEmail: req.CustomerEmail,
-			CustomerPhone: req.CustomerPhone,
-			Notes:         req.Notes,
-			Status:        "draft",
-		}
-		if err := tx.Create(&q).Error; err != nil {
-			return err
-		}
+	q := models.Quotation{
+		CustomerName:  req.CustomerName,
+		CustomerEmail: req.CustomerEmail,
+		CustomerPhone: req.CustomerPhone,
+		Notes:         req.Notes,
+	}
 
-		items := make([]models.QuotationItem, 0, len(req.Items))
-		for _, it := range req.Items {
-			if strings.TrimSpace(it.ProductNameEN) == "" || strings.TrimSpace(it.SKU) == "" || it.Quantity <= 0 {
-				return errBad("Invalid quotation item")
-			}
-			items = append(items, models.QuotationItem{
-				QuotationID:   q.ID,
-				VariantID:     it.VariantID,
-				ProductNameEN: strings.TrimSpace(it.ProductNameEN),
-				SKU:           strings.TrimSpace(it.SKU),
-				UnitPrice:     it.UnitPrice,
-				Quantity:      it.Quantity,
-				LineTotal:     it.UnitPrice * float64(it.Quantity),
-			})
+	for _, it := range req.Items {
+		if strings.TrimSpace(it.ProductNameEN) == "" || strings.TrimSpace(it.SKU) == "" || it.Quantity <= 0 {
+			response.Fail(c, http.StatusBadRequest, "Invalid quotation item", nil)
+			return
 		}
-		if err := tx.Create(&items).Error; err != nil {
-			return err
-		}
+		q.Items = append(q.Items, models.QuotationItem{
+			VariantID:     it.VariantID,
+			ProductNameEN: strings.TrimSpace(it.ProductNameEN),
+			SKU:           strings.TrimSpace(it.SKU),
+			UnitPrice:     it.UnitPrice,
+			Quantity:      it.Quantity,
+			LineTotal:     it.UnitPrice * float64(it.Quantity),
+		})
+	}
 
-		if err := tx.Preload("Items").First(&created, q.ID).Error; err != nil {
-			return err
-		}
-		return nil
-	})
-	if txErr != nil {
-		response.Fail(c, http.StatusInternalServerError, "Failed to create quotation", txErr.Error())
+	if err := h.svc.RequestQuotation(&q); err != nil {
+		response.Fail(c, http.StatusInternalServerError, "Failed to create quotation", err.Error())
 		return
 	}
-	response.Created(c, "Quotation created successfully", created)
+	response.Created(c, "Quotation created successfully", q)
 }
 
 func (h *QuotationsHandler) List(c *gin.Context) {
-	var out []models.Quotation
-	if err := h.db.Preload("Items").Order("id DESC").Find(&out).Error; err != nil {
+	out, err := h.svc.ListQuotations()
+	if err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to fetch quotations", nil)
 		return
 	}
@@ -108,21 +95,15 @@ func (h *QuotationsHandler) UpdateStatus(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
-	req.Status = strings.TrimSpace(strings.ToLower(req.Status))
-	if req.Status == "" {
+	st := strings.TrimSpace(strings.ToLower(req.Status))
+	if st == "" {
 		response.Fail(c, http.StatusBadRequest, "status is required", nil)
 		return
 	}
 
-	var q models.Quotation
-	if err := h.db.First(&q, uint(id64)).Error; err != nil {
-		response.Fail(c, http.StatusNotFound, "Quotation not found", nil)
-		return
-	}
-	q.Status = req.Status
-	if err := h.db.Save(&q).Error; err != nil {
+	if err := h.svc.UpdateQuotationStatus(uint(id64), st); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to update quotation", nil)
 		return
 	}
-	response.OK(c, "Quotation updated successfully", q)
+	response.OK(c, "Quotation updated successfully", gin.H{"id": uint(id64), "status": st})
 }

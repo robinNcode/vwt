@@ -6,25 +6,25 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/robinncode/vwt/internal/http/response"
 	"github.com/robinncode/vwt/internal/models"
-	"gorm.io/gorm"
+	"github.com/robinncode/vwt/internal/service"
 )
 
 type AccountingHandler struct {
-	db *gorm.DB
+	svc service.AccountingService
 }
 
-func NewAccountingHandler(db *gorm.DB) *AccountingHandler {
-	return &AccountingHandler{db: db}
+func NewAccountingHandler(svc service.AccountingService) *AccountingHandler {
+	return &AccountingHandler{svc: svc}
 }
 
 // Sales
 func (h *AccountingHandler) ListSales(c *gin.Context) {
-	var sales []models.AccountingSale
-	if err := h.db.Order("date DESC").Find(&sales).Error; err != nil {
+	out, err := h.svc.ListSales()
+	if err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to fetch sales", nil)
 		return
 	}
-	response.OK(c, "Sales fetched", sales)
+	response.OK(c, "Sales fetched", out)
 }
 
 func (h *AccountingHandler) CreateSale(c *gin.Context) {
@@ -33,7 +33,7 @@ func (h *AccountingHandler) CreateSale(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
-	if err := h.db.Create(&s).Error; err != nil {
+	if err := h.svc.CreateSale(&s); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Create failed", err.Error())
 		return
 	}
@@ -42,12 +42,12 @@ func (h *AccountingHandler) CreateSale(c *gin.Context) {
 
 // Purchases
 func (h *AccountingHandler) ListPurchases(c *gin.Context) {
-	var purchases []models.AccountingPurchase
-	if err := h.db.Order("date DESC").Find(&purchases).Error; err != nil {
+	out, err := h.svc.ListPurchases()
+	if err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to fetch purchases", nil)
 		return
 	}
-	response.OK(c, "Purchases fetched", purchases)
+	response.OK(c, "Purchases fetched", out)
 }
 
 func (h *AccountingHandler) CreatePurchase(c *gin.Context) {
@@ -56,7 +56,7 @@ func (h *AccountingHandler) CreatePurchase(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
-	if err := h.db.Create(&p).Error; err != nil {
+	if err := h.svc.CreatePurchase(&p); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Create failed", err.Error())
 		return
 	}
@@ -65,12 +65,12 @@ func (h *AccountingHandler) CreatePurchase(c *gin.Context) {
 
 // Expenses
 func (h *AccountingHandler) ListExpenses(c *gin.Context) {
-	var expenses []models.AccountingExpense
-	if err := h.db.Order("date DESC").Find(&expenses).Error; err != nil {
+	out, err := h.svc.ListExpenses()
+	if err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed fetch expenses", nil)
 		return
 	}
-	response.OK(c, "Expenses fetched", expenses)
+	response.OK(c, "Expenses fetched", out)
 }
 
 func (h *AccountingHandler) CreateExpense(c *gin.Context) {
@@ -79,7 +79,7 @@ func (h *AccountingHandler) CreateExpense(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
-	if err := h.db.Create(&e).Error; err != nil {
+	if err := h.svc.CreateExpense(&e); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Create failed", err.Error())
 		return
 	}
@@ -88,12 +88,12 @@ func (h *AccountingHandler) CreateExpense(c *gin.Context) {
 
 // Service Revenue
 func (h *AccountingHandler) ListServiceRevenues(c *gin.Context) {
-	var revs []models.AccountingServiceRevenue
-	if err := h.db.Order("date DESC").Find(&revs).Error; err != nil {
+	out, err := h.svc.ListServiceRevenues()
+	if err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to fetch service revenues", nil)
 		return
 	}
-	response.OK(c, "Service revenues fetched", revs)
+	response.OK(c, "Service revenues fetched", out)
 }
 
 func (h *AccountingHandler) CreateServiceRevenue(c *gin.Context) {
@@ -102,7 +102,7 @@ func (h *AccountingHandler) CreateServiceRevenue(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
-	if err := h.db.Create(&r).Error; err != nil {
+	if err := h.svc.CreateServiceRevenue(&r); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Create failed", err.Error())
 		return
 	}
