@@ -6,6 +6,7 @@ import {
     Wrench,
     ShoppingCart,
     FileText,
+    BarChart3,
     Settings as SettingsIcon,
     Menu,
     X,
@@ -20,20 +21,30 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { authService } from '@/lib/auth';
 import ThemeToggle from '../ThemeToggle';
+import { useTranslation } from 'react-i18next';
+import finalLogo from '@/assets/images/final_logo.png';
+import finalIcon from '@/assets/images/final_icon.png';
 
 const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const location = useLocation();
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
+
+    const toggleLanguage = () => {
+        const newLang = i18n.language === 'en' || i18n.language.startsWith('en') ? 'bn' : 'en';
+        i18n.changeLanguage(newLang);
+    };
 
     const menuItems = [
-        { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard' },
-        { icon: Package, label: 'Products', path: '/admin/products' },
-        { icon: Wrench, label: 'Services', path: '/admin/services' },
-        { icon: ShoppingCart, label: 'Orders', path: '/admin/orders' },
-        { icon: FileSearch, label: 'Quotations', path: '/admin/quotations' },
-        { icon: FileText, label: 'Invoices', path: '/admin/invoices' },
-        { icon: SettingsIcon, label: 'Settings', path: '/admin/settings' },
+        { icon: LayoutDashboard, label: t('admin_nav.dashboard'), path: '/admin/dashboard' },
+        { icon: Package, label: t('admin_nav.products'), path: '/admin/products' },
+        { icon: Wrench, label: t('admin_nav.services'), path: '/admin/services' },
+        { icon: ShoppingCart, label: t('admin_nav.orders'), path: '/admin/orders' },
+        { icon: FileSearch, label: t('admin_nav.quotations'), path: '/admin/quotations' },
+        { icon: FileText, label: t('admin_nav.invoices'), path: '/admin/invoices' },
+        { icon: BarChart3, label: t('admin_nav.accounting'), path: '/admin/reports' },
+        { icon: SettingsIcon, label: t('admin_nav.settings'), path: '/admin/settings' },
     ];
 
     const handleLogout = () => {
@@ -51,15 +62,11 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 )}
             >
                 <div className="p-6 flex items-center gap-3">
-                    <div className="w-8 h-8 bg-[#F5A623] rounded-lg flex items-center justify-center shrink-0">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0D0F14" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-                        </svg>
-                    </div>
                     {isSidebarOpen && (
-                        <span className="font-sora font-bold text-lg tracking-tight text-slate-900 dark:text-white transition-colors">
-                            Volt<span className="text-[#F5A623]">Wave</span>
-                        </span>
+                        <img src={finalLogo} alt="Logo" className="w-full h-full object-cover" />
+                    )}
+                    {!isSidebarOpen && (
+                        <img src={finalIcon} alt="Logo" className="w-full h-full object-cover" />
                     )}
                 </div>
 
@@ -94,7 +101,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                         )}
                     >
                         <LogOut size={20} />
-                        {isSidebarOpen && <span className="text-sm font-semibold">Logout</span>}
+                        {isSidebarOpen && <span className="text-sm font-semibold">{t('admin_nav.logout')}</span>}
                     </button>
                 </div>
             </aside>
@@ -118,10 +125,16 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-[#4D526A]" size={16} />
                             <input
                                 type="text"
-                                placeholder="Search..."
+                                placeholder={t('admin_nav.search_placeholder')}
                                 className="bg-slate-100 dark:bg-[#1A1E29] border border-slate-200 dark:border-white/5 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#F5A623]/50 w-64 transition-all text-slate-900 dark:text-white"
                             />
                         </div>
+                        <button
+                            onClick={toggleLanguage}
+                            className="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all text-slate-600 dark:text-[#8A8FA8]"
+                        >
+                            {i18n.language === 'en' || i18n.language.startsWith('en') ? 'বাংলা' : 'EN'}
+                        </button>
                         <ThemeToggle />
                         <button className="relative p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all text-slate-500 dark:text-[#8A8FA8]">
                             <Bell size={18} />

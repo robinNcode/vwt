@@ -17,6 +17,7 @@ import AdminServices from './pages/admin/Services'
 import AdminOrders from './pages/admin/Orders'
 import AdminInvoices from './pages/admin/Invoices'
 import AdminQuotations from './pages/admin/Quotations'
+import AdminReports from './pages/admin/Reports'
 import AdminSettings from './pages/admin/Settings'
 
 function App() {
@@ -67,6 +68,7 @@ function App() {
                     <Route path="/admin/orders" element={<AdminLayout children={<AdminOrders />} />} />
                     <Route path="/admin/invoices" element={<AdminLayout children={<AdminInvoices />} />} />
                     <Route path="/admin/quotations" element={<AdminLayout children={<AdminQuotations />} />} />
+                    <Route path="/admin/reports" element={<AdminLayout children={<AdminReports />} />} />
                     <Route path="/admin/settings" element={<AdminLayout children={<AdminSettings />} />} />
                 </Routes>
             </Suspense>

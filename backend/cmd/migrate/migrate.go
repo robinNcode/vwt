@@ -85,6 +85,12 @@ func main() {
 		&models.Setting{},
 		&models.ActivityLog{},
 		&models.AuditLog{},
+
+		// Accounting
+		&models.AccountingSale{},
+		&models.AccountingPurchase{},
+		&models.AccountingExpense{},
+		&models.AccountingServiceRevenue{},
 	)
 	if err != nil {
 		log.Fatalf("auto-migrate failed: %v", err)

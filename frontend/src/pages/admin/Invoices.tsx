@@ -10,6 +10,7 @@ import {
     Save
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import Pagination from '@/components/Pagination';
 
 interface Invoice {
     id: number;
@@ -24,7 +25,11 @@ interface Invoice {
 const Invoices: React.FC = () => {
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
     const [showManualModal, setShowManualModal] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
     const [newInvoice, setNewInvoice] = useState({
         client_name: '',
         invoice_number: `INV-${Date.now().toString().slice(-6)}`,
@@ -35,10 +40,18 @@ const Invoices: React.FC = () => {
     const fetchInvoices = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:8083/api/v1/invoices`);
+            const res = await fetch(`http://localhost:8083/api/v1/invoices?search=${searchTerm}&page=${currentPage}`);
             const data = await res.json();
             if (data.success) {
-                setInvoices(data.data);
+                if (data.data.items) {
+                    setInvoices(data.data.items);
+                    setTotalPages(data.data.totalPages || 1);
+                    setTotalItems(data.data.totalItems || 0);
+                } else {
+                    setInvoices(data.data);
+                    setTotalPages(1);
+                    setTotalItems(data.data.length);
+                }
             }
         } catch (error) {
             console.error('Failed to fetch invoices:', error);
@@ -48,8 +61,11 @@ const Invoices: React.FC = () => {
     };
 
     useEffect(() => {
-        fetchInvoices();
-    }, []);
+        const timer = setTimeout(() => {
+            fetchInvoices();
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [searchTerm, currentPage]);
 
     const handleAddItem = () => {
         setNewInvoice({
@@ -69,8 +85,8 @@ const Invoices: React.FC = () => {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="font-sora text-2xl font-extrabold text-slate-900 dark:text-white">Finance & Invoices</h1>
-                    <p className="text-sm text-slate-500 dark:text-[#8A8FA8] mt-1">Review transaction documents and billing history.</p>
+                    <h1 className="font-sora text-2xl font-extrabold text-[#5C4D3C] dark:text-white">Finance & Invoices</h1>
+                    <p className="text-sm text-[#8B7355] dark:text-[#8A8FA8] mt-1">Review transaction documents and billing history.</p>
                 </div>
                 <button
                     onClick={() => setShowManualModal(true)}
@@ -81,18 +97,18 @@ const Invoices: React.FC = () => {
                 </button>
             </div>
 
-            <div className="bg-white dark:bg-[#1A1E29] border border-slate-200 dark:border-white/5 rounded-2xl overflow-hidden shadow-sm dark:shadow-xl dark:shadow-black/20 transition-all">
+            <div className="bg-[#FDFBF7] dark:bg-[#1A1E29] border border-[#E8DCC4] dark:border-white/5 rounded-2xl overflow-hidden shadow-xl shadow-[#F5A623]/10 dark:shadow-black/20 transition-all">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-slate-50 dark:bg-[#13161E]/50">
+                        <thead className="bg-[#F8F3E6] dark:bg-[#13161E]/50">
                             <tr>
-                                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-[#4D526A] uppercase tracking-wider">Invoice No.</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-[#4D526A] uppercase tracking-wider">Order ID / Client</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-[#4D526A] uppercase tracking-wider">Issued Date</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-slate-400 dark:text-[#4D526A] uppercase tracking-wider">Actions</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">Invoice No.</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">Order ID / Client</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">Issued Date</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                        <tbody className="divide-y divide-[#E8DCC4] dark:divide-white/5">
                             {loading ? (
                                 <tr>
                                     <td colSpan={4} className="px-6 py-12 text-center">
@@ -101,30 +117,30 @@ const Invoices: React.FC = () => {
                                 </tr>
                             ) : invoices.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className="px-6 py-12 text-center text-slate-400 dark:text-[#4D526A]">No invoices found.</td>
+                                    <td colSpan={4} className="px-6 py-12 text-center text-[#8B7355] dark:text-[#4D526A]">No invoices found.</td>
                                 </tr>
                             ) : invoices.map((invoice) => (
-                                <tr key={invoice.id} className="hover:bg-slate-50 dark:hover:bg-white/[0.02] transition-all group">
+                                <tr key={invoice.id} className="hover:bg-[#F8F3E6]/60 dark:hover:bg-white/[0.02] transition-all group">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
                                                 <FileText size={16} />
                                             </div>
-                                            <span className="text-sm font-bold text-slate-900 dark:text-[#F0F2F7]">{invoice.invoice_number}</span>
+                                            <span className="text-sm font-bold text-[#5C4D3C] dark:text-[#F0F2F7]">{invoice.invoice_number}</span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-slate-500 dark:text-[#8A8FA8]">
+                                    <td className="px-6 py-4 text-sm text-[#8B7355] dark:text-[#8A8FA8]">
                                         {invoice.order_id ? `#ORD-${invoice.order_id}` : invoice.client_name || 'Manual Entry'}
                                     </td>
-                                    <td className="px-6 py-4 text-xs text-slate-500 dark:text-[#8A8FA8]">
+                                    <td className="px-6 py-4 text-xs text-[#8B7355] dark:text-[#8A8FA8]">
                                         {new Date(invoice.issued_at).toLocaleDateString()}
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2">
-                                            <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 dark:text-[#4D526A] hover:text-slate-900 dark:hover:text-[#F0F2F7] transition-all">
+                                            <button className="p-2 rounded-lg hover:bg-white dark:hover:bg-white/5 text-[#8B7355] dark:text-[#4D526A] hover:text-[#5C4D3C] dark:hover:text-[#F0F2F7] transition-all">
                                                 <Download size={16} />
                                             </button>
-                                            <button className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 text-slate-400 dark:text-[#4D526A] hover:text-slate-900 dark:hover:text-[#F0F2F7] transition-all">
+                                            <button className="p-2 rounded-lg hover:bg-white dark:hover:bg-white/5 text-[#8B7355] dark:text-[#4D526A] hover:text-[#5C4D3C] dark:hover:text-[#F0F2F7] transition-all">
                                                 <Printer size={16} />
                                             </button>
                                         </div>
@@ -134,6 +150,12 @@ const Invoices: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalItems={totalItems}
+                    onPageChange={setCurrentPage}
+                />
             </div>
 
             {/* Manual Invoice Modal */}

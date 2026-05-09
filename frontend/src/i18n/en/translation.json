@@ -11,5 +11,17 @@
         "subtitle": "Your destination for electronics and power solutions. We ensure quality products and services.",
         "cta_products": "View Products",
         "cta_services": "Book Services"
+    },
+    "admin_nav": {
+        "dashboard": "Dashboard",
+        "products": "Products",
+        "services": "Services",
+        "orders": "Orders",
+        "quotations": "Quotations",
+        "invoices": "Invoices",
+        "accounting": "Accounting",
+        "settings": "Settings",
+        "logout": "Logout",
+        "search_placeholder": "Search..."
     }
 }

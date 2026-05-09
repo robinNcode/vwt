@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import Pagination from '@/components/Pagination';
 
 interface Service {
     id: number;
@@ -26,6 +27,9 @@ const Services: React.FC = () => {
     const [services, setServices] = useState<Service[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingService, setEditingService] = useState<Service | null>(null);
     const [formData, setFormData] = useState({
@@ -40,10 +44,18 @@ const Services: React.FC = () => {
     const fetchServices = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:8083/api/v1/services?search=${searchTerm}`);
+            const res = await fetch(`http://localhost:8083/api/v1/services?search=${searchTerm}&page=${currentPage}`);
             const data = await res.json();
             if (data.success) {
-                setServices(data.data);
+                if (data.data.items) {
+                    setServices(data.data.items);
+                    setTotalPages(data.data.totalPages || 1);
+                    setTotalItems(data.data.totalItems || 0);
+                } else {
+                    setServices(data.data);
+                    setTotalPages(1);
+                    setTotalItems(data.data.length);
+                }
             }
         } catch (error) {
             console.error('Failed to fetch services:', error);
@@ -57,7 +69,7 @@ const Services: React.FC = () => {
             fetchServices();
         }, 300);
         return () => clearTimeout(timer);
-    }, [searchTerm]);
+    }, [searchTerm, currentPage]);
 
     const handleUpsert = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -123,8 +135,8 @@ const Services: React.FC = () => {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="font-sora text-2xl font-extrabold text-white">Service Management</h1>
-                    <p className="text-sm text-[#8A8FA8] mt-1">Configure your professional technical services.</p>
+                    <h1 className="font-sora text-2xl font-extrabold text-[#5C4D3C] dark:text-white">Service Management</h1>
+                    <p className="text-sm text-[#8B7355] dark:text-[#8A8FA8] mt-1">Configure your professional technical services.</p>
                 </div>
                 <button
                     onClick={() => { setEditingService(null); setIsModalOpen(true); }}
@@ -135,32 +147,32 @@ const Services: React.FC = () => {
                 </button>
             </div>
 
-            <div className="bg-[#1A1E29] border border-white/5 p-4 rounded-2xl flex flex-col md:flex-row items-center gap-4">
+            <div className="bg-[#FDFBF7] dark:bg-[#1A1E29] border border-[#E8DCC4] dark:border-white/5 p-4 rounded-2xl flex flex-col md:flex-row items-center gap-4">
                 <div className="relative flex-1 w-full">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#4D526A]" size={18} />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8B7355] dark:text-[#4D526A]" size={18} />
                     <input
                         type="text"
                         placeholder="Search services..."
-                        className="bg-[#13161E] border border-white/5 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-[#F5A623]/50 w-full transition-all text-white"
+                        className="bg-white dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-[#F5A623]/50 w-full transition-all text-[#5C4D3C] dark:text-white"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
             </div>
 
-            <div className="bg-[#1A1E29] border border-white/5 rounded-2xl overflow-hidden shadow-xl shadow-black/20">
+            <div className="bg-[#FDFBF7] dark:bg-[#1A1E29] border border-[#E8DCC4] dark:border-white/5 rounded-2xl overflow-hidden shadow-xl shadow-[#F5A623]/10 dark:shadow-black/20">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-[#13161E]/50">
+                        <thead className="bg-[#F8F3E6] dark:bg-[#13161E]/50">
                             <tr>
-                                <th className="px-6 py-4 text-[10px] font-bold text-[#4D526A] uppercase tracking-wider">Service Name</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-[#4D526A] uppercase tracking-wider">Base Price</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-[#4D526A] uppercase tracking-wider">Status</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-[#4D526A] uppercase tracking-wider">Sort Order</th>
-                                <th className="px-6 py-4 text-[10px] font-bold text-[#4D526A] uppercase tracking-wider">Action</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">Service Name</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">Base Price</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">Sort Order</th>
+                                <th className="px-6 py-4 text-[10px] font-bold text-[#8B7355] dark:text-[#4D526A] uppercase tracking-wider">Action</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-white/5">
+                        <tbody className="divide-y divide-[#E8DCC4] dark:divide-white/5">
                             {loading ? (
                                 <tr>
                                     <td colSpan={5} className="px-6 py-12 text-center">
@@ -172,22 +184,22 @@ const Services: React.FC = () => {
                                 </tr>
                             ) : services.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-[#4D526A]">No services found.</td>
+                                    <td colSpan={5} className="px-6 py-12 text-center text-[#8B7355] dark:text-[#4D526A]">No services found.</td>
                                 </tr>
                             ) : services.map((svc) => (
-                                <tr key={svc.id} className="hover:bg-white/[0.02] transition-all group">
+                                <tr key={svc.id} className="hover:bg-[#F8F3E6]/60 dark:hover:bg-white/[0.02] transition-all group">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-[#4D526A] group-hover:text-[#F5A623] transition-all">
+                                            <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-[#d48e1d] dark:text-[#4D526A] group-hover:text-[#F5A623] transition-all">
                                                 <Wrench size={18} />
                                             </div>
                                             <div>
-                                                <p className="text-sm font-bold text-[#F0F2F7]">{svc.name_en}</p>
-                                                <p className="text-xs text-[#4D526A] mt-0.5">{svc.name_bn}</p>
+                                                <p className="text-sm font-bold text-[#5C4D3C] dark:text-[#F0F2F7]">{svc.name_en}</p>
+                                                <p className="text-xs text-[#8B7355] dark:text-[#4D526A] mt-0.5">{svc.name_bn}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 font-mono text-sm text-[#F0F2F7]">
+                                    <td className="px-6 py-4 font-mono text-sm text-[#5C4D3C] dark:text-[#F0F2F7]">
                                         {svc.price ? `৳${svc.price.toLocaleString()}` : 'Contact for Price'}
                                     </td>
                                     <td className="px-6 py-4">
@@ -196,20 +208,20 @@ const Services: React.FC = () => {
                                             <span className="text-xs font-semibold text-[#8A8FA8]">{svc.is_active ? 'Active' : 'Inactive'}</span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-xs font-bold text-[#F5A623]">
+                                    <td className="px-6 py-4 text-xs font-bold text-[#d48e1d] dark:text-[#F5A623]">
                                         {svc.sort_order}
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2">
                                             <button
                                                 onClick={() => openEditModal(svc)}
-                                                className="p-2 rounded-lg hover:bg-blue-500/10 hover:text-blue-400 transition-all text-[#4D526A]"
+                                                className="p-2 rounded-lg hover:bg-blue-500/10 hover:text-blue-400 transition-all text-[#8B7355] dark:text-[#4D526A]"
                                             >
                                                 <Edit2 size={16} />
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(svc.id)}
-                                                className="p-2 rounded-lg hover:bg-red-500/10 hover:text-red-400 transition-all text-[#4D526A]"
+                                                className="p-2 rounded-lg hover:bg-red-500/10 hover:text-red-400 transition-all text-[#8B7355] dark:text-[#4D526A]"
                                             >
                                                 <Trash2 size={16} />
                                             </button>
@@ -220,6 +232,13 @@ const Services: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
+                {/* Pagination */}
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalItems={totalItems}
+                    onPageChange={setCurrentPage}
+                />
             </div>
 
             <AnimatePresence>

@@ -37,6 +37,7 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	settingsH := handlers.NewSettingsHandler(db)
 	quotationsH := handlers.NewQuotationsHandler(db)
 	contactsH := handlers.NewContactsHandler(db)
+	accountingH := handlers.NewAccountingHandler(db)
 
 	v1.POST("/auth/login", authH.AdminLogin)
 	v1.POST("/auth/customers/register", authH.CustomerRegister)
@@ -78,6 +79,18 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	admin.PUT("/quotations/:id/status", quotationsH.UpdateStatus)
 	admin.GET("/contact-messages", contactsH.List)
 	admin.PUT("/contact-messages/:id/read", contactsH.MarkRead)
+
+	admin.GET("/accounting/sales", accountingH.ListSales)
+	admin.POST("/accounting/sales", accountingH.CreateSale)
+
+	admin.GET("/accounting/purchases", accountingH.ListPurchases)
+	admin.POST("/accounting/purchases", accountingH.CreatePurchase)
+
+	admin.GET("/accounting/expenses", accountingH.ListExpenses)
+	admin.POST("/accounting/expenses", accountingH.CreateExpense)
+
+	admin.GET("/accounting/service-revenues", accountingH.ListServiceRevenues)
+	admin.POST("/accounting/service-revenues", accountingH.CreateServiceRevenue)
 
 	return r
 }

@@ -11,5 +11,17 @@
         "subtitle": "আপনার প্রিয় ইলেকট্রনিক্স এবং পাওয়ার সলিউশনের গন্তব্য। আমরা সেরা মানের পণ্য এবং সেবা নিশ্চিত করি।",
         "cta_products": "পণ্য দেখুন",
         "cta_services": "সেবা বুক করুন"
+    },
+    "admin_nav": {
+        "dashboard": "ড্যাশবোর্ড",
+        "products": "পণ্য",
+        "services": "সেবা",
+        "orders": "অর্ডার",
+        "quotations": "কোটেশন",
+        "invoices": "ইনভয়েস",
+        "accounting": "হিসাবরক্ষণ",
+        "settings": "সেটিংস",
+        "logout": "লগআউট",
+        "search_placeholder": "অনুসন্ধান..."
     }
 }
