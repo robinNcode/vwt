@@ -8,6 +8,8 @@ import (
 	"github.com/robinncode/vwt/internal/config"
 	"github.com/robinncode/vwt/internal/http/handlers"
 	"github.com/robinncode/vwt/internal/http/middleware"
+	"github.com/robinncode/vwt/internal/repository"
+	"github.com/robinncode/vwt/internal/service"
 	"gorm.io/gorm"
 )
 
@@ -30,7 +32,9 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	v1 := r.Group("/api/v1")
 
 	authH := handlers.NewAuthHandler(cfg, db)
-	productsH := handlers.NewProductsHandler(db)
+	productRepo := repository.NewProductRepository(db)
+	productSvc := service.NewProductService(productRepo)
+	productsH := handlers.NewProductsHandler(productSvc)
 	servicesH := handlers.NewServicesHandler(db)
 	ordersH := handlers.NewOrdersHandler(db)
 	invoicesH := handlers.NewInvoicesHandler(db)

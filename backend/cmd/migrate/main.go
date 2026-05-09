@@ -3,26 +3,21 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/robinncode/vwt/migrations/models"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	"github.com/robinncode/vwt/internal/config"
+	dbPkg "github.com/robinncode/vwt/internal/db"
+	"github.com/robinncode/vwt/internal/models"
 )
 
 func main() {
-	err := godotenv.Load()
+	err := godotenv.Load("../../.env")
 	if err != nil {
 		log.Printf("warning: could not load .env file: %v", err)
 	}
 
-	dsn := buildDSN()
-
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
+	cfg := config.Load()
+	db, err := dbPkg.Connect(cfg)
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
@@ -99,22 +94,4 @@ func main() {
 	fmt.Println("✅ Migrations completed successfully.")
 }
 
-func buildDSN() string {
-	host := getEnv("DB_HOST", "127.0.0.1")
-	port := getEnv("DB_PORT", "3306")
-	user := getEnv("DB_USER", "root")
-	password := getEnv("DB_PASSWORD", "")
-	dbname := getEnv("DB_NAME", "voltwavetech")
-
-	return fmt.Sprintf(
-		"%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		user, password, host, port, dbname,
-	)
-}
-
-func getEnv(key, fallback string) string {
-	if val := os.Getenv(key); val != "" {
-		return val
-	}
-	return fallback
-}
+// Removed Custom DB Setup helpers

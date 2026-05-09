@@ -7,24 +7,22 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/robinncode/vwt/internal/http/response"
-	"github.com/robinncode/vwt/migrations/models"
-	"gorm.io/gorm"
+	"github.com/robinncode/vwt/internal/models"
+	"github.com/robinncode/vwt/internal/service"
 )
 
 type ProductsHandler struct {
-	db *gorm.DB
+	svc service.ProductService
 }
 
-func NewProductsHandler(db *gorm.DB) *ProductsHandler { return &ProductsHandler{db: db} }
+func NewProductsHandler(svc service.ProductService) *ProductsHandler {
+	return &ProductsHandler{svc: svc}
+}
 
 func (h *ProductsHandler) List(c *gin.Context) {
-	var out []models.Product
-	q := h.db.Where("deleted_at IS NULL")
-	if s := strings.TrimSpace(c.Query("search")); s != "" {
-		like := "%" + s + "%"
-		q = q.Where("name_bn LIKE ? OR name_en LIKE ? OR slug LIKE ?", like, like, like)
-	}
-	if err := q.Order("id DESC").Find(&out).Error; err != nil {
+	s := strings.TrimSpace(c.Query("search"))
+	out, err := h.svc.ListProducts(s)
+	if err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to fetch products", nil)
 		return
 	}
@@ -62,7 +60,7 @@ func (h *ProductsHandler) Create(c *gin.Context) {
 		IsActive:    req.IsActive,
 		IsFeatured:  req.IsFeatured,
 	}
-	if err := h.db.Create(&p).Error; err != nil {
+	if err := h.svc.CreateProduct(&p); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to create product", nil)
 		return
 	}
@@ -82,8 +80,9 @@ func (h *ProductsHandler) Update(c *gin.Context) {
 		return
 	}
 
-	var p models.Product
-	if err := h.db.Where("id = ? AND deleted_at IS NULL", uint(id64)).First(&p).Error; err != nil {
+	var p *models.Product
+	p, err := h.svc.GetProductByID(uint(id64))
+	if err != nil || p == nil {
 		response.Fail(c, http.StatusNotFound, "Product not found", nil)
 		return
 	}
@@ -102,7 +101,7 @@ func (h *ProductsHandler) Update(c *gin.Context) {
 	p.IsActive = req.IsActive
 	p.IsFeatured = req.IsFeatured
 
-	if err := h.db.Save(&p).Error; err != nil {
+	if err := h.svc.UpdateProduct(p); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to update product", nil)
 		return
 	}
@@ -116,7 +115,7 @@ func (h *ProductsHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	if err := h.db.Where("id = ? AND deleted_at IS NULL", uint(id64)).Delete(&models.Product{}).Error; err != nil {
+	if err := h.svc.DeleteProduct(uint(id64)); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to delete product", nil)
 		return
 	}

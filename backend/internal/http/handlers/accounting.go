@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/robinncode/vwt/internal/http/response"
-	"github.com/robinncode/vwt/migrations/models"
+	"github.com/robinncode/vwt/internal/models"
 	"gorm.io/gorm"
 )
 
