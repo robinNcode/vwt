@@ -252,7 +252,7 @@ const Settings: React.FC = () => {
                 </div>
 
                 {/* Settings Form */}
-                <div className="lg:col-span-9">
+                <div className="lg:col-span-9">.
                     {loading ? (
                         <Skeleton className="h-[500px] rounded-3xl" />
                     ) : (
