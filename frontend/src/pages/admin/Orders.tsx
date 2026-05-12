@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import api from '@/lib/axios';
 
 interface Order {
     id: number;
@@ -34,10 +35,9 @@ const Orders: React.FC = () => {
     const fetchOrders = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:8083/api/v1/orders?status=${statusFilter}`);
-            const data = await res.json();
-            if (data.success) {
-                setOrders(data.data);
+            const res = await api.get(`/admin/orders?status=${statusFilter}`);
+            if (res.data.success) {
+                setOrders(res.data.data);
             }
         } catch (error) {
             console.error('Failed to fetch orders:', error);
@@ -53,13 +53,8 @@ const Orders: React.FC = () => {
     const handleStatusUpdate = async (id: number, newStatus: string) => {
         setUpdatingId(id);
         try {
-            const res = await fetch(`http://localhost:8083/api/v1/orders/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: newStatus })
-            });
-            const data = await res.json();
-            if (data.success) {
+            const res = await api.put(`/admin/orders/${id}`, { status: newStatus });
+            if (res.data.success) {
                 fetchOrders();
             }
         } catch (error) {

@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
+import api from '@/lib/axios';
 
 const Dashboard: React.FC = () => {
     const { t } = useTranslation();
@@ -25,20 +26,16 @@ const Dashboard: React.FC = () => {
             setLoading(true);
             try {
                 const [salesRes, purchasesRes, expensesRes, revRes] = await Promise.all([
-                    fetch('http://localhost:8083/api/v1/accounting/sales'),
-                    fetch('http://localhost:8083/api/v1/accounting/purchases'),
-                    fetch('http://localhost:8083/api/v1/accounting/expenses'),
-                    fetch('http://localhost:8083/api/v1/accounting/service-revenues')
+                    api.get('/admin/accounting/sales'),
+                    api.get('/admin/accounting/purchases'),
+                    api.get('/admin/accounting/expenses'),
+                    api.get('/admin/accounting/service-revenues')
                 ]);
-                const salesData = await salesRes.json();
-                const purchasesData = await purchasesRes.json();
-                const expensesData = await expensesRes.json();
-                const revData = await revRes.json();
 
-                if (salesData.success) setSales(salesData.data || []);
-                if (purchasesData.success) setPurchases(purchasesData.data || []);
-                if (expensesData.success) setExpenses(expensesData.data || []);
-                if (revData.success) setServiceRevs(revData.data || []);
+                if (salesRes.data.success) setSales(salesRes.data.data || []);
+                if (purchasesRes.data.success) setPurchases(purchasesRes.data.data || []);
+                if (expensesRes.data.success) setExpenses(expensesRes.data.data || []);
+                if (revRes.data.success) setServiceRevs(revRes.data.data || []);
             } catch (error) {
                 console.error("Failed to fetch accounting data:", error);
             } finally {

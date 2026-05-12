@@ -91,6 +91,9 @@ func (h *SettingsHandler) Update(c *gin.Context) {
 	// So I'll add GetByID to SettingRepository.
 
 	// Placeholder for now as I missed GetByID in repository
+	userID, _ := c.Get("auth.user_id")
+	uID := userID.(uint)
+
 	s := models.Setting{ID: uint(id64)}
 	s.Group = req.Group
 	s.Key = req.Key
@@ -98,12 +101,34 @@ func (h *SettingsHandler) Update(c *gin.Context) {
 	s.ValueJSON = req.ValueJSON
 	s.LabelBN = req.LabelBN
 	s.LabelEN = req.LabelEN
+	s.UpdatedBy = &uID
 
 	if err := h.svc.UpdateSetting(&s); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to update setting", nil)
 		return
 	}
 	response.OK(c, "Setting updated successfully", s)
+}
+
+func (h *SettingsHandler) BulkUpdate(c *gin.Context) {
+	var req []models.Setting
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.Fail(c, http.StatusBadRequest, "Invalid request", err.Error())
+		return
+	}
+
+	userID, _ := c.Get("auth.user_id")
+	uID := userID.(uint)
+
+	for i := range req {
+		req[i].UpdatedBy = &uID
+	}
+
+	if err := h.svc.BulkUpdateSettings(req); err != nil {
+		response.Fail(c, http.StatusInternalServerError, "Failed to bulk update settings", nil)
+		return
+	}
+	response.OK(c, "Settings updated successfully", nil)
 }
 
 func (h *SettingsHandler) Delete(c *gin.Context) {

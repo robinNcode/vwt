@@ -11,6 +11,7 @@ type SettingRepository interface {
 	GetByKey(group, key string) (*models.Setting, error)
 	Create(s *models.Setting) error
 	Update(s *models.Setting) error
+	BulkUpdate(settings []models.Setting) error
 	Delete(id uint) error
 }
 
@@ -46,6 +47,17 @@ func (r *settingRepository) Create(s *models.Setting) error {
 
 func (r *settingRepository) Update(s *models.Setting) error {
 	return r.db.Save(s).Error
+}
+
+func (r *settingRepository) BulkUpdate(settings []models.Setting) error {
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		for _, s := range settings {
+			if err := tx.Save(&s).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }
 
 func (r *settingRepository) Delete(id uint) error {

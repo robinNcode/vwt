@@ -25,6 +25,8 @@
         "accounting_expenses": "Expenses",
         "accounting_revenue": "Service Revenues",
         "settings": "Settings",
+        "users": "Users & Permissions",
+        "profile": "My Profile",
         "logout": "Logout",
         "search_placeholder": "Search..."
     },
@@ -39,7 +41,9 @@
             "templates": "Invoice/Quotation Templates",
             "order": "Order Configuration",
             "security": "Security Settings",
-            "notifications": "Notification Preferences"
+            "notifications": "Notification Preferences",
+            "logistics": "Machinery & Logistics",
+            "social": "Social Media Presence"
         }
     },
     "dashboard": {
