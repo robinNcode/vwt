@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Pagination from '@/components/Pagination';
 import { useTranslation } from 'react-i18next';
+import api from '@/lib/axios';
 
 interface Expense {
     id: number;
@@ -45,12 +46,11 @@ const Expenses: React.FC = () => {
     const fetchExpenses = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:8083/api/v1/accounting/expenses?search=${searchTerm}&page=${currentPage}`);
-            const data = await res.json();
-            if (data.success) {
-                setExpenses(data.data || []);
+            const res = await api.get(`/admin/accounting/expenses?search=${searchTerm}&page=${currentPage}`);
+            if (res.data.success) {
+                setExpenses(res.data.data || []);
                 setTotalPages(1);
-                setTotalItems(data.data?.length || 0);
+                setTotalItems(res.data.data?.length || 0);
             }
         } catch (error) {
             console.error('Failed to fetch expenses:', error);
@@ -66,22 +66,21 @@ const Expenses: React.FC = () => {
     const handleUpsert = async (e: React.FormEvent) => {
         e.preventDefault();
         const url = editingExpense
-            ? `http://localhost:8083/api/v1/accounting/expenses/${editingExpense.id}`
-            : 'http://localhost:8083/api/v1/accounting/expenses';
-        const method = editingExpense ? 'PUT' : 'POST';
+            ? `/admin/accounting/expenses/${editingExpense.id}`
+            : '/admin/accounting/expenses';
+        const method = editingExpense ? 'put' : 'post';
 
         try {
-            const res = await fetch(url, {
+            const res = await api({
                 method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+                url,
+                data: {
                     ...formData,
                     amount: Number(formData.amount),
                     date: new Date(formData.date).toISOString()
-                })
+                }
             });
-            const result = await res.json();
-            if (result.success) {
+            if (res.data.success) {
                 resetForm();
                 fetchExpenses();
             }
@@ -104,10 +103,8 @@ const Expenses: React.FC = () => {
     const handleDelete = async (id: number) => {
         if (!confirm('Are you sure you want to delete this expense?')) return;
         try {
-            const res = await fetch(`http://localhost:8083/api/v1/accounting/expenses/${id}`, {
-                method: 'DELETE'
-            });
-            if ((await res.json()).success) fetchExpenses();
+            const res = await api.delete(`/admin/accounting/expenses/${id}`);
+            if (res.data.success) fetchExpenses();
         } catch (error) {
             console.error('Failed to delete expense:', error);
         }

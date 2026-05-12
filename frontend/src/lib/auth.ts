@@ -1,3 +1,5 @@
+import api from './axios';
+
 export interface User {
     id: number;
     name: string;
@@ -14,19 +16,11 @@ interface AuthResponse {
     };
 }
 
-const API_URL = 'http://localhost:8083/api/v1';
-
 export const authService = {
     async login(email: string, password: string, type: string = 'admin'): Promise<AuthResponse> {
-        const response = await fetch(`${API_URL}/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password, type }),
-        });
+        const response = await api.post('/auth/login', { email, password, type });
 
-        const data = await response.json();
+        const data = response.data;
         if (data.success && data.data.token) {
             localStorage.setItem('vwt_token', data.data.token);
             localStorage.setItem('vwt_user', JSON.stringify(data.data.user));

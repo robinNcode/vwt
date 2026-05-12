@@ -61,13 +61,14 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             label: t('admin_nav.accounting'),
             path: '/admin/reports',
             subItems: [
-                { icon: TrendingUp, label: t('admin_nav.accounting_sales'), path: '/admin/accounting-sales' },
-                { icon: ShoppingCart, label: t('admin_nav.accounting_purchases'), path: '/admin/accounting-purchases' },
-                { icon: CreditCard, label: t('admin_nav.accounting_expenses'), path: '/admin/accounting-expenses' },
-                { icon: Briefcase, label: t('admin_nav.accounting_revenue'), path: '/admin/accounting-revenues' },
+                { icon: TrendingUp, label: t('admin_nav.accounting_sales'), path: '/admin/accounting/sales' },
+                { icon: ShoppingCart, label: t('admin_nav.accounting_purchases'), path: '/admin/accounting/purchases' },
+                { icon: CreditCard, label: t('admin_nav.accounting_expenses'), path: '/admin/accounting/expenses' },
+                { icon: Briefcase, label: t('admin_nav.accounting_revenue'), path: '/admin/accounting/service-revenues' },
             ]
         },
         { icon: SettingsIcon, label: t('admin_nav.settings'), path: '/admin/settings' },
+        { icon: User, label: t('admin_nav.users'), path: '/admin/users' },
     ];
 
     const handleLogout = () => {
@@ -223,7 +224,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                             <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#F5A623]" />
                         </button>
                         <div className="h-8 w-[1px] bg-slate-200 dark:bg-white/5 mx-2" />
-                        <div className="flex items-center gap-3 cursor-pointer group">
+                        <Link to="/admin/profile" className="flex items-center gap-3 cursor-pointer group">
                             <div className="w-8 h-8 rounded-lg bg-[#F5A623]/10 border border-[#F5A623]/20 flex items-center justify-center text-[#F5A623] group-hover:bg-[#F5A623] group-hover:text-[#0D0F14] transition-all">
                                 <User size={18} />
                             </div>
@@ -231,7 +232,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                                 <p className="text-xs font-bold">{authService.getUser()?.name || 'Admin'}</p>
                                 <p className="text-[10px] text-slate-500 dark:text-[#4D526A]">Super Admin</p>
                             </div>
-                        </div>
+                        </Link>
                     </div>
                 </header>
 

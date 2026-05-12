@@ -19,6 +19,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Pagination from '@/components/Pagination';
 import { useTranslation } from 'react-i18next';
+import api from '@/lib/axios';
 
 interface ProductImage {
     url: string;
@@ -82,17 +83,16 @@ const Products: React.FC = () => {
     const fetchProducts = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:8083/api/v1/products?search=${searchTerm}&page=${currentPage}`);
-            const data = await res.json();
-            if (data.success) {
-                if (data.data.items) {
-                    setProducts(data.data.items);
-                    setTotalPages(data.data.totalPages || 1);
-                    setTotalItems(data.data.totalItems || 0);
+            const res = await api.get(`/admin/products?search=${searchTerm}&page=${currentPage}`);
+            if (res.data.success) {
+                if (res.data.data.items) {
+                    setProducts(res.data.data.items);
+                    setTotalPages(res.data.data.totalPages || 1);
+                    setTotalItems(res.data.data.totalItems || 0);
                 } else {
-                    setProducts(data.data);
+                    setProducts(res.data.data);
                     setTotalPages(1);
-                    setTotalItems(data.data.length);
+                    setTotalItems(res.data.data.length);
                 }
             }
         } catch (error) {
@@ -120,9 +120,9 @@ const Products: React.FC = () => {
     const handleUpsert = async (e: React.FormEvent) => {
         e.preventDefault();
         const url = editingProduct
-            ? `http://localhost:8083/api/v1/products/${editingProduct.id}`
-            : 'http://localhost:8083/api/v1/products';
-        const method = editingProduct ? 'PUT' : 'POST';
+            ? `/admin/products/${editingProduct.id}`
+            : '/admin/products';
+        const method = editingProduct ? 'put' : 'post';
 
         const data = new FormData();
         Object.entries(formData).forEach(([key, value]) => {
@@ -133,12 +133,13 @@ const Products: React.FC = () => {
         }
 
         try {
-            const res = await fetch(url, {
+            const res = await api({
                 method,
-                body: data
+                url,
+                data,
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
-            const result = await res.json();
-            if (result.success) {
+            if (res.data.success) {
                 resetForm();
                 fetchProducts();
             }
@@ -176,11 +177,8 @@ const Products: React.FC = () => {
     const handleDelete = async (id: number) => {
         if (!confirm('Are you sure you want to delete this product?')) return;
         try {
-            const res = await fetch(`http://localhost:8083/api/v1/products/${id}`, {
-                method: 'DELETE'
-            });
-            const data = await res.json();
-            if (data.success) {
+            const res = await api.delete(`/admin/products/${id}`);
+            if (res.data.success) {
                 fetchProducts();
             }
         } catch (error) {
@@ -209,7 +207,7 @@ const Products: React.FC = () => {
             description_en: product.description_en || '',
             description_bn: product.description_bn || ''
         });
-        setPreviewUrl(product.images?.[0]?.url ? `http://localhost:8083${product.images[0].url}` : null);
+        setPreviewUrl(product.images?.[0]?.url ? `${import.meta.env.VITE_SERVER_URL}${product.images[0].url}` : null);
         setIsModalOpen(true);
     };
 
@@ -270,7 +268,7 @@ const Products: React.FC = () => {
                                         <div className="flex items-center gap-4">
                                             <div className="w-12 h-12 rounded-xl bg-[#F5A623]/10 flex items-center justify-center text-[#d48e1d] overflow-hidden border border-[#F5A623]/20">
                                                 {product.images?.length ? (
-                                                    <img src={`http://localhost:8083${product.images[0].url}`} alt="" className="w-full h-full object-cover" />
+                                                    <img src={`${import.meta.env.VITE_SERVER_URL}${product.images[0].url}`} alt="" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <ImageIcon size={20} />
                                                 )}

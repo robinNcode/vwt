@@ -11,6 +11,7 @@ func RunAll(db *gorm.DB) {
 
 	SeedCore(db)
 	SeedCatalog(db)
+	SeedProducts(db)
 	SeedOperations(db)
 	SeedCMS(db)
 

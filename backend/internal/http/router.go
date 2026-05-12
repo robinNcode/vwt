@@ -67,6 +67,14 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	accountingSvc := service.NewAccountingService(accountingRepo)
 	accountingH := handlers.NewAccountingHandler(accountingSvc)
 
+	userRepo := repository.NewUserRepository(db)
+	userSvc := service.NewUserService(userRepo)
+	userH := handlers.NewUserHandler(userSvc)
+
+	roleRepo := repository.NewRoleRepository(db)
+	roleSvc := service.NewRoleService(roleRepo)
+	roleH := handlers.NewRoleHandler(roleSvc)
+
 	v1.POST("/auth/login", authH.AdminLogin)
 	v1.POST("/auth/customers/register", authH.CustomerRegister)
 
@@ -79,8 +87,8 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	v1.POST("/quotations", quotationsH.Create)
 	v1.POST("/contact-messages", contactsH.Create)
 
-	// Admin
-	admin := v1.Group("")
+	// Admin routes with /admin prefix to avoid route conflicts (especially for /products)
+	admin := v1.Group("/admin")
 	admin.Use(middleware.RequireAuth(cfg), middleware.RequireAdmin())
 
 	admin.GET("/products", productsH.List)
@@ -91,6 +99,7 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	admin.POST("/services", servicesH.Create)
 	admin.PUT("/services/:id", servicesH.Update)
 	admin.DELETE("/services/:id", servicesH.Delete)
+	admin.GET("/services", servicesH.List)
 
 	admin.GET("/orders", ordersH.List)
 	admin.PUT("/orders/:id", ordersH.UpdateStatus)
@@ -102,12 +111,24 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 
 	admin.GET("/settings", settingsH.List)
 	admin.POST("/settings", settingsH.Create)
+	admin.PATCH("/settings/bulk", settingsH.BulkUpdate)
 	admin.PUT("/settings/:id", settingsH.Update)
 	admin.DELETE("/settings/:id", settingsH.Delete)
 	admin.GET("/quotations", quotationsH.List)
 	admin.PUT("/quotations/:id/status", quotationsH.UpdateStatus)
 	admin.GET("/contact-messages", contactsH.List)
 	admin.PUT("/contact-messages/:id/read", contactsH.MarkRead)
+
+	admin.GET("/profile", userH.GetProfile)
+	admin.PUT("/profile", userH.UpdateProfile)
+	admin.POST("/profile/avatar", userH.UpdateAvatar)
+	admin.GET("/users", userH.List)
+	admin.PUT("/users/:id", userH.Update)
+
+	admin.GET("/roles", roleH.List)
+	admin.POST("/roles", roleH.Create)
+	admin.GET("/permissions", roleH.ListPermissions)
+	admin.PUT("/roles/:id/permissions", roleH.UpdatePermissions)
 
 	admin.GET("/accounting/sales", accountingH.ListSales)
 	admin.POST("/accounting/sales", accountingH.CreateSale)

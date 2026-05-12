@@ -11,6 +11,7 @@ type SettingService interface {
 	GetSetting(group, key string) (*models.Setting, error)
 	CreateSetting(s *models.Setting) error
 	UpdateSetting(s *models.Setting) error
+	BulkUpdateSettings(settings []models.Setting) error
 	DeleteSetting(id uint) error
 }
 
@@ -40,6 +41,10 @@ func (s *settingService) CreateSetting(sl *models.Setting) error {
 
 func (s *settingService) UpdateSetting(sl *models.Setting) error {
 	return s.repo.Update(sl)
+}
+
+func (s *settingService) BulkUpdateSettings(settings []models.Setting) error {
+	return s.repo.BulkUpdate(settings)
 }
 
 func (s *settingService) DeleteSetting(id uint) error {

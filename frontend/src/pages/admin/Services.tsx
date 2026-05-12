@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Pagination from '@/components/Pagination';
 import { useTranslation } from 'react-i18next';
+import api from '@/lib/axios';
 
 interface Service {
     id: number;
@@ -56,17 +57,16 @@ const Services: React.FC = () => {
     const fetchServices = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:8083/api/v1/services?search=${searchTerm}&page=${currentPage}`);
-            const data = await res.json();
-            if (data.success) {
-                if (data.data.items) {
-                    setServices(data.data.items);
-                    setTotalPages(data.data.totalPages || 1);
-                    setTotalItems(data.data.totalItems || 0);
+            const res = await api.get(`/admin/services?search=${searchTerm}&page=${currentPage}`);
+            if (res.data.success) {
+                if (res.data.data.items) {
+                    setServices(res.data.data.items);
+                    setTotalPages(res.data.data.totalPages || 1);
+                    setTotalItems(res.data.data.totalItems || 0);
                 } else {
-                    setServices(data.data);
+                    setServices(res.data.data);
                     setTotalPages(1);
-                    setTotalItems(data.data.length);
+                    setTotalItems(res.data.data.length);
                 }
             }
         } catch (error) {
@@ -94,9 +94,9 @@ const Services: React.FC = () => {
     const handleUpsert = async (e: React.FormEvent) => {
         e.preventDefault();
         const url = editingService
-            ? `http://localhost:8083/api/v1/services/${editingService.id}`
-            : 'http://localhost:8083/api/v1/services';
-        const method = editingService ? 'PUT' : 'POST';
+            ? `/admin/services/${editingService.id}`
+            : '/admin/services';
+        const method = editingService ? 'put' : 'post';
 
         const data = new FormData();
         Object.entries(formData).forEach(([key, value]) => {
@@ -107,12 +107,13 @@ const Services: React.FC = () => {
         }
 
         try {
-            const res = await fetch(url, {
+            const res = await api({
                 method,
-                body: data
+                url,
+                data,
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
-            const result = await res.json();
-            if (result.success) {
+            if (res.data.success) {
                 resetForm();
                 fetchServices();
             }
@@ -141,11 +142,8 @@ const Services: React.FC = () => {
     const handleDelete = async (id: number) => {
         if (!confirm('Are you sure you want to delete this service?')) return;
         try {
-            const res = await fetch(`http://localhost:8083/api/v1/services/${id}`, {
-                method: 'DELETE'
-            });
-            const data = await res.json();
-            if (data.success) {
+            const res = await api.delete(`/admin/services/${id}`);
+            if (res.data.success) {
                 fetchServices();
             }
         } catch (error) {
@@ -165,7 +163,7 @@ const Services: React.FC = () => {
             is_active: svc.is_active,
             sort_order: svc.sort_order
         });
-        setPreviewUrl(svc.image_url ? `http://localhost:8083${svc.image_url}` : null);
+        setPreviewUrl(svc.image_url ? `${import.meta.env.VITE_SERVER_URL}${svc.image_url}` : null);
         setIsModalOpen(true);
     };
 
@@ -223,7 +221,7 @@ const Services: React.FC = () => {
                                         <div className="flex items-center gap-4">
                                             <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-[#d48e1d] overflow-hidden border border-[#F5A623]/20">
                                                 {svc.image_url ? (
-                                                    <img src={`http://localhost:8083${svc.image_url}`} alt="" className="w-full h-full object-cover" />
+                                                    <img src={`${import.meta.env.VITE_SERVER_URL}${svc.image_url}`} alt="" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <Wrench size={18} />
                                                 )}

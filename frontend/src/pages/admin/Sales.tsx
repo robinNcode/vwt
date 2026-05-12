@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Pagination from '@/components/Pagination';
 import { useTranslation } from 'react-i18next';
+import api from '@/lib/axios';
 
 interface Sale {
     id: number;
@@ -43,12 +44,11 @@ const Sales: React.FC = () => {
     const fetchSales = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:8083/api/v1/accounting/sales?search=${searchTerm}&page=${currentPage}`);
-            const data = await res.json();
-            if (data.success) {
-                setSales(data.data || []);
+            const res = await api.get(`/admin/accounting/sales?search=${searchTerm}&page=${currentPage}`);
+            if (res.data.success) {
+                setSales(res.data.data || []);
                 setTotalPages(1); // Backend might not support paging yet for this
-                setTotalItems(data.data?.length || 0);
+                setTotalItems(res.data.data?.length || 0);
             }
         } catch (error) {
             console.error('Failed to fetch sales:', error);
@@ -64,22 +64,21 @@ const Sales: React.FC = () => {
     const handleUpsert = async (e: React.FormEvent) => {
         e.preventDefault();
         const url = editingSale
-            ? `http://localhost:8083/api/v1/accounting/sales/${editingSale.id}`
-            : 'http://localhost:8083/api/v1/accounting/sales';
-        const method = editingSale ? 'PUT' : 'POST';
+            ? `/admin/accounting/sales/${editingSale.id}`
+            : '/admin/accounting/sales';
+        const method = editingSale ? 'put' : 'post';
 
         try {
-            const res = await fetch(url, {
+            const res = await api({
                 method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+                url,
+                data: {
                     ...formData,
                     amount: Number(formData.amount),
                     date: new Date(formData.date).toISOString()
-                })
+                }
             });
-            const result = await res.json();
-            if (result.success) {
+            if (res.data.success) {
                 setIsModalOpen(false);
                 setEditingSale(null);
                 setFormData({
@@ -97,10 +96,8 @@ const Sales: React.FC = () => {
     const handleDelete = async (id: number) => {
         if (!confirm('Are you sure you want to delete this record?')) return;
         try {
-            const res = await fetch(`http://localhost:8083/api/v1/accounting/sales/${id}`, {
-                method: 'DELETE'
-            });
-            if ((await res.json()).success) fetchSales();
+            const res = await api.delete(`/admin/accounting/sales/${id}`);
+            if (res.data.success) fetchSales();
         } catch (error) {
             console.error('Failed to delete sale:', error);
         }
