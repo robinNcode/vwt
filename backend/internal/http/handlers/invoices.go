@@ -7,19 +7,21 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/robinncode/vwt/internal/http/response"
-	"github.com/robinncode/vwt/migrations/models"
-	"gorm.io/gorm"
+	"github.com/robinncode/vwt/internal/models"
+	"github.com/robinncode/vwt/internal/service"
 )
 
 type InvoicesHandler struct {
-	db *gorm.DB
+	svc service.InvoiceService
 }
 
-func NewInvoicesHandler(db *gorm.DB) *InvoicesHandler { return &InvoicesHandler{db: db} }
+func NewInvoicesHandler(svc service.InvoiceService) *InvoicesHandler {
+	return &InvoicesHandler{svc: svc}
+}
 
 func (h *InvoicesHandler) List(c *gin.Context) {
-	var out []models.Invoice
-	if err := h.db.Where("deleted_at IS NULL").Order("id DESC").Find(&out).Error; err != nil {
+	out, err := h.svc.ListInvoices()
+	if err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to fetch invoices", nil)
 		return
 	}
@@ -46,7 +48,7 @@ func (h *InvoicesHandler) Create(c *gin.Context) {
 		OrderID:       req.OrderID,
 		InvoiceNumber: req.InvoiceNumber,
 	}
-	if err := h.db.Create(&inv).Error; err != nil {
+	if err := h.svc.CreateInvoice(&inv); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to create invoice", nil)
 		return
 	}
@@ -64,21 +66,16 @@ func (h *InvoicesHandler) Update(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
-	req.InvoiceNumber = strings.TrimSpace(req.InvoiceNumber)
-	if req.OrderID == 0 || req.InvoiceNumber == "" {
-		response.Fail(c, http.StatusBadRequest, "order_id and invoice_number are required", nil)
-		return
-	}
 
-	var inv models.Invoice
-	if err := h.db.Where("id = ? AND deleted_at IS NULL", uint(id64)).First(&inv).Error; err != nil {
+	inv, err := h.svc.GetInvoiceByID(uint(id64))
+	if err != nil || inv == nil {
 		response.Fail(c, http.StatusNotFound, "Invoice not found", nil)
 		return
 	}
 
 	inv.OrderID = req.OrderID
-	inv.InvoiceNumber = req.InvoiceNumber
-	if err := h.db.Save(&inv).Error; err != nil {
+	inv.InvoiceNumber = strings.TrimSpace(req.InvoiceNumber)
+	if err := h.svc.UpdateInvoice(inv); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to update invoice", nil)
 		return
 	}
@@ -91,7 +88,7 @@ func (h *InvoicesHandler) Delete(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "Invalid id", nil)
 		return
 	}
-	if err := h.db.Where("id = ? AND deleted_at IS NULL", uint(id64)).Delete(&models.Invoice{}).Error; err != nil {
+	if err := h.svc.DeleteInvoice(uint(id64)); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to delete invoice", nil)
 		return
 	}

@@ -1,0 +1,106 @@
+{
+    "nav": {
+        "home": "Home",
+        "products": "Products",
+        "services": "Services",
+        "about": "About",
+        "contact": "Contact"
+    },
+    "hero": {
+        "title": "Welcome to Volt Wave Tech",
+        "subtitle": "Your destination for electronics and power solutions. We ensure quality products and services.",
+        "cta_products": "View Products",
+        "cta_services": "Book Services"
+    },
+    "admin_nav": {
+        "dashboard": "Dashboard",
+        "products": "Products",
+        "services": "Services",
+        "orders": "Orders",
+        "quotations": "Quotations",
+        "invoices": "Invoices",
+        "accounting": "Accounting",
+        "accounting_sales": "Sales",
+        "accounting_purchases": "Purchases",
+        "accounting_expenses": "Expenses",
+        "accounting_revenue": "Service Revenues",
+        "settings": "Settings",
+        "logout": "Logout",
+        "search_placeholder": "Search..."
+    },
+    "settings": {
+        "title": "System Settings",
+        "subtitle": "Configure global application variables and preferences.",
+        "save_success": "Settings updated successfully!",
+        "save_error": "Failed to update settings. Please try again.",
+        "groups": {
+            "general": "General Configuration",
+            "seo": "SEO Configuration",
+            "templates": "Invoice/Quotation Templates",
+            "order": "Order Configuration",
+            "security": "Security Settings",
+            "notifications": "Notification Preferences"
+        }
+    },
+    "dashboard": {
+        "overview": "System Overview",
+        "subtitle": "Check how your business is performing today.",
+        "export": "Export Report",
+        "revenue": "Revenue",
+        "orders": "Orders",
+        "products": "Products",
+        "customers": "Customers",
+        "recent_orders": "Recent Orders",
+        "view_all": "View All",
+        "quick_actions": "Quick Actions",
+        "add_product": "Add New Product",
+        "add_product_desc": "Stock inventory updates",
+        "create_order": "Create New Order",
+        "create_order_desc": "Manual order entry",
+        "customer_query": "Customer Query",
+        "customer_query_desc": "Recent contact messages",
+        "need_support": "Need Support?",
+        "visit_docs": "Visit documentation"
+    },
+    "accounting": {
+        "sales": "Sales Revenue",
+        "purchases": "Vendor Purchases",
+        "expenses": "Operational Expenses",
+        "service_revenues": "Service Revenue",
+        "overview": "Accounting Overview",
+        "full_report": "Full Report",
+        "total_income": "Total Income",
+        "total_expenses": "Total Expenses",
+        "net_margin": "Net Margin"
+    },
+    "invoices": {
+        "title": "Finance & Invoices",
+        "subtitle": "Review transaction documents and billing history.",
+        "create_manual": "Create Manual Invoice",
+        "invoice_no": "Invoice No.",
+        "client_orders": "Order ID / Client",
+        "issued_date": "Issued Date",
+        "actions": "Actions",
+        "no_found": "No invoices found.",
+        "modal_title": "Create Manual Invoice",
+        "modal_desc": "Manually generate an invoice for offline orders.",
+        "client_name": "Client Name",
+        "items_title": "Invoice Items",
+        "add_item": "+ Add Item",
+        "desc": "Description",
+        "qty": "Qty",
+        "price": "Price",
+        "save": "Save Invoice"
+    },
+    "quotations": {
+        "title": "Quotations & Proposals",
+        "subtitle": "Manage and generate professional quotes for potential clients.",
+        "create_new": "New Quote",
+        "quote_no": "Quote No.",
+        "client": "Client",
+        "valid_until": "Valid Until",
+        "status": "Status",
+        "actions": "Actions",
+        "no_found": "No quotations found."
+    }
+}

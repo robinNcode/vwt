@@ -8,7 +8,7 @@ import (
 	"github.com/robinncode/vwt/internal/config"
 	"github.com/robinncode/vwt/internal/http/middleware"
 	"github.com/robinncode/vwt/internal/http/response"
-	"github.com/robinncode/vwt/migrations/models"
+	"github.com/robinncode/vwt/internal/models"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )

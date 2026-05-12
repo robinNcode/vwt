@@ -8,6 +8,8 @@ import (
 	"github.com/robinncode/vwt/internal/config"
 	"github.com/robinncode/vwt/internal/http/handlers"
 	"github.com/robinncode/vwt/internal/http/middleware"
+	"github.com/robinncode/vwt/internal/repository"
+	"github.com/robinncode/vwt/internal/service"
 	"gorm.io/gorm"
 )
 
@@ -24,31 +26,64 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 		AllowCredentials: true,
 	}))
 
+	r.GET("/", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"message": "Volt Wave Tech API"}) })
 	r.GET("/health", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"ok": true}) })
+
+	// Serve Static Files
+	r.Static("/uploads", "./public/uploads")
 
 	v1 := r.Group("/api/v1")
 
 	authH := handlers.NewAuthHandler(cfg, db)
-	productsH := handlers.NewProductsHandler(db)
-	servicesH := handlers.NewServicesHandler(db)
-	ordersH := handlers.NewOrdersHandler(db)
-	invoicesH := handlers.NewInvoicesHandler(db)
-	settingsH := handlers.NewSettingsHandler(db)
+	productRepo := repository.NewProductRepository(db)
+	productSvc := service.NewProductService(productRepo)
+	productsH := handlers.NewProductsHandler(productSvc)
+
+	serviceRepo := repository.NewServiceRepository(db)
+	serviceSvc := service.NewServiceService(serviceRepo)
+	servicesH := handlers.NewServicesHandler(serviceSvc)
+
+	contactRepo := repository.NewContactRepository(db)
+	contactSvc := service.NewContactService(contactRepo)
+	contactsH := handlers.NewContactsHandler(contactSvc)
+
+	settingRepo := repository.NewSettingRepository(db)
+	settingSvc := service.NewSettingService(settingRepo)
+	settingsH := handlers.NewSettingsHandler(settingSvc)
+
+	orderRepo := repository.NewOrderRepository(db)
+	orderSvc := service.NewOrderService(orderRepo)
+	ordersH := handlers.NewOrdersHandler(orderSvc)
+
+	quotationRepo := repository.NewQuotationRepository(db)
+	quotationSvc := service.NewQuotationService(quotationRepo)
+	quotationsH := handlers.NewQuotationsHandler(quotationSvc)
+
+	invoiceRepo := repository.NewInvoiceRepository(db)
+	invoiceSvc := service.NewInvoiceService(invoiceRepo)
+	invoicesH := handlers.NewInvoicesHandler(invoiceSvc)
+
+	accountingRepo := repository.NewAccountingRepository(db)
+	accountingSvc := service.NewAccountingService(accountingRepo)
+	accountingH := handlers.NewAccountingHandler(accountingSvc)
 
 	v1.POST("/auth/login", authH.AdminLogin)
 	v1.POST("/auth/customers/register", authH.CustomerRegister)
 
 	// Public reads
-	v1.GET("/products", productsH.List)
+	v1.GET("/products", productsH.ListPublic)
 	v1.GET("/services", servicesH.List)
 	v1.GET("/orders/track/:id", ordersH.TrackByNumber)
 	v1.GET("/orders/:id", ordersH.GetByID)
 	v1.POST("/orders", ordersH.Create)
+	v1.POST("/quotations", quotationsH.Create)
+	v1.POST("/contact-messages", contactsH.Create)
 
 	// Admin
 	admin := v1.Group("")
 	admin.Use(middleware.RequireAuth(cfg), middleware.RequireAdmin())
 
+	admin.GET("/products", productsH.List)
 	admin.POST("/products", productsH.Create)
 	admin.PUT("/products/:id", productsH.Update)
 	admin.DELETE("/products/:id", productsH.Delete)
@@ -69,6 +104,22 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	admin.POST("/settings", settingsH.Create)
 	admin.PUT("/settings/:id", settingsH.Update)
 	admin.DELETE("/settings/:id", settingsH.Delete)
+	admin.GET("/quotations", quotationsH.List)
+	admin.PUT("/quotations/:id/status", quotationsH.UpdateStatus)
+	admin.GET("/contact-messages", contactsH.List)
+	admin.PUT("/contact-messages/:id/read", contactsH.MarkRead)
+
+	admin.GET("/accounting/sales", accountingH.ListSales)
+	admin.POST("/accounting/sales", accountingH.CreateSale)
+
+	admin.GET("/accounting/purchases", accountingH.ListPurchases)
+	admin.POST("/accounting/purchases", accountingH.CreatePurchase)
+
+	admin.GET("/accounting/expenses", accountingH.ListExpenses)
+	admin.POST("/accounting/expenses", accountingH.CreateExpense)
+
+	admin.GET("/accounting/service-revenues", accountingH.ListServiceRevenues)
+	admin.POST("/accounting/service-revenues", accountingH.CreateServiceRevenue)
 
 	return r
 }

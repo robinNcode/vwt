@@ -10,7 +10,9 @@ import (
 )
 
 func main() {
-	_ = godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		_ = godotenv.Load("../.env")
+	}
 
 	cfg := config.Load()
 	gormDB, err := db.Connect(cfg)

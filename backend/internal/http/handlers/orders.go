@@ -4,27 +4,25 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/robinncode/vwt/internal/http/response"
-	"github.com/robinncode/vwt/migrations/models"
-	"gorm.io/gorm"
+	"github.com/robinncode/vwt/internal/models"
+	"github.com/robinncode/vwt/internal/service"
 )
 
 type OrdersHandler struct {
-	db *gorm.DB
+	svc service.OrderService
 }
 
-func NewOrdersHandler(db *gorm.DB) *OrdersHandler { return &OrdersHandler{db: db} }
+func NewOrdersHandler(svc service.OrderService) *OrdersHandler {
+	return &OrdersHandler{svc: svc}
+}
 
 func (h *OrdersHandler) List(c *gin.Context) {
-	var out []models.Order
-	q := h.db.Where("deleted_at IS NULL")
-	if st := strings.TrimSpace(c.Query("status")); st != "" {
-		q = q.Where("status = ?", st)
-	}
-	if err := q.Order("id DESC").Find(&out).Error; err != nil {
+	st := strings.TrimSpace(c.Query("status"))
+	out, err := h.svc.ListOrders(st)
+	if err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to fetch orders", nil)
 		return
 	}
@@ -37,8 +35,8 @@ func (h *OrdersHandler) GetByID(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "Invalid id", nil)
 		return
 	}
-	var o models.Order
-	if err := h.db.Preload("Items").Where("id = ? AND deleted_at IS NULL", uint(id64)).First(&o).Error; err != nil {
+	o, err := h.svc.GetOrderByID(uint(id64))
+	if err != nil {
 		response.Fail(c, http.StatusNotFound, "Order not found", nil)
 		return
 	}
@@ -51,8 +49,8 @@ func (h *OrdersHandler) TrackByNumber(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "Invalid id", nil)
 		return
 	}
-	var o models.Order
-	if err := h.db.Preload("Items").Where("order_number = ? AND deleted_at IS NULL", id).First(&o).Error; err != nil {
+	o, err := h.svc.TrackOrder(id)
+	if err != nil {
 		response.Fail(c, http.StatusNotFound, "Order not found", nil)
 		return
 	}
@@ -101,80 +99,41 @@ func (h *OrdersHandler) Create(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "Order items required", nil)
 		return
 	}
-	if req.CurrencyCode == "" {
-		req.CurrencyCode = "BDT"
+
+	o := models.Order{
+		CustomerName:     req.CustomerName,
+		CustomerEmail:    req.CustomerEmail,
+		CustomerPhone:    req.CustomerPhone,
+		ShipAddressLine1: req.ShipAddressLine1,
+		ShipAddressLine2: req.ShipAddressLine2,
+		ShipCity:         req.ShipCity,
+		ShipDistrict:     req.ShipDistrict,
+		ShipPostalCode:   req.ShipPostalCode,
+		ShipCountry:      req.ShipCountry,
+		CurrencyCode:     req.CurrencyCode,
+		Subtotal:         req.Subtotal,
+		GrandTotal:       req.GrandTotal,
+		Notes:            req.Notes,
 	}
-	if req.ShipCountry == "" {
-		req.ShipCountry = "BD"
+
+	for _, it := range req.Items {
+		o.Items = append(o.Items, models.OrderItem{
+			VariantID:     it.VariantID,
+			ProductNameBN: it.ProductNameBN,
+			ProductNameEN: it.ProductNameEN,
+			SKU:           it.SKU,
+			UnitPrice:     it.UnitPrice,
+			Quantity:      it.Quantity,
+			LineTotal:     it.LineTotal,
+		})
 	}
 
-	orderNumber := "ORD-" + time.Now().Format("20060102-150405")
-
-	txErr := h.db.Transaction(func(tx *gorm.DB) error {
-		o := models.Order{
-			OrderNumber:      orderNumber,
-			CustomerName:     req.CustomerName,
-			CustomerEmail:    req.CustomerEmail,
-			CustomerPhone:    req.CustomerPhone,
-			ShipAddressLine1: req.ShipAddressLine1,
-			ShipAddressLine2: req.ShipAddressLine2,
-			ShipCity:         req.ShipCity,
-			ShipDistrict:     req.ShipDistrict,
-			ShipPostalCode:   req.ShipPostalCode,
-			ShipCountry:      req.ShipCountry,
-			CurrencyCode:     req.CurrencyCode,
-			Subtotal:         req.Subtotal,
-			GrandTotal:       req.GrandTotal,
-			Status:           "pending",
-			PaymentStatus:    "unpaid",
-			Notes:            req.Notes,
-		}
-		if err := tx.Create(&o).Error; err != nil {
-			return err
-		}
-
-		items := make([]models.OrderItem, 0, len(req.Items))
-		for _, it := range req.Items {
-			if it.SKU == "" || it.ProductNameEN == "" || it.ProductNameBN == "" || it.Quantity <= 0 {
-				return gin.Error{Err: errBad("Invalid order item"), Type: gin.ErrorTypeBind}
-			}
-			quantity := it.Quantity
-			items = append(items, models.OrderItem{
-				OrderID:       o.ID,
-				VariantID:     it.VariantID,
-				ProductNameBN: it.ProductNameBN,
-				ProductNameEN: it.ProductNameEN,
-				SKU:           it.SKU,
-				UnitPrice:     it.UnitPrice,
-				Quantity:      quantity,
-				LineTotal:     it.LineTotal,
-			})
-		}
-		if err := tx.Create(&items).Error; err != nil {
-			return err
-		}
-
-		hist := models.OrderStatusHistory{
-			OrderID:   o.ID,
-			NewStatus: "pending",
-		}
-		if err := tx.Create(&hist).Error; err != nil {
-			return err
-		}
-
-		c.Set("created.order_id", o.ID)
-		return nil
-	})
-	if txErr != nil {
-		response.Fail(c, http.StatusInternalServerError, "Failed to create order", txErr.Error())
+	if err := h.svc.PlaceOrder(&o); err != nil {
+		response.Fail(c, http.StatusInternalServerError, "Failed to create order", err.Error())
 		return
 	}
 
-	var created models.Order
-	if orderID, ok := c.Get("created.order_id"); ok {
-		h.db.Preload("Items").First(&created, orderID)
-	}
-	response.Created(c, "Order created successfully", created)
+	response.Created(c, "Order created successfully", o)
 }
 
 type updateOrderReq struct {
@@ -192,37 +151,16 @@ func (h *OrdersHandler) UpdateStatus(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "Invalid request", err.Error())
 		return
 	}
-	req.Status = strings.TrimSpace(strings.ToLower(req.Status))
-	if req.Status == "" {
+	st := strings.TrimSpace(strings.ToLower(req.Status))
+	if st == "" {
 		response.Fail(c, http.StatusBadRequest, "status is required", nil)
 		return
 	}
 
-	var o models.Order
-	if err := h.db.Where("id = ? AND deleted_at IS NULL", uint(id64)).First(&o).Error; err != nil {
-		response.Fail(c, http.StatusNotFound, "Order not found", nil)
-		return
-	}
-
-	old := o.Status
-	o.Status = req.Status
-	if err := h.db.Save(&o).Error; err != nil {
+	if err := h.svc.UpdateOrderStatus(uint(id64), st); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to update order", nil)
 		return
 	}
 
-	hist := models.OrderStatusHistory{
-		OrderID:   o.ID,
-		OldStatus: &old,
-		NewStatus: req.Status,
-	}
-	_ = h.db.Create(&hist).Error
-
-	response.OK(c, "Order updated successfully", o)
+	response.OK(c, "Order updated successfully", gin.H{"id": uint(id64), "status": st})
 }
-
-func errBad(msg string) error { return &badReqErr{msg: msg} }
-
-type badReqErr struct{ msg string }
-
-func (e *badReqErr) Error() string { return e.msg }
