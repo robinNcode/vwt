@@ -6,8 +6,8 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/robinncode/vwt/internal/config"
-	"github.com/robinncode/vwt/internal/database/seeders"
-	dbPkg "github.com/robinncode/vwt/internal/db"
+	"github.com/robinncode/vwt/internal/database"
+	"github.com/robinncode/vwt/internal/database/seeder"
 )
 
 func main() {
@@ -17,12 +17,12 @@ func main() {
 	}
 
 	cfg := config.Load()
-	database, err := dbPkg.Connect(cfg)
+	db, err := database.Connect(cfg)
 	if err != nil {
 		log.Fatalf("failed to connect: %v", err)
 	}
 
 	fmt.Println("⚡ Initializing Database Connection for Seeding...")
 
-	seeders.RunAll(database)
+	seeder.RunAll(db)
 }

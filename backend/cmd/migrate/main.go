@@ -5,8 +5,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/robinncode/vwt/internal/config"
-	"github.com/robinncode/vwt/internal/database/migrations"
-	dbPkg "github.com/robinncode/vwt/internal/db"
+	"github.com/robinncode/vwt/internal/database"
 )
 
 func main() {
@@ -16,14 +15,12 @@ func main() {
 	}
 
 	cfg := config.Load()
-	db, err := dbPkg.Connect(cfg)
+	db, err := database.Connect(cfg)
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
-	if err := migrations.RunMigrations(db); err != nil {
+	if err := database.RunMigrations(db); err != nil {
 		log.Fatalf("Migration failed: %v", err)
 	}
 }
-
-// Removed Custom DB Setup helpers
