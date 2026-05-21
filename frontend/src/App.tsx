@@ -28,7 +28,7 @@ import AdminProfile from './pages/admin/Profile'
 
 function App() {
     return (
-        <Router>
+        <Router basename={import.meta.env.BASE_URL}>
             <Suspense fallback={<div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-[#0D0F14] text-slate-900 dark:text-white transition-colors duration-300">Loading...</div>}>
                 <Routes>
                     {/* Public Routes */}

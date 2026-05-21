@@ -51,7 +51,7 @@ func Load() Config {
 		DBPassword:  dbPassword,
 		DBName:      dbName,
 		JWTSecret:   getEnv("JWT_SECRET", "change-me"),
-		CORSOrigins: splitCSV(getEnv("CORS_ORIGINS", "http://localhost:5173")),
+		CORSOrigins: splitCSV(getEnv("CORS_ORIGINS", "http://localhost:5173,https://robin.adovasoft.com,https://robin.adovasoft.com/vwt/")),
 	}
 }
 

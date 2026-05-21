@@ -1,7 +1,18 @@
 import axios from 'axios';
 
+const appMode = import.meta.env.VITE_APP_MODE;
+let baseURL;
+if (appMode == 'production') {
+    baseURL = import.meta.env.VITE_PROD_API_BASE_URL;
+} else {
+    baseURL = import.meta.env.VITE_API_BASE_URL;
+}
+
+console.log("appMode", appMode);
+console.log("baseURL", baseURL);
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8083/api/v1',
+    baseURL,
     headers: {
         'Content-Type': 'application/json',
     },
