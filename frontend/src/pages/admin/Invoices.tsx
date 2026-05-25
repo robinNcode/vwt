@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import Pagination from '@/components/Pagination';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/axios';
+import { toast } from 'react-hot-toast';
 
 interface Invoice {
     id: number;
@@ -32,10 +33,14 @@ const Invoices: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
+    const [saving, setSaving] = useState(false);
+
     const [newInvoice, setNewInvoice] = useState({
         client_name: '',
+        client_address: '',
         invoice_number: `INV-${Date.now().toString().slice(-6)}`,
-        total_amount: 0,
+        due_date: '',
+        notes: '',
         items: [{ description: '', quantity: 1, price: 0 }]
     });
 
@@ -75,10 +80,37 @@ const Invoices: React.FC = () => {
         });
     };
 
+    const handleItemChange = (idx: number, field: string, value: any) => {
+        const newItems = [...newInvoice.items];
+        newItems[idx] = { ...newItems[idx], [field]: value };
+        setNewInvoice({ ...newInvoice, items: newItems });
+    };
+
     const handleCreateInvoice = async (e: React.FormEvent) => {
         e.preventDefault();
-        alert('Manual Invoice functionality simulated.');
-        setShowManualModal(false);
+        setSaving(true);
+        try {
+            // In a real scenario, we might need to create a simplified Order first 
+            // if the backend strictly requires order_id. 
+            // For now, we'll try to send the data.
+            const payload = {
+                order_id: 1, // Placeholder if required
+                invoice_number: newInvoice.invoice_number,
+                due_date: newInvoice.due_date,
+                notes: newInvoice.notes
+            };
+            const res = await api.post('/admin/invoices', payload);
+            if (res.data.success) {
+                toast.success('Invoice created successfully');
+                setShowManualModal(false);
+                fetchInvoices();
+            }
+        } catch (error) {
+            console.error('Create failed:', error);
+            toast.error('Failed to create invoice');
+        } finally {
+            setSaving(false);
+        }
     };
 
     return (
@@ -88,13 +120,24 @@ const Invoices: React.FC = () => {
                     <h1 className="font-sora text-2xl font-extrabold text-[#5C4D3C] dark:text-white">{t('invoices.title')}</h1>
                     <p className="text-sm text-[#8B7355] dark:text-[#8A8FA8] mt-1">{t('invoices.subtitle')}</p>
                 </div>
-                <button
-                    onClick={() => setShowManualModal(true)}
-                    className="bg-[#F5A623] hover:bg-[#D48E1D] text-[#0D0F14] px-5 py-2.5 rounded-xl text-sm font-bold transition-all shadow-lg shadow-[#F5A623]/20 flex items-center gap-2"
-                >
-                    <Plus size={18} />
-                    <span>{t('invoices.create_manual')}</span>
-                </button>
+                <div className="flex items-center gap-3">
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder={t('admin_nav.search_placeholder')}
+                            className="bg-white dark:bg-[#1A1E29] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-2 text-sm outline-none focus:border-[#F5A623]/50 w-64"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <button
+                        onClick={() => setShowManualModal(true)}
+                        className="bg-[#F5A623] hover:bg-[#D48E1D] text-[#0D0F14] px-5 py-2.5 rounded-xl text-sm font-bold transition-all shadow-lg shadow-[#F5A623]/20 flex items-center gap-2"
+                    >
+                        <Plus size={18} />
+                        <span>{t('invoices.create_manual')}</span>
+                    </button>
+                </div>
             </div>
 
             <div className="bg-[#FDFBF7] dark:bg-[#1A1E29] border border-[#E8DCC4] dark:border-white/5 rounded-2xl overflow-hidden shadow-xl shadow-[#F5A623]/10 dark:shadow-black/20">
@@ -164,7 +207,7 @@ const Invoices: React.FC = () => {
             {showManualModal && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-[#0D0F14]/60 backdrop-blur-sm" onClick={() => setShowManualModal(false)} />
-                    <div className="relative bg-white dark:bg-[#1A1E29] border border-[#E8DCC4] dark:border-white/5 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 shadow-2xl">
+                    <div className="relative bg-white dark:bg-[#1A1E29] border border-[#E8DCC4] dark:border-white/5 rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-8 shadow-2xl">
                         <div className="flex items-center justify-between mb-8">
                             <div>
                                 <h2 className="text-2xl font-extrabold text-[#5C4D3C] dark:text-white">{t('invoices.modal_title')}</h2>
@@ -187,12 +230,34 @@ const Invoices: React.FC = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
+                                    <label className="text-sm font-bold text-[#5C4D3C] dark:text-slate-300">Due Date</label>
+                                    <input
+                                        type="date"
+                                        required
+                                        className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3 text-[#5C4D3C] dark:text-white outline-none"
+                                        value={newInvoice.due_date}
+                                        onChange={(e) => setNewInvoice({ ...newInvoice, due_date: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
                                     <label className="text-sm font-bold text-[#5C4D3C] dark:text-slate-300">{t('invoices.client_name')}</label>
                                     <input
                                         type="text"
                                         required
                                         placeholder="Enter client name"
-                                        className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3 text-[#5C4D3C] dark:text-white focus:border-[#F5A623]/50 outline-none"
+                                        className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3 text-[#5C4D3C] dark:text-white outline-none"
+                                        value={newInvoice.client_name}
+                                        onChange={(e) => setNewInvoice({ ...newInvoice, client_name: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-[#5C4D3C] dark:text-slate-300">Client Address</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Enter client address"
+                                        className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3 text-[#5C4D3C] dark:text-white outline-none"
+                                        value={newInvoice.client_address}
+                                        onChange={(e) => setNewInvoice({ ...newInvoice, client_address: e.target.value })}
                                     />
                                 </div>
                             </div>
@@ -215,25 +280,40 @@ const Invoices: React.FC = () => {
                                             <input
                                                 type="text"
                                                 placeholder={t('invoices.desc')}
-                                                className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3 text-sm text-[#5C4D3C] dark:text-white focus:border-[#F5A623]/50 outline-none"
+                                                className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3 text-sm text-[#5C4D3C] dark:text-white outline-none"
+                                                value={item.description}
+                                                onChange={(e) => handleItemChange(idx, 'description', e.target.value)}
                                             />
                                         </div>
                                         <div className="col-span-2">
                                             <input
                                                 type="number"
                                                 placeholder={t('invoices.qty')}
-                                                className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3 text-sm text-[#5C4D3C] dark:text-white focus:border-[#F5A623]/50 outline-none"
+                                                className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3 text-sm text-[#5C4D3C] dark:text-white outline-none"
+                                                value={item.quantity}
+                                                onChange={(e) => handleItemChange(idx, 'quantity', parseInt(e.target.value))}
                                             />
                                         </div>
                                         <div className="col-span-4">
                                             <input
                                                 type="number"
                                                 placeholder={t('invoices.price')}
-                                                className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3 text-sm text-[#5C4D3C] dark:text-white focus:border-[#F5A623]/50 outline-none"
+                                                className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3 text-sm text-[#5C4D3C] dark:text-white outline-none"
+                                                value={item.price}
+                                                onChange={(e) => handleItemChange(idx, 'price', parseFloat(e.target.value))}
                                             />
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-[#5C4D3C] dark:text-slate-300">Notes / Terms</label>
+                                <textarea
+                                    className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3 text-sm text-[#5C4D3C] dark:text-white min-h-[80px] outline-none"
+                                    value={newInvoice.notes}
+                                    onChange={(e) => setNewInvoice({ ...newInvoice, notes: e.target.value })}
+                                />
                             </div>
 
                             <div className="mt-8 flex items-center justify-end gap-4">
@@ -246,9 +326,10 @@ const Invoices: React.FC = () => {
                                 </button>
                                 <button
                                     type="submit"
-                                    className="bg-[#F5A623] hover:bg-[#D48E1D] text-[#0D0F14] px-8 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-[#F5A623]/20"
+                                    disabled={saving}
+                                    className="bg-[#F5A623] hover:bg-[#D48E1D] text-[#0D0F14] px-8 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-[#F5A623]/20 disabled:opacity-50"
                                 >
-                                    <Save size={18} />
+                                    {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
                                     <span>{t('invoices.save')}</span>
                                 </button>
                             </div>

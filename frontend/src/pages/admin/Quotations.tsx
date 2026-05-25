@@ -10,11 +10,14 @@ import {
     Calendar,
     DollarSign,
     MoreHorizontal,
-    Eye
+    Eye,
+    Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import api from '@/lib/axios';
+import { toast } from 'react-hot-toast';
 
 interface QuotationItem {
     id: string;
@@ -44,6 +47,46 @@ const Quotations: React.FC = () => {
     const [items, setItems] = useState<QuotationItem[]>([
         { id: '1', description: '', quantity: 1, price: 0 }
     ]);
+    const [formData, setFormData] = useState({
+        customer_name: '',
+        customer_email: '',
+        customer_phone: '',
+        customer_address: '',
+        expires_at: '',
+        notes: ''
+    });
+    const [saving, setSaving] = useState(false);
+
+    const handleSaveQuotation = async () => {
+        if (!formData.customer_name || items.some(i => !i.description)) {
+            toast.error('Please fill required fields');
+            return;
+        }
+
+        setSaving(true);
+        try {
+            const payload = {
+                ...formData,
+                items: items.map(item => ({
+                    product_name_en: item.description,
+                    sku: 'MANUAL', // Or handle SKU properly
+                    unit_price: item.price,
+                    quantity: item.quantity
+                }))
+            };
+            const res = await api.post('/admin/quotations', payload);
+            if (res.data.success) {
+                toast.success('Quotation saved successfully');
+                setShowModal(false);
+                // Refresh list if needed
+            }
+        } catch (error) {
+            console.error('Save failed:', error);
+            toast.error('Failed to save quotation');
+        } finally {
+            setSaving(false);
+        }
+    };
 
     const handleAddItem = () => {
         setItems([...items, { id: Date.now().toString(), description: '', quantity: 1, price: 0 }]);
@@ -163,19 +206,117 @@ const Quotations: React.FC = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
                                         <label className="text-sm font-bold text-[#5C4D3C] dark:text-slate-300">Client Name</label>
-                                        <input type="text" className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3" placeholder="Enter client name" />
+                                        <input
+                                            type="text"
+                                            className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3"
+                                            placeholder="Enter client name"
+                                            value={formData.customer_name}
+                                            onChange={(e) => setFormData({ ...formData, customer_name: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-[#5C4D3C] dark:text-slate-300">Client Email</label>
+                                        <input
+                                            type="email"
+                                            className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3"
+                                            placeholder="Enter client email"
+                                            value={formData.customer_email}
+                                            onChange={(e) => setFormData({ ...formData, customer_email: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-bold text-[#5C4D3C] dark:text-slate-300">Client Phone</label>
+                                        <input
+                                            type="text"
+                                            className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3"
+                                            placeholder="Enter client phone"
+                                            value={formData.customer_phone}
+                                            onChange={(e) => setFormData({ ...formData, customer_phone: e.target.value })}
+                                        />
                                     </div>
                                     <div className="space-y-2">
                                         <label className="text-sm font-bold text-[#5C4D3C] dark:text-slate-300">Expiry Date</label>
-                                        <input type="date" className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3" />
+                                        <input
+                                            type="date"
+                                            className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3"
+                                            value={formData.expires_at}
+                                            onChange={(e) => setFormData({ ...formData, expires_at: e.target.value })}
+                                        />
+                                    </div>
+                                    <div className="md:col-span-2 space-y-2">
+                                        <label className="text-sm font-bold text-[#5C4D3C] dark:text-slate-300">Client Address</label>
+                                        <textarea
+                                            className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3 min-h-[100px]"
+                                            placeholder="Enter client address"
+                                            value={formData.customer_address}
+                                            onChange={(e) => setFormData({ ...formData, customer_address: e.target.value })}
+                                        />
                                     </div>
                                 </div>
-                                <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400 text-sm font-medium">
-                                    Module finalized with 100% localization support.
+
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="font-bold text-[#5C4D3C] dark:text-white">Items</h3>
+                                        <button onClick={handleAddItem} className="text-xs font-bold text-[#F5A623] hover:underline">+ Add Item</button>
+                                    </div>
+                                    {items.map((item) => (
+                                        <div key={item.id} className="grid grid-cols-12 gap-4 items-end">
+                                            <div className="col-span-6">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Description"
+                                                    className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3 text-sm"
+                                                    value={item.description}
+                                                    onChange={(e) => handleItemChange(item.id, 'description', e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="col-span-2">
+                                                <input
+                                                    type="number"
+                                                    placeholder="Qty"
+                                                    className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3 text-sm"
+                                                    value={item.quantity}
+                                                    onChange={(e) => handleItemChange(item.id, 'quantity', parseInt(e.target.value))}
+                                                />
+                                            </div>
+                                            <div className="col-span-3">
+                                                <input
+                                                    type="number"
+                                                    placeholder="Price"
+                                                    className="w-full bg-[#FDFBF7] dark:bg-[#13161E] border border-[#E8DCC4] dark:border-white/5 rounded-xl px-4 py-3 text-sm"
+                                                    value={item.price}
+                                                    onChange={(e) => handleItemChange(item.id, 'price', parseFloat(e.target.value))}
+                                                />
+                                            </div>
+                                            <div className="col-span-1">
+                                                <button onClick={() => handleRemoveItem(item.id)} className="p-3 text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all">
+                                                    <X size={18} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                                <div className="flex justify-end gap-3">
-                                    <button onClick={() => setShowModal(false)} className="px-6 py-3 rounded-xl border border-[#E8DCC4] text-[#8B7355] font-bold">Cancel</button>
-                                    <button onClick={() => setShowModal(false)} className="bg-[#F5A623] text-[#0D0F14] px-8 py-3 rounded-xl font-bold">Save Proposal</button>
+
+                                <div className="p-6 bg-slate-500/5 border border-dashed border-[#E8DCC4] dark:border-white/10 rounded-2xl flex items-center justify-between">
+                                    <span className="text-sm font-bold text-[#5C4D3C] dark:text-[#8A8FA8]">Total Amount</span>
+                                    <span className="text-2xl font-extrabold text-[#F5A623]">৳ {calculateTotal().toLocaleString()}</span>
+                                </div>
+
+                                <div className="flex justify-end gap-3 pt-4">
+                                    <button
+                                        onClick={() => setShowModal(false)}
+                                        className="px-6 py-3 rounded-xl border border-[#E8DCC4] text-[#8B7355] font-bold hover:bg-[#F8F3E6] transition-all"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleSaveQuotation}
+                                        disabled={saving}
+                                        className="bg-[#F5A623] hover:bg-[#D48E1D] text-[#0D0F14] px-8 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-[#F5A623]/20 disabled:opacity-50"
+                                    >
+                                        {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                                        <span>Save Quote</span>
+                                    </button>
                                 </div>
                             </div>
                         </motion.div>
