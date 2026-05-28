@@ -18,16 +18,14 @@ func NewCartHandler(cartService service.CartService) *CartHandler {
 
 // Helpers to get user ID from context
 func getUserID(c *gin.Context) uint {
-	userID, exists := c.Get("userID")
+	userID, exists := c.Get("auth.user_id")
 	if !exists {
 		return 0
 	}
-	floatID, ok := userID.(float64)
-	if ok {
-		return uint(floatID)
+	uid, ok := userID.(uint)
+	if !ok {
+		return 0
 	}
-	// Fallback to direct uint cast if using that
-	uid, _ := userID.(uint)
 	return uid
 }
 

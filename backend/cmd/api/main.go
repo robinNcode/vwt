@@ -24,9 +24,13 @@ func main() {
 	gormDB, err := database.Connect(cfg)
 	if err != nil {
 		log.Fatalf("db connect failed: %v", err)
-	} else {
-		log.Println("db connected successfully")
 	}
+
+	// Run auto-migrations
+	if err := database.RunMigrations(gormDB); err != nil {
+		log.Fatalf("migrations failed: %v", err)
+	}
+	log.Println("db connected and migrated successfully")
 
 	r := server.NewRouter(cfg, gormDB)
 	if err := r.Run(":" + cfg.Port); err != nil {

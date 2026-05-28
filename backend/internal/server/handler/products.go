@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/robinncode/vwt/internal/server/response"
 	"github.com/robinncode/vwt/internal/model"
+	"github.com/robinncode/vwt/internal/server/response"
 	"github.com/robinncode/vwt/internal/service"
 )
 
@@ -92,13 +92,21 @@ func (h *ProductsHandler) Create(c *gin.Context) {
 		IsFeatured:    req.IsFeatured,
 	}
 
-	// Handle Image Upload
-	file, _ := c.FormFile("image")
-	if file != nil {
-		filename := "product_" + strconv.FormatInt(time.Now().Unix(), 10) + "_" + file.Filename
-		filepath := "public/uploads/products/" + filename
-		if err := c.SaveUploadedFile(file, filepath); err == nil {
-			p.Images = []model.ProductImage{{URL: "/" + filepath, IsPrimary: true}}
+	// Handle Multiple Image Uploads
+	form, _ := c.MultipartForm()
+	if form != nil {
+		files := form.File["images"]
+		for i, file := range files {
+			filename := "product_" + strconv.FormatInt(time.Now().Unix(), 10) + "_" + strconv.Itoa(i) + "_" + file.Filename
+			filepath := "public/uploads/products/" + filename
+			if err := c.SaveUploadedFile(file, filepath); err == nil {
+				img := model.ProductImage{
+					URL:       "/public/uploads/products/" + filename,
+					IsPrimary: i == 0,
+					SortOrder: i,
+				}
+				p.Images = append(p.Images, img)
+			}
 		}
 	}
 
@@ -154,17 +162,26 @@ func (h *ProductsHandler) Update(c *gin.Context) {
 	p.IsActive = req.IsActive
 	p.IsFeatured = req.IsFeatured
 
-	// Handle Image Upload Replace
-	file, _ := c.FormFile("image")
-	if file != nil {
-		filename := "product_" + strconv.FormatInt(time.Now().Unix(), 10) + "_" + file.Filename
-		filepath := "public/uploads/products/" + filename
-		if err := c.SaveUploadedFile(file, filepath); err == nil {
-			if len(p.Images) > 0 {
-				p.Images[0].URL = "/" + filepath
-			} else {
-				p.Images = []model.ProductImage{{URL: "/" + filepath, IsPrimary: true, ProductID: p.ID}}
+	// Handle Multiple Image Uploads (Append or Replace based on need, here we replace new set if provided)
+	form, _ := c.MultipartForm()
+	if form != nil && len(form.File["images"]) > 0 {
+		files := form.File["images"]
+		var newImages []model.ProductImage
+		for i, file := range files {
+			filename := "product_" + strconv.FormatInt(time.Now().Unix(), 10) + "_" + strconv.Itoa(i) + "_" + file.Filename
+			filepath := "public/uploads/products/" + filename
+			if err := c.SaveUploadedFile(file, filepath); err == nil {
+				img := model.ProductImage{
+					URL:       "/public/uploads/products/" + filename,
+					IsPrimary: i == 0,
+					SortOrder: i,
+					ProductID: p.ID,
+				}
+				newImages = append(newImages, img)
 			}
+		}
+		if len(newImages) > 0 {
+			p.Images = newImages
 		}
 	}
 

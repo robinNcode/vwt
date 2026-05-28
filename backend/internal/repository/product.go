@@ -55,7 +55,16 @@ func (r *productRepository) GetByID(id uint) (*model.Product, error) {
 }
 
 func (r *productRepository) Update(p *model.Product) error {
-	return r.db.Save(p).Error
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		// If we are passing images in the struct, we might want to clear old ones to prevent orphans
+		// This depends on the desired behavior. Here we clear and re-insert if images is provided.
+		if len(p.Images) > 0 {
+			if err := tx.Where("product_id = ?", p.ID).Delete(&model.ProductImage{}).Error; err != nil {
+				return err
+			}
+		}
+		return tx.Save(p).Error
+	})
 }
 
 func (r *productRepository) Delete(id uint) error {

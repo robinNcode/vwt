@@ -20,7 +20,8 @@ import {
     DollarSign,
     TrendingUp,
     CreditCard,
-    Briefcase
+    Briefcase,
+    Home
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -212,6 +213,13 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                                 className="bg-slate-100 dark:bg-[#1A1E29] border border-slate-200 dark:border-white/5 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#F5A623]/50 w-64 transition-all text-slate-900 dark:text-white"
                             />
                         </div>
+                        
+                        {/* Landing Page */}
+                        <Link to="/" className="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all text-slate-600 dark:text-[#8A8FA8]">
+                            <Home size={18} />
+                        </Link>
+
+                        {/* Language Toggle */}
                         <button
                             onClick={toggleLanguage}
                             className="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all text-slate-600 dark:text-[#8A8FA8]"

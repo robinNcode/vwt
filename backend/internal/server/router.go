@@ -30,6 +30,7 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	r.GET("/health", func(c *gin.Context) { c.JSON(http.StatusOK, gin.H{"ok": true}) })
 
 	// Serve Static Files
+	r.Static("/public", "./public")
 	r.Static("/uploads", "./public/uploads")
 
 	v1 := r.Group("/api/v1")
