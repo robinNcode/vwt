@@ -9,7 +9,7 @@ import (
 
 type CartService interface {
 	GetCart(userID uint) (*model.Cart, error)
-	AddToCart(userID uint, productID uint, quantity int) (*model.Cart, error)
+	AddToCart(userID uint, productID *uint, serviceID *uint, quantity int) (*model.Cart, error)
 	UpdateItemQuantity(userID uint, itemID uint, quantity int) (*model.Cart, error)
 	RemoveItem(userID uint, itemID uint) (*model.Cart, error)
 	ClearCart(userID uint) error
@@ -25,25 +25,40 @@ func NewCartService(db *gorm.DB) CartService {
 
 func (s *cartService) GetCart(userID uint) (*model.Cart, error) {
 	var cart model.Cart
-	err := s.db.Preload("Items").Preload("Items.Product").Where("user_id = ?", userID).FirstOrCreate(&cart, model.Cart{UserID: &userID}).Error
+	err := s.db.Preload("Items").Preload("Items.Product").Preload("Items.Service").Where("user_id = ?", userID).FirstOrCreate(&cart, model.Cart{UserID: &userID}).Error
 	return &cart, err
 }
 
-func (s *cartService) AddToCart(userID uint, productID uint, quantity int) (*model.Cart, error) {
+func (s *cartService) AddToCart(userID uint, productID *uint, serviceID *uint, quantity int) (*model.Cart, error) {
 	cart, err := s.GetCart(userID)
 	if err != nil {
 		return nil, err
 	}
 
-	// Validate product exists and has stock
-	var product model.Product
-	if err := s.db.First(&product, productID).Error; err != nil {
-		return nil, errors.New("product not found")
+	if productID == nil && serviceID == nil {
+		return nil, errors.New("either product_id or service_id must be provided")
 	}
 
 	// Check if item already in cart
 	var existingItem model.CartItem
-	err = s.db.Where("cart_id = ? AND product_id = ?", cart.ID, productID).First(&existingItem).Error
+	query := s.db.Where("cart_id = ?", cart.ID)
+	if productID != nil {
+		// Validate product exists
+		var product model.Product
+		if err := s.db.First(&product, *productID).Error; err != nil {
+			return nil, errors.New("product not found")
+		}
+		query = query.Where("product_id = ?", *productID)
+	} else {
+		// Validate service exists
+		var service model.Service
+		if err := s.db.First(&service, *serviceID).Error; err != nil {
+			return nil, errors.New("service not found")
+		}
+		query = query.Where("service_id = ?", *serviceID)
+	}
+
+	err = query.First(&existingItem).Error
 
 	if err == nil {
 		// Update quantity
@@ -54,6 +69,7 @@ func (s *cartService) AddToCart(userID uint, productID uint, quantity int) (*mod
 		newItem := model.CartItem{
 			CartID:    cart.ID,
 			ProductID: productID,
+			ServiceID: serviceID,
 			Quantity:  quantity,
 		}
 		s.db.Create(&newItem)

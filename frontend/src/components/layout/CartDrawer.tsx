@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ShoppingCart, Plus, Minus, Trash2, Package } from 'lucide-react';
+import { X, ShoppingCart, Plus, Minus, Trash2, Package, Wrench } from 'lucide-react';
 import { useCartStore } from '../../lib/cart';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -10,19 +10,23 @@ const CartDrawer: React.FC = () => {
     const { items, isOpen, setIsOpen, updateQuantity, removeItem, clearCart } = useCartStore();
 
     const total = items.reduce((sum, item) => {
-        const price = item.product?.price ?? 0;
+        const price = item.product?.price ?? item.service?.price ?? 0;
         return sum + price * item.quantity;
     }, 0);
 
-    const getProductName = (product: any) => {
-        if (!product) return 'Product';
-        return i18n.language === 'bn' ? (product.name_bn || product.name_en) : (product.name_en || product.name_bn);
+    const getItemName = (item: any) => {
+        const entity = item.product || item.service;
+        if (!entity) return 'Item';
+        return i18n.language === 'bn' ? (entity.name_bn || entity.name_en) : (entity.name_en || entity.name_bn);
     };
 
-    const getPrimaryImage = (product: any): string | null => {
-        if (!product?.images?.length) return null;
-        const primary = product.images.find((img: any) => img.is_primary) || product.images[0];
-        return primary?.url || null;
+    const getItemImage = (item: any): string | null => {
+        if (item.product) {
+            const images = item.product.images || [];
+            const primary = images.find((img: any) => img.is_primary) || images[0];
+            return primary?.url || null;
+        }
+        return item.service?.image_url || null;
     };
 
     return (
@@ -72,20 +76,21 @@ const CartDrawer: React.FC = () => {
                                     <Package size={56} strokeWidth={1} />
                                     <div className="text-center">
                                         <p className="font-bold text-slate-600 dark:text-slate-300 mb-1">Your cart is empty</p>
-                                        <p className="text-sm text-slate-400">Add some products to get started</p>
+                                        <p className="text-sm text-slate-400">Add some products or services to get started</p>
                                     </div>
                                     <Link
                                         to="/products"
                                         onClick={() => setIsOpen(false)}
                                         className="mt-2 px-6 py-2.5 bg-blue-600 dark:bg-[#F5A623] text-white dark:text-[#0D0F14] rounded-xl font-bold text-sm hover:bg-blue-700 dark:hover:bg-[#D48E1D] transition-colors"
                                     >
-                                        Browse Products
+                                        Browse Items
                                     </Link>
                                 </div>
                             ) : (
                                 items.map((item) => {
-                                    const imgUrl = getPrimaryImage(item.product);
-                                    const name = getProductName(item.product);
+                                    const imgUrl = getItemImage(item);
+                                    const name = getItemName(item);
+                                    const price = item.product?.price ?? item.service?.price ?? 0;
                                     return (
                                         <div key={item.id} className="flex items-center gap-3 p-3 rounded-2xl bg-slate-50 dark:bg-white/[0.03] border border-slate-100 dark:border-white/5">
                                             {/* Image */}
@@ -97,7 +102,7 @@ const CartDrawer: React.FC = () => {
                                                         className="w-full h-full object-cover"
                                                     />
                                                 ) : (
-                                                    <Package size={20} className="text-slate-300 dark:text-slate-700" strokeWidth={1} />
+                                                    item.service_id ? <Wrench size={20} className="text-slate-300 dark:text-slate-700" strokeWidth={1} /> : <Package size={20} className="text-slate-300 dark:text-slate-700" strokeWidth={1} />
                                                 )}
                                             </div>
 
@@ -105,9 +110,13 @@ const CartDrawer: React.FC = () => {
                                             <div className="flex-1 min-w-0">
                                                 <p className="font-bold text-slate-900 dark:text-white text-sm truncate">{name}</p>
                                                 <p className="text-xs text-blue-600 dark:text-[#F5A623] font-bold">
-                                                    ৳{((item.product?.price ?? 0) * item.quantity).toLocaleString()}
+                                                    ৳{(price * item.quantity).toLocaleString()}
                                                 </p>
+                                                {item.service_id && (
+                                                    <span className="text-[8px] font-bold uppercase tracking-widest text-slate-400">Service</span>
+                                                )}
                                             </div>
+
 
                                             {/* Qty Controls */}
                                             <div className="flex items-center gap-1">

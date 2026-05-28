@@ -46,8 +46,9 @@ func (h *CartHandler) GetCart(c *gin.Context) {
 }
 
 type AddToCartRequest struct {
-	ProductID uint `json:"product_id" binding:"required"`
-	Quantity  int  `json:"quantity" binding:"required,min=1"`
+	ProductID *uint `json:"product_id"`
+	ServiceID *uint `json:"service_id"`
+	Quantity  int   `json:"quantity" binding:"required,min=1"`
 }
 
 func (h *CartHandler) AddToCart(c *gin.Context) {
@@ -63,7 +64,12 @@ func (h *CartHandler) AddToCart(c *gin.Context) {
 		return
 	}
 
-	cart, err := h.cartService.AddToCart(userID, req.ProductID, req.Quantity)
+	if req.ProductID == nil && req.ServiceID == nil {
+		response.Fail(c, http.StatusBadRequest, "Product ID or Service ID is required", nil)
+		return
+	}
+
+	cart, err := h.cartService.AddToCart(userID, req.ProductID, req.ServiceID, req.Quantity)
 	if err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to add to cart", err.Error())
 		return

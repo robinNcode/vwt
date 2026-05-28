@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Skeleton from '../components/ui/Skeleton';
 import watermark from '@/assets/images/invoice_quatation_watermark.png';
-import { Zap, Shield, Clock, Wrench } from 'lucide-react';
+import { Zap, Shield, Clock, Wrench, ShoppingCart } from 'lucide-react';
 import api from '../lib/axios';
+import { useCartStore } from '../lib/cart';
 import ServiceModal from '../components/services/ServiceModal';
+
 
 export interface Service {
     id: number;
@@ -24,6 +26,8 @@ const Services: React.FC = () => {
     const [services, setServices] = useState<Service[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedService, setSelectedService] = useState<Service | null>(null);
+    const addToCart = useCartStore((state) => state.addToCart);
+
 
     useEffect(() => {
         const fetchServices = async () => {
@@ -116,15 +120,30 @@ const Services: React.FC = () => {
                                                 {service.price ? `৳${service.price.toLocaleString()}` : 'Contact Us'}
                                             </span>
                                         </div>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setSelectedService(service);
-                                            }}
-                                            className="bg-blue-600 dark:bg-[#F5A623] text-white dark:text-[#0D0F14] px-6 py-3 rounded-xl font-bold hover:bg-blue-700 dark:hover:bg-[#D48E1D] transition-colors shadow-lg shadow-blue-200 dark:shadow-[#F5A623]/10"
-                                        >
-                                            View Details
-                                        </button>
+                                        <div className="flex flex-col sm:flex-row gap-3">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedService(service);
+                                                }}
+                                                className="flex-1 bg-slate-900/5 dark:bg-white/5 text-slate-900 dark:text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-900/10 dark:hover:bg-white/10 transition-colors"
+                                            >
+                                                Details
+                                            </button>
+                                            {service.price && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        addToCart({ serviceId: service.id, quantity: 1 });
+                                                    }}
+                                                    className="flex-1 bg-blue-600 dark:bg-[#F5A623] text-white dark:text-[#0D0F14] px-6 py-3 rounded-xl font-bold hover:bg-blue-700 dark:hover:bg-[#D48E1D] transition-colors shadow-lg shadow-blue-200 dark:shadow-[#F5A623]/10 flex items-center justify-center gap-2"
+                                                >
+                                                    <ShoppingCart size={18} />
+                                                    Add
+                                                </button>
+                                            )}
+                                        </div>
+
                                     </div>
                                 </div>
                             );

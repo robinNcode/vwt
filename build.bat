@@ -12,7 +12,7 @@ if %errorlevel% neq 0 (
     echo Backend build failed!
     exit /b %errorlevel%
 )
-copy .env.production ..\build\.env
+copy .env.production ..\backend\build\.env
 cd ..
 
 :: Build Frontend

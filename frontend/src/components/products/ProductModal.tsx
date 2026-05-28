@@ -29,9 +29,10 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
     const handleAddToCart = async () => {
         setAdding(true);
         try {
-            await addToCart(product.id, 1);
+            await addToCart({ productId: product.id, quantity: 1 });
             onClose();
         } catch {
+
             // error handled in store
         } finally {
             setAdding(false);

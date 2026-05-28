@@ -3,9 +3,11 @@ import api from './axios';
 
 export interface CartItem {
     id: number;
-    product_id: number;
+    product_id?: number;
+    service_id?: number;
     quantity: number;
     product?: any;
+    service?: any;
 }
 
 export interface CartState {
@@ -13,7 +15,7 @@ export interface CartState {
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
     fetchCart: () => Promise<void>;
-    addToCart: (productId: number, quantity: number) => Promise<void>;
+    addToCart: (params: { productId?: number; serviceId?: number; quantity: number }) => Promise<void>;
     updateQuantity: (itemId: number, quantity: number) => Promise<void>;
     removeItem: (itemId: number) => Promise<void>;
     clearCart: () => Promise<void>;
@@ -33,9 +35,13 @@ export const useCartStore = create<CartState>((set) => ({
             console.error('Failed to fetch cart', error);
         }
     },
-    addToCart: async (productId, quantity) => {
+    addToCart: async ({ productId, serviceId, quantity }) => {
         try {
-            const res = await api.post('/cart/items', { product_id: productId, quantity });
+            const res = await api.post('/cart/items', {
+                product_id: productId,
+                service_id: serviceId,
+                quantity
+            });
             if (res.data.success && res.data.data) {
                 set({ items: res.data.data.items || [] });
                 set({ isOpen: true }); // Open cart upon adding
@@ -45,6 +51,7 @@ export const useCartStore = create<CartState>((set) => ({
             throw error;
         }
     },
+
     updateQuantity: async (itemId, quantity) => {
         try {
             const res = await api.put(`/cart/items/${itemId}`, { quantity });

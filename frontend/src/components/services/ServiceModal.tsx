@@ -1,8 +1,9 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, Zap, Shield, Clock, Wrench } from 'lucide-react';
+import { X, Calendar, Zap, Shield, Clock, Wrench, ShoppingCart } from 'lucide-react';
 import type { Service } from '../../pages/Services';
 import { useTranslation } from 'react-i18next';
+import { useCartStore } from '../../lib/cart';
 
 interface ServiceModalProps {
     service: Service | null;
@@ -12,6 +13,8 @@ interface ServiceModalProps {
 
 const ServiceModal: React.FC<ServiceModalProps> = ({ service, isOpen, onClose }) => {
     const { i18n } = useTranslation();
+    const addToCart = useCartStore((state) => state.addToCart);
+    const [adding, setAdding] = React.useState(false);
 
     if (!service) return null;
 
@@ -19,6 +22,23 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ service, isOpen, onClose })
     const desc = i18n.language === 'bn'
         ? (service.description_bn || service.description_en || '')
         : (service.description_en || service.description_bn || '');
+
+    const handleAddToCart = async () => {
+        if (!service.price) {
+            // If no price, maybe redirect to contact or just alert
+            alert("Please contact us for pricing and booking of this service.");
+            return;
+        }
+        setAdding(true);
+        try {
+            await addToCart({ serviceId: service.id, quantity: 1 });
+            onClose();
+        } catch {
+            // error handled in store
+        } finally {
+            setAdding(false);
+        }
+    };
 
     return (
         <AnimatePresence>
@@ -102,15 +122,14 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ service, isOpen, onClose })
                                     </span>
                                 </div>
                                 <button
-                                    onClick={() => {
-                                        alert("Redirecting to booking...");
-                                        onClose();
-                                    }}
-                                    className="bg-blue-600 dark:bg-[#F5A623] hover:bg-blue-700 dark:hover:bg-[#D48E1D] text-white dark:text-[#0D0F14] px-8 py-4 rounded-xl font-bold transition-all hover:shadow-lg hover:shadow-blue-600/30 active:scale-95 flex items-center gap-2"
+                                    onClick={handleAddToCart}
+                                    disabled={adding}
+                                    className="bg-blue-600 dark:bg-[#F5A623] hover:bg-blue-700 dark:hover:bg-[#D48E1D] text-white dark:text-[#0D0F14] px-8 py-4 rounded-xl font-bold transition-all hover:shadow-lg hover:shadow-blue-600/30 active:scale-95 flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                                 >
-                                    <Calendar size={18} />
-                                    Book Now
+                                    <ShoppingCart size={18} />
+                                    {adding ? 'Adding...' : 'Add to Cart'}
                                 </button>
+
                             </div>
                         </div>
                     </motion.div>
