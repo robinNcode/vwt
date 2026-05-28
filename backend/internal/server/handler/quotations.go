@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/robinncode/vwt/internal/server/response"
 	"github.com/robinncode/vwt/internal/model"
+	"github.com/robinncode/vwt/internal/server/response"
 	"github.com/robinncode/vwt/internal/service"
 )
 
@@ -47,7 +47,7 @@ func (h *QuotationsHandler) Create(c *gin.Context) {
 		return
 	}
 
-	q := models.Quotation{
+	q := model.Quotation{
 		CustomerName:    req.CustomerName,
 		CustomerEmail:   req.CustomerEmail,
 		CustomerPhone:   req.CustomerPhone,
