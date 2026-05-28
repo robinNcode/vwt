@@ -6,9 +6,9 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/robinncode/vwt/internal/config"
+	"github.com/robinncode/vwt/internal/repository"
 	"github.com/robinncode/vwt/internal/server/handler"
 	"github.com/robinncode/vwt/internal/server/middleware"
-	"github.com/robinncode/vwt/internal/repository"
 	"github.com/robinncode/vwt/internal/service"
 	"gorm.io/gorm"
 )
@@ -75,6 +75,9 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	roleSvc := service.NewRoleService(roleRepo)
 	roleH := handler.NewRoleHandler(roleSvc)
 
+	cartSvc := service.NewCartService(db)
+	cartH := handler.NewCartHandler(cartSvc)
+
 	v1.POST("/auth/login", authH.AdminLogin)
 	v1.POST("/auth/customers/register", authH.CustomerRegister)
 
@@ -86,6 +89,15 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	v1.POST("/orders", ordersH.Create)
 	v1.POST("/quotations", quotationsH.Create)
 	v1.POST("/contact-messages", contactsH.Create)
+
+	// Protected routes for users (Customers/Admins)
+	protected := v1.Group("")
+	protected.Use(middleware.RequireAuth(cfg))
+	protected.GET("/cart", cartH.GetCart)
+	protected.POST("/cart/items", cartH.AddToCart)
+	protected.PUT("/cart/items/:id", cartH.UpdateQuantity)
+	protected.DELETE("/cart/items/:id", cartH.RemoveItem)
+	protected.DELETE("/cart", cartH.ClearCart)
 
 	// Admin routes with /admin prefix to avoid route conflicts (especially for /products)
 	admin := v1.Group("/admin")

@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/robinncode/vwt/internal/config"
@@ -10,8 +11,13 @@ import (
 )
 
 func main() {
-	if err := godotenv.Load(); err != nil {
-		_ = godotenv.Load("../.env")
+	// Load primary .env
+	_ = godotenv.Load()
+
+	// Load environment specific .env if APP_ENV is set
+	env := os.Getenv("APP_ENV")
+	if env != "" {
+		_ = godotenv.Load(".env." + env)
 	}
 
 	cfg := config.Load()

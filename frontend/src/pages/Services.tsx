@@ -4,6 +4,7 @@ import Skeleton from '../components/ui/Skeleton';
 import watermark from '@/assets/images/invoice_quatation_watermark.png';
 import { Zap, Shield, Clock } from 'lucide-react';
 import api from '../lib/axios';
+import ServiceModal from '../components/services/ServiceModal';
 
 interface Service {
     id: number;
@@ -16,6 +17,7 @@ const Services: React.FC = () => {
     const { t } = useTranslation();
     const [services, setServices] = useState<Service[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedService, setSelectedService] = useState<Service | null>(null);
 
     useEffect(() => {
         const fetchServices = async () => {
@@ -73,7 +75,11 @@ const Services: React.FC = () => {
                         Array(4).fill(0).map((_, i) => <ServiceSkeleton key={i} />)
                     ) : services.length > 0 ? (
                         services.map((service) => (
-                            <div key={service.id} className="group bg-white rounded-3xl border border-slate-100 p-8 hover:shadow-2xl hover:shadow-slate-200 transition-all duration-500 hover:-translate-y-1">
+                            <div
+                                key={service.id}
+                                onClick={() => setSelectedService(service)}
+                                className="group bg-white rounded-3xl border border-slate-100 p-8 hover:shadow-2xl hover:shadow-slate-200 transition-all duration-500 hover:-translate-y-1 cursor-pointer"
+                            >
                                 <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
                                     <Zap size={28} />
                                 </div>
@@ -86,7 +92,13 @@ const Services: React.FC = () => {
                                         <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Starts from</span>
                                         <span className="text-2xl font-extrabold text-slate-900">${service.price}</span>
                                     </div>
-                                    <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            alert("Redirecting to booking...");
+                                        }}
+                                        className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
+                                    >
                                         Book Now
                                     </button>
                                 </div>
@@ -115,6 +127,12 @@ const Services: React.FC = () => {
                     ))}
                 </div>
             </div>
+
+            <ServiceModal
+                service={selectedService}
+                isOpen={!!selectedService}
+                onClose={() => setSelectedService(null)}
+            />
         </div>
     );
 };

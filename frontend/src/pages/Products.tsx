@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import Skeleton from '../components/ui/Skeleton';
 import { ShoppingCart, Heart, Eye } from 'lucide-react';
 import api from '../lib/axios';
+import { useCartStore } from '../lib/cart';
+import ProductModal from '../components/products/ProductModal';
 
 interface Product {
     id: number;
@@ -16,6 +18,8 @@ const Products: React.FC = () => {
     const { t } = useTranslation();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const addToCart = useCartStore((state) => state.addToCart);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -81,7 +85,10 @@ const Products: React.FC = () => {
                                     <button className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-slate-600 hover:bg-blue-600 hover:text-white transition-all">
                                         <Heart size={18} />
                                     </button>
-                                    <button className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-slate-600 hover:bg-blue-600 hover:text-white transition-all">
+                                    <button
+                                        onClick={() => setSelectedProduct(product)}
+                                        className="w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center text-slate-600 hover:bg-blue-600 hover:text-white transition-all"
+                                    >
                                         <Eye size={18} />
                                     </button>
                                 </div>
@@ -91,7 +98,10 @@ const Products: React.FC = () => {
                                 <h3 className="text-lg font-bold text-slate-900 mb-2 truncate">{product.name}</h3>
                                 <div className="flex items-center justify-between mt-4">
                                     <span className="text-xl font-extrabold text-slate-900">${product.price}</span>
-                                    <button className="bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-600 transition-colors">
+                                    <button
+                                        onClick={() => addToCart(product.id, 1)}
+                                        className="bg-slate-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-600 transition-colors"
+                                    >
                                         Add to Cart
                                     </button>
                                 </div>
@@ -104,6 +114,12 @@ const Products: React.FC = () => {
                     </div>
                 )}
             </div>
+
+            <ProductModal
+                product={selectedProduct}
+                isOpen={!!selectedProduct}
+                onClose={() => setSelectedProduct(null)}
+            />
         </div>
     );
 };
