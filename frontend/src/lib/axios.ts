@@ -18,4 +18,17 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+// Response interceptor to handle errors
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response && error.response.status === 401) {
+            localStorage.removeItem('vwt_token');
+            localStorage.removeItem('vwt_user');
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);
+
 export default api;

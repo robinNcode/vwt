@@ -57,7 +57,7 @@ func SeedCore(db *gorm.DB) {
 	db.Where("slug = ?", "super-admin").First(&superRole)
 	var allPerms []model.Permission
 	db.Find(&allPerms)
-	db.Model(&superRole).Association("Permissions").Replace(allPerms)
+	db.Model(&superRole).Association("Permissions").Append(allPerms)
 
 	// Users
 	password, _ := bcrypt.GenerateFromPassword([]byte("Admin@123"), bcrypt.DefaultCost)

@@ -9,21 +9,23 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/robinncode/vwt/internal/config"
-	"github.com/robinncode/vwt/internal/server/response"
 	"github.com/robinncode/vwt/internal/model"
+	"github.com/robinncode/vwt/internal/server/response"
 	"gorm.io/gorm"
 )
 
 type Claims struct {
 	UserID uint   `json:"user_id"`
+	RoleID uint   `json:"role_id"`
 	Type   string `json:"type"`
 	jwt.RegisteredClaims
 }
 
-func SignJWT(cfg config.Config, userID uint, userType string) (string, error) {
+func SignJWT(cfg config.Config, userID uint, roleID uint, userType string) (string, error) {
 	now := time.Now()
 	claims := Claims{
 		UserID: userID,
+		RoleID: roleID,
 		Type:   userType,
 		RegisteredClaims: jwt.RegisteredClaims{
 			IssuedAt:  jwt.NewNumericDate(now),
@@ -62,6 +64,7 @@ func RequireAuth(cfg config.Config) gin.HandlerFunc {
 		}
 
 		c.Set("auth.user_id", claims.UserID)
+		c.Set("auth.role_id", claims.RoleID)
 		c.Set("auth.type", claims.Type)
 		c.Next()
 	}
@@ -69,8 +72,8 @@ func RequireAuth(cfg config.Config) gin.HandlerFunc {
 
 func RequireAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		userID, _ := c.Get("auth.user_id")
-		if uID, ok := userID.(uint); ok && uID == 1 {
+		roleID, _ := c.Get("auth.role_id")
+		if rID, ok := roleID.(uint); ok && rID == 1 {
 			c.Next()
 			return
 		}
@@ -101,9 +104,9 @@ func RequirePermission(db *gorm.DB, permissionSlug string) gin.HandlerFunc {
 			return
 		}
 
-		// Hardcoded Super Admin wildcard (User ID 1)
-		fmt.Println("User ID:", uID)
-		if uID == 1 {
+		// Role ID 1 wildcard (Super Admin)
+		roleID, _ := c.Get("auth.role_id")
+		if rID, ok := roleID.(uint); ok && rID == 1 {
 			c.Next()
 			return
 		}

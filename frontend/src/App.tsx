@@ -1,5 +1,6 @@
 import { HashRouter as Router, Routes, Route } from 'react-router-dom'
 import { Suspense, lazy } from 'react'
+import { Toaster } from 'react-hot-toast'
 import Navbar from './components/layout/Navbar'
 import Footer from './components/layout/Footer'
 import Home from './pages/Home'
@@ -8,6 +9,7 @@ import Home from './pages/Home'
 const Products = lazy(() => import('./pages/Products'))
 const Services = lazy(() => import('./pages/Services'))
 const Contact = lazy(() => import('./pages/Contact'))
+const About = lazy(() => import('./pages/About'))
 const Login = lazy(() => import('./pages/Login'))
 
 import AdminLayout from './components/layout/AdminLayout'
@@ -24,14 +26,17 @@ import AdminPurchases from './pages/admin/Purchases'
 import AdminExpenses from './pages/admin/Expenses'
 import AdminServiceRevenues from './pages/admin/ServiceRevenues'
 import AdminUsers from './pages/admin/Users'
+import AdminMessages from './pages/admin/Messages'
 import AdminProfile from './pages/admin/Profile'
 
 function App() {
     return (
         <Router>
+            <Toaster position="top-right" toastOptions={{ className: 'dark:bg-[#1A1E29] dark:text-white' }} />
             <Suspense fallback={<div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-[#0D0F14] text-slate-900 dark:text-white transition-colors duration-300">Loading...</div>}>
                 <Routes>
-                    {/* Public Routes */}
+                    {/* ... existing routes ... */}
+                    {/* Public Routes skipped for brevity but kept in file */}
                     <Route path="/" element={
                         <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] font-sans text-slate-900 dark:text-white transition-colors duration-300 selection:bg-blue-100 selection:text-blue-900">
                             <Navbar />
@@ -50,6 +55,13 @@ function App() {
                         <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] font-sans text-slate-900 transition-colors duration-300">
                             <Navbar />
                             <main><Services /></main>
+                            <Footer />
+                        </div>
+                    } />
+                    <Route path="/about" element={
+                        <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] font-sans text-slate-900 transition-colors duration-300">
+                            <Navbar />
+                            <main><About /></main>
                             <Footer />
                         </div>
                     } />
@@ -81,6 +93,7 @@ function App() {
                     <Route path="/admin/accounting/expenses" element={<AdminLayout children={<AdminExpenses />} />} />
                     <Route path="/admin/accounting/service-revenues" element={<AdminLayout children={<AdminServiceRevenues />} />} />
                     <Route path="/admin/users" element={<AdminLayout children={<AdminUsers />} />} />
+                    <Route path="/admin/messages" element={<AdminLayout children={<AdminMessages />} />} />
                     <Route path="/admin/profile" element={<AdminLayout children={<AdminProfile />} />} />
                 </Routes>
             </Suspense>

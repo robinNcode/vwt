@@ -16,8 +16,7 @@ const Footer = () => {
                             <img src={finalLogo} alt="Volt Wave Tech" className="h-6 object-contain dark:brightness-0 dark:invert" />
                         </Link>
                         <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-                            Your destination for premium electronics and professional electrical services.
-                            We bring power to your life with quality and trust.
+                            {t('footer.desc')}
                         </p>
                         <div className="flex gap-4">
                             <a href="#" className="w-10 h-10 rounded-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-blue-600 dark:hover:bg-[#F5A623] hover:text-white dark:hover:text-[#0D0F14] hover:border-blue-600 dark:hover:border-[#F5A623] transition-all">
@@ -34,34 +33,34 @@ const Footer = () => {
 
                     {/* Quick Links */}
                     <div>
-                        <h4 className="text-slate-900 dark:text-white font-bold mb-6">Quick Links</h4>
+                        <h4 className="text-slate-900 dark:text-white font-bold mb-6">{t('footer.quick_links')}</h4>
                         <ul className="flex flex-col gap-4">
-                            <li><Link to="/products" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors text-sm">Products</Link></li>
-                            <li><Link to="/services" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors text-sm">Services</Link></li>
-                            <li><Link to="/about" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors text-sm">About Us</Link></li>
-                            <li><Link to="/contact" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors text-sm">Contact</Link></li>
+                            <li><Link to="/products" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors text-sm">{t('nav.products')}</Link></li>
+                            <li><Link to="/services" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors text-sm">{t('nav.services')}</Link></li>
+                            <li><Link to="/about" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors text-sm">{t('nav.about')}</Link></li>
+                            <li><Link to="/contact" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors text-sm">{t('nav.contact')}</Link></li>
                         </ul>
                     </div>
 
                     {/* Customer Support */}
                     <div>
-                        <h4 className="text-slate-900 dark:text-white font-bold mb-6">Support</h4>
+                        <h4 className="text-slate-900 dark:text-white font-bold mb-6">{t('footer.support')}</h4>
                         <ul className="flex flex-col gap-4">
-                            <li><Link to="/faq" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors text-sm">FAQs</Link></li>
-                            <li><Link to="/shipping" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors text-sm">Shipping Policy</Link></li>
-                            <li><Link to="/returns" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors text-sm">Return Policy</Link></li>
-                            <li><Link to="/track-order" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors text-sm">Track Order</Link></li>
+                            <li><Link to="/faq" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors text-sm">{t('footer.faqs')}</Link></li>
+                            <li><Link to="/shipping" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors text-sm">{t('footer.shipping')}</Link></li>
+                            <li><Link to="/returns" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors text-sm">{t('footer.returns')}</Link></li>
+                            <li><Link to="/track-order" className="text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors text-sm">{t('footer.track')}</Link></li>
                         </ul>
                     </div>
 
                     {/* Contact Info */}
                     <div>
-                        <h4 className="text-slate-900 dark:text-white font-bold mb-6">Contact Us</h4>
+                        <h4 className="text-slate-900 dark:text-white font-bold mb-6">{t('footer.contact_us')}</h4>
                         <ul className="flex flex-col gap-4">
                             <li className="flex items-start gap-3">
                                 <MapPin className="text-blue-600 dark:text-[#F5A623] shrink-0" size={18} />
                                 <span className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-                                    Hosna Plaza, Mirpur-10, Dhaka-1216, Bangladesh
+                                    {t('contact_page.info.address')}
                                 </span>
                             </li>
                             <li className="flex items-center gap-3">
@@ -81,8 +80,8 @@ const Footer = () => {
                         © {new Date().getFullYear()} Volt Wave Tech. All rights reserved.
                     </p>
                     <div className="flex gap-6">
-                        <Link to="/terms" className="text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-[#F5A623] text-xs transition-colors">Terms of Service</Link>
-                        <Link to="/privacy" className="text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-[#F5A623] text-xs transition-colors">Privacy Policy</Link>
+                        <Link to="/terms" className="text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-[#F5A623] text-xs transition-colors">{t('footer.terms')}</Link>
+                        <Link to="/privacy" className="text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-[#F5A623] text-xs transition-colors">{t('footer.privacy')}</Link>
                     </div>
                 </div>
             </div>

@@ -11,7 +11,12 @@ mkdir -p build
 # Build Backend
 echo "[1/2] Building Backend..."
 cd backend
-go build -o ../build/api ./cmd/api
+if [ "$1" == "linux" ]; then
+    echo "  Target: Linux (amd64)"
+    GOOS=linux GOARCH=amd64 go build -o ../build/api ./cmd/api
+else
+    go build -o ../build/api ./cmd/api
+fi
 if [ $? -ne 0 ]; then
     echo "Backend build failed!"
     exit 1

@@ -13,18 +13,18 @@ const Home = () => {
     const features = [
         {
             icon: <Zap className="text-yellow-500" size={24} />,
-            title: "Fast Delivery",
-            description: "Quick delivery across the country within 24-48 hours."
+            title: t('features.fast_delivery.title'),
+            description: t('features.fast_delivery.desc')
         },
         {
             icon: <Shield className="text-blue-500" size={24} />,
-            title: "Original Products",
-            description: "We guarantee 100% authentic and genuine electronics."
+            title: t('features.original_products.title'),
+            description: t('features.original_products.desc')
         },
         {
             icon: <Clock className="text-emerald-500" size={24} />,
-            title: "24/7 Support",
-            description: "Our dedicated support team is always ready to help you."
+            title: t('features.support.title'),
+            description: t('features.support.desc')
         }
     ]
 
@@ -49,7 +49,7 @@ const Home = () => {
                             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 dark:bg-white/5 text-blue-600 dark:text-[#F5A623] text-sm font-semibold mb-8 ring-1 ring-inset ring-blue-600/10 dark:ring-white/10"
                         >
                             <Zap size={16} />
-                            <span>New Arrival: Next-Gen Power Modules</span>
+                            <span>{t('hero.new_arrival')}</span>
                         </motion.div>
 
                         <motion.h1
@@ -132,16 +132,18 @@ const Home = () => {
                             />
                         </motion.div>
                         <div className="flex-1">
-                            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">Certified Quality & Professional Excellence</h2>
+                            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">
+                                {t('trust.title')}
+                            </h2>
                             <p className="text-slate-600 dark:text-slate-400 text-lg mb-8 leading-relaxed">
-                                At Volt Wave Tech, we don't just sell electronics; we deliver excellence. Our products and services are backed by industry certifications and a commitment to the highest standards of safety and performance.
+                                {t('trust.desc')}
                             </p>
                             <ul className="space-y-4">
                                 {[
-                                    "Licensed Electrical Professionals",
-                                    "Genuine Manufacturer Warranty",
-                                    "Quality Verified and Tested",
-                                    "Eco-friendly Power Solutions"
+                                    t('trust.points.licensed'),
+                                    t('trust.points.warranty'),
+                                    t('trust.points.verified'),
+                                    t('trust.points.eco')
                                 ].map((item, idx) => (
                                     <li key={idx} className="flex items-center gap-3 text-slate-700 dark:text-slate-300 font-medium">
                                         <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600">
@@ -153,7 +155,7 @@ const Home = () => {
                             </ul>
                             <div className="mt-10 pt-8 border-t border-slate-100 dark:border-white/5">
                                 <img src={sign} alt="Signature" className="h-12 opacity-80 dark:brightness-0 dark:invert" />
-                                <p className="mt-2 text-sm font-bold text-slate-900 dark:text-white">Authorized Signatory</p>
+                                <p className="mt-2 text-sm font-bold text-slate-900 dark:text-white">{t('trust.signatory')}</p>
                             </div>
                         </div>
                     </div>
@@ -170,23 +172,25 @@ const Home = () => {
                         </div>
 
                         <div className="max-w-xl relative">
-                            <h2 className="text-3xl md:text-5xl font-bold text-white dark:text-[#0D0F14] mb-6">Ready to upgrade your workspace?</h2>
+                            <h2 className="text-3xl md:text-5xl font-bold text-white dark:text-[#0D0F14] mb-6">
+                                {t('cta.title')}
+                            </h2>
                             <p className="text-blue-100 dark:text-[#0D0F14]/70 text-lg mb-8">
-                                Explore our wide range of professional tools and expert components designed for engineers and hobbyists alike.
+                                {t('cta.desc')}
                             </p>
                             <Link to="/products" className="inline-flex items-center justify-center rounded-xl bg-white dark:bg-[#0D0F14] px-8 py-4 text-sm font-bold text-blue-600 dark:text-[#F5A623] shadow-sm transition-all hover:bg-slate-50 dark:hover:bg-black active:scale-95">
-                                Shop Collection
+                                {t('cta.button')}
                             </Link>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 relative">
                             <div className="w-40 h-40 bg-white/10 dark:bg-black/10 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center gap-3 group hover:-translate-y-2 transition-transform">
                                 <Cpu className="text-white dark:text-[#0D0F14]" size={32} />
-                                <span className="text-white dark:text-[#0D0F14] text-xs font-medium uppercase tracking-widest">Smart ICs</span>
+                                <span className="text-white dark:text-[#0D0F14] text-xs font-medium uppercase tracking-widest">{t('cta.ics')}</span>
                             </div>
                             <div className="w-40 h-40 bg-white/10 dark:bg-black/10 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center gap-3 mt-8 group hover:-translate-y-2 transition-transform">
                                 <Wifi className="text-white dark:text-[#0D0F14]" size={32} />
-                                <span className="text-white dark:text-[#0D0F14] text-xs font-medium uppercase tracking-widest">IoT Modules</span>
+                                <span className="text-white dark:text-[#0D0F14] text-xs font-medium uppercase tracking-widest">{t('cta.iot')}</span>
                             </div>
                         </div>
                     </div>
@@ -197,9 +201,11 @@ const Home = () => {
             <section className="py-20 bg-slate-50 dark:bg-[#0D0F14]">
                 <div className="container-custom">
                     <div className="flex flex-col items-center text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">Our Brand Identity</h2>
+                        <h2 className="text-3xl md:text-5xl font-bold text-slate-900 dark:text-white mb-6">
+                            {t('brand.title')}
+                        </h2>
                         <p className="text-slate-500 dark:text-slate-400 text-lg max-w-2xl">
-                            Volt Wave Tech stands for quality and reliability in the electronics industry.
+                            {t('brand.desc')}
                         </p>
                     </div>
 

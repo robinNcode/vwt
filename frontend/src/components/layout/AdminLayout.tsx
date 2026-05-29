@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard,
@@ -21,7 +21,8 @@ import {
     TrendingUp,
     CreditCard,
     Briefcase,
-    Home
+    Home,
+    MessageSquare
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,6 +31,7 @@ import ThemeToggle from '../ThemeToggle';
 import { useTranslation } from 'react-i18next';
 import finalLogo from '@/assets/images/final_logo.png';
 import finalIcon from '@/assets/images/final_icon.png';
+import api from '@/lib/axios';
 
 interface MenuItem {
     icon: any;
@@ -69,6 +71,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             ]
         },
         { icon: SettingsIcon, label: t('admin_nav.settings'), path: '/admin/settings' },
+        { icon: MessageSquare, label: t('admin_nav.messages'), path: '/admin/messages' },
         { icon: User, label: t('admin_nav.users'), path: '/admin/users' },
     ];
 
@@ -76,6 +79,25 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         authService.logout();
         navigate('/login');
     };
+
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    const fetchUnreadCount = async () => {
+        try {
+            const response = await api.get('/admin/contact-messages/unread-count');
+            if (response.data.success) {
+                setUnreadCount(response.data.data.count);
+            }
+        } catch (error) {
+            console.error('Fetch unread count error:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchUnreadCount();
+        const interval = setInterval(fetchUnreadCount, 120000); // Check every 2 minutes
+        return () => clearInterval(interval);
+    }, []);
 
     const toggleSubmenu = (label: string) => {
         if (openSubmenu === label) {
@@ -213,7 +235,7 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                                 className="bg-slate-100 dark:bg-[#1A1E29] border border-slate-200 dark:border-white/5 rounded-xl pl-10 pr-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#F5A623]/50 w-64 transition-all text-slate-900 dark:text-white"
                             />
                         </div>
-                        
+
                         {/* Landing Page */}
                         <Link to="/" className="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all text-slate-600 dark:text-[#8A8FA8]">
                             <Home size={18} />
@@ -227,10 +249,18 @@ const AdminLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                             {i18n.language === 'en' || i18n.language.startsWith('en') ? 'বাংলা' : 'EN'}
                         </button>
                         <ThemeToggle />
-                        <button className="relative p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all text-slate-500 dark:text-[#8A8FA8]">
+                        <Link
+                            to="/admin/messages"
+                            className="relative p-2 rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all text-slate-500 dark:text-[#8A8FA8]"
+                            title={t('admin_nav.messages')}
+                        >
                             <Bell size={18} />
-                            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#F5A623]" />
-                        </button>
+                            {unreadCount > 0 && (
+                                <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-[#F5A623] text-[#0D0F14] text-[10px] font-bold ring-2 ring-white dark:ring-[#0D0F14] animate-pulse">
+                                    {unreadCount}
+                                </span>
+                            )}
+                        </Link>
                         <div className="h-8 w-[1px] bg-slate-200 dark:bg-white/5 mx-2" />
                         <Link to="/admin/profile" className="flex items-center gap-3 cursor-pointer group">
                             <div className="w-8 h-8 rounded-lg bg-[#F5A623]/10 border border-[#F5A623]/20 flex items-center justify-center text-[#F5A623] group-hover:bg-[#F5A623] group-hover:text-[#0D0F14] transition-all">

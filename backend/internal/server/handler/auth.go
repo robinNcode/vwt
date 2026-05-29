@@ -6,9 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/robinncode/vwt/internal/config"
+	"github.com/robinncode/vwt/internal/model"
 	"github.com/robinncode/vwt/internal/server/middleware"
 	"github.com/robinncode/vwt/internal/server/response"
-	"github.com/robinncode/vwt/internal/model"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -54,7 +54,7 @@ func (h *AuthHandler) AdminLogin(c *gin.Context) {
 		return
 	}
 
-	jwtStr, err := middleware.SignJWT(h.cfg, user.ID, "admin")
+	jwtStr, err := middleware.SignJWT(h.cfg, user.ID, user.RoleID, "admin")
 	if err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Token generation failed", nil)
 		return
@@ -116,7 +116,7 @@ func (h *AuthHandler) CustomerRegister(c *gin.Context) {
 		return
 	}
 
-	jwtStr, err := middleware.SignJWT(h.cfg, customer.ID, "customer")
+	jwtStr, err := middleware.SignJWT(h.cfg, customer.ID, 0, "customer")
 	if err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Token generation failed", nil)
 		return

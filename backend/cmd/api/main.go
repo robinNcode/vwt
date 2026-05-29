@@ -11,13 +11,21 @@ import (
 )
 
 func main() {
-	// Load primary .env
-	_ = godotenv.Load()
-
 	// Load environment specific .env if APP_ENV is set
 	env := os.Getenv("APP_ENV")
 	if env != "" {
-		_ = godotenv.Load(".env." + env)
+		err := godotenv.Overload(".env." + env)
+		if err != nil {
+			log.Printf("Warning: .env.%s not loaded: %v", env, err)
+		} else {
+			log.Printf("Successfully loaded .env.%s", env)
+		}
+	}
+
+	// Load primary .env (will not override existing)
+	err := godotenv.Load()
+	if err == nil {
+		log.Println("Successfully loaded .env")
 	}
 
 	cfg := config.Load()
@@ -26,11 +34,15 @@ func main() {
 		log.Fatalf("db connect failed: %v", err)
 	}
 
-	// Run auto-migrations
-	if err := database.RunMigrations(gormDB); err != nil {
-		log.Fatalf("migrations failed: %v", err)
+	// Run auto-migrations if enabled
+	if os.Getenv("DB_AUTO_MIGRATE") == "true" {
+		if err := database.RunMigrations(gormDB); err != nil {
+			log.Fatalf("migrations failed: %v", err)
+		}
+		log.Println("db connected and migrated successfully")
+	} else {
+		log.Println("db connected (skipping migrations - set DB_AUTO_MIGRATE=true to enable)")
 	}
-	log.Println("db connected and migrated successfully")
 
 	r := server.NewRouter(cfg, gormDB)
 	if err := r.Run(":" + cfg.Port); err != nil {

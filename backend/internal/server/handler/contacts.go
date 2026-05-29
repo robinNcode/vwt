@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/robinncode/vwt/internal/server/response"
 	"github.com/robinncode/vwt/internal/model"
+	"github.com/robinncode/vwt/internal/server/response"
 	"github.com/robinncode/vwt/internal/service"
 )
 
@@ -78,4 +78,13 @@ func (h *ContactsHandler) MarkRead(c *gin.Context) {
 		return
 	}
 	response.OK(c, "Message updated successfully", gin.H{"id": uint(id64), "is_read": true})
+}
+
+func (h *ContactsHandler) GetUnreadCount(c *gin.Context) {
+	count, err := h.svc.GetUnreadCount()
+	if err != nil {
+		response.Fail(c, http.StatusInternalServerError, "Failed to fetch unread count", nil)
+		return
+	}
+	response.OK(c, "Unread count fetched", gin.H{"count": count})
 }

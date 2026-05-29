@@ -48,7 +48,7 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	contactSvc := service.NewContactService(contactRepo)
 	contactsH := handler.NewContactsHandler(contactSvc)
 
-	settingRepo := repository.NewSettingRepository(db)
+	settingRepo := repository.NewFileSettingRepository("./storage/settings")
 	settingSvc := service.NewSettingService(settingRepo)
 	settingsH := handler.NewSettingsHandler(settingSvc)
 
@@ -127,9 +127,11 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	admin.PATCH("/settings/bulk", settingsH.BulkUpdate)
 	admin.PUT("/settings/:id", settingsH.Update)
 	admin.DELETE("/settings/:id", settingsH.Delete)
+
 	admin.GET("/quotations", quotationsH.List)
 	admin.PUT("/quotations/:id/status", quotationsH.UpdateStatus)
 	admin.GET("/contact-messages", contactsH.List)
+	admin.GET("/contact-messages/unread-count", contactsH.GetUnreadCount)
 	admin.PUT("/contact-messages/:id/read", contactsH.MarkRead)
 
 	admin.GET("/profile", userH.GetProfile)

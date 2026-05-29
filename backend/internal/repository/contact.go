@@ -10,6 +10,7 @@ type ContactRepository interface {
 	Create(m *model.ContactMessage) error
 	GetByID(id uint) (*model.ContactMessage, error)
 	MarkRead(id uint) error
+	CountUnread() (int64, error)
 }
 
 type contactRepository struct {
@@ -43,4 +44,10 @@ func (r *contactRepository) GetByID(id uint) (*model.ContactMessage, error) {
 
 func (r *contactRepository) MarkRead(id uint) error {
 	return r.db.Model(&model.ContactMessage{}).Where("id = ?", id).Update("is_read", true).Error
+}
+
+func (r *contactRepository) CountUnread() (int64, error) {
+	var count int64
+	err := r.db.Model(&model.ContactMessage{}).Where("is_read = ?", false).Count(&count).Error
+	return count, err
 }

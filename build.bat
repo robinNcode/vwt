@@ -7,12 +7,22 @@ echo ===================================
 :: Build Backend
 echo [1/2] Building Backend...
 cd backend
-go build -o ../build/api.exe ./cmd/api
+if "%1"=="linux" (
+    echo   Target: Linux (amd64)
+    set GOOS=linux
+    set GOARCH=amd64
+    go build -o ../build/api ./cmd/api
+    set GOOS=
+    set GOARCH=
+    copy .env.production ..\build\.env
+) else (
+    go build -o ../build/api.exe ./cmd/api
+    copy .env.production ..\build\.env
+)
 if %errorlevel% neq 0 (
     echo Backend build failed!
     exit /b %errorlevel%
 )
-copy .env.production ..\backend\build\.env
 cd ..
 
 :: Build Frontend
