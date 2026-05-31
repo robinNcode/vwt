@@ -10,6 +10,7 @@ type QuotationRepository interface {
 	GetByID(id uint) (*model.Quotation, error)
 	Create(q *model.Quotation) error
 	UpdateStatus(id uint, status string) error
+	GetLatestQuotationNumber() (string, error)
 }
 
 type quotationRepository struct {
@@ -40,4 +41,16 @@ func (r *quotationRepository) Create(q *model.Quotation) error {
 
 func (r *quotationRepository) UpdateStatus(id uint, status string) error {
 	return r.db.Model(&model.Quotation{}).Where("id = ?", id).Update("status", status).Error
+}
+
+func (r *quotationRepository) GetLatestQuotationNumber() (string, error) {
+	var q model.Quotation
+	err := r.db.Order("id DESC").First(&q).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return "", nil
+		}
+		return "", err
+	}
+	return q.QuotationNumber, nil
 }

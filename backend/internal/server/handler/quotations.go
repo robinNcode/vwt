@@ -25,6 +25,7 @@ type quotationCreateReq struct {
 	CustomerEmail   *string `json:"customer_email"`
 	CustomerPhone   *string `json:"customer_phone"`
 	CustomerAddress *string `json:"customer_address"`
+	QuotationNumber *string `json:"quotation_number"`
 	Notes           *string `json:"notes"`
 	ExpiresAt       *string `json:"expires_at"`
 	Items           []struct {
@@ -34,6 +35,15 @@ type quotationCreateReq struct {
 		UnitPrice     float64 `json:"unit_price"`
 		Quantity      int     `json:"quantity"`
 	} `json:"items"`
+}
+
+func (h *QuotationsHandler) NextNumber(c *gin.Context) {
+	num, err := h.svc.GetNextQuotationNumber()
+	if err != nil {
+		response.Fail(c, http.StatusInternalServerError, "Failed to generate quotation number", nil)
+		return
+	}
+	response.OK(c, "Success", gin.H{"quotation_number": num})
 }
 
 func (h *QuotationsHandler) Create(c *gin.Context) {
@@ -53,6 +63,17 @@ func (h *QuotationsHandler) Create(c *gin.Context) {
 		CustomerPhone:   req.CustomerPhone,
 		CustomerAddress: req.CustomerAddress,
 		Notes:           req.Notes,
+	}
+
+	if req.QuotationNumber != nil && *req.QuotationNumber != "" {
+		q.QuotationNumber = *req.QuotationNumber
+	} else {
+		num, err := h.svc.GetNextQuotationNumber()
+		if err == nil {
+			q.QuotationNumber = num
+		} else {
+			q.QuotationNumber = "QTN-" + strconv.FormatInt(time.Now().Unix(), 10)
+		}
 	}
 
 	if req.ExpiresAt != nil && *req.ExpiresAt != "" {

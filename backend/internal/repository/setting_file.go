@@ -93,7 +93,7 @@ func (r *fileSettingRepository) GetByGroup(group string) ([]model.Setting, error
 	}
 
 	sort.Slice(out, func(i, j int) bool {
-		return out[i].Key < out[i].Key
+		return out[i].Key < out[j].Key
 	})
 
 	return out, nil

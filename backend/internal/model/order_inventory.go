@@ -133,7 +133,7 @@ type OrderStatusHistory struct {
 
 type Invoice struct {
 	ID             uint           `gorm:"primaryKey;autoIncrement" json:"id"`
-	OrderID        uint           `gorm:"not null;uniqueIndex" json:"order_id"`
+	OrderID        *uint          `gorm:"uniqueIndex" json:"order_id,omitempty"`
 	InvoiceNumber  string         `gorm:"column:invoice_number;size:50;not null;uniqueIndex" json:"invoice_number"`
 	IssuedAt       time.Time      `gorm:"column:issued_at;not null;autoCreateTime" json:"issued_at"`
 	DueDate        *time.Time     `gorm:"column:due_date" json:"due_date,omitempty"`
@@ -150,6 +150,7 @@ type Invoice struct {
 
 type Quotation struct {
 	ID              uint            `gorm:"primaryKey;autoIncrement" json:"id"`
+	QuotationNumber string          `gorm:"column:quotation_number;size:50;not null;uniqueIndex" json:"quotation_number"`
 	CustomerID      *uint           `gorm:"index" json:"customer_id,omitempty"`
 	SessionToken    *string         `gorm:"column:session_token;size:255;index" json:"session_token,omitempty"`
 	CustomerName    *string         `gorm:"column:customer_name;size:200" json:"customer_name,omitempty"`

@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/robinncode/vwt/internal/model"
 	"github.com/robinncode/vwt/internal/repository"
 )
@@ -11,6 +13,7 @@ type InvoiceService interface {
 	CreateInvoice(inv *model.Invoice) error
 	UpdateInvoice(inv *model.Invoice) error
 	DeleteInvoice(id uint) error
+	GetNextInvoiceNumber() (string, error)
 }
 
 type invoiceService struct {
@@ -39,4 +42,25 @@ func (s *invoiceService) UpdateInvoice(inv *model.Invoice) error {
 
 func (s *invoiceService) DeleteInvoice(id uint) error {
 	return s.repo.Delete(id)
+}
+
+func (s *invoiceService) GetNextInvoiceNumber() (string, error) {
+	lastNum, err := s.repo.GetLatestInvoiceNumber()
+	if err != nil {
+		return "", err
+	}
+	if lastNum == "" {
+		return "INV-1001", nil
+	}
+	// Extract numeric part assuming format INV-XXXX
+	// Let's do simple increment if it matches INV- format
+	if len(lastNum) > 4 && lastNum[:4] == "INV-" {
+		var num int
+		fmt.Sscanf(lastNum[4:], "%d", &num)
+		if num > 0 {
+			return fmt.Sprintf("INV-%d", num+1), nil
+		}
+	}
+	// Default fallback
+	return "INV-1001", nil
 }

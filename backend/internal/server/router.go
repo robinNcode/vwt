@@ -118,6 +118,7 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	admin.PUT("/orders/:id", ordersH.UpdateStatus)
 
 	admin.GET("/invoices", invoicesH.List)
+	admin.GET("/invoices/next-number", invoicesH.NextNumber)
 	admin.POST("/invoices", invoicesH.Create)
 	admin.PUT("/invoices/:id", invoicesH.Update)
 	admin.DELETE("/invoices/:id", invoicesH.Delete)
@@ -129,6 +130,7 @@ func NewRouter(cfg config.Config, db *gorm.DB) *gin.Engine {
 	admin.DELETE("/settings/:id", settingsH.Delete)
 
 	admin.GET("/quotations", quotationsH.List)
+	admin.GET("/quotations/next-number", quotationsH.NextNumber)
 	admin.PUT("/quotations/:id/status", quotationsH.UpdateStatus)
 	admin.GET("/contact-messages", contactsH.List)
 	admin.GET("/contact-messages/unread-count", contactsH.GetUnreadCount)

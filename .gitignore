@@ -3,3 +3,5 @@ frontend/node_modules/
 .idea/
 frontend/backup/
 frontend/dist/
+
+backup/secrets.txt
