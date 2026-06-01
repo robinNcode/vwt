@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import Pagination from '@/components/Pagination';
 import { useTranslation } from 'react-i18next';
+import api from '@/lib/axios';
 
 interface ServiceRevenue {
     id: number;
@@ -52,12 +53,11 @@ const ServiceRevenues: React.FC = () => {
     const fetchRevenues = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:8083/api/v1/accounting/service-revenues?search=${searchTerm}&page=${currentPage}`);
-            const data = await res.json();
-            if (data.success) {
-                setRevenues(data.data || []);
+            const res = await api.get(`/admin/accounting/service-revenues?search=${searchTerm}&page=${currentPage}`);
+            if (res.data.success) {
+                setRevenues(res.data.data || []);
                 setTotalPages(1);
-                setTotalItems(data.data?.length || 0);
+                setTotalItems(res.data.data?.length || 0);
             }
         } catch (error) {
             console.error('Failed to fetch service revenues:', error);
@@ -68,10 +68,9 @@ const ServiceRevenues: React.FC = () => {
 
     const fetchServices = async () => {
         try {
-            const res = await fetch(`http://localhost:8083/api/v1/services`);
-            const data = await res.json();
-            if (data.success) {
-                setServices(data.data.items || data.data || []);
+            const res = await api.get('/admin/services');
+            if (res.data.success) {
+                setServices(res.data.data.items || res.data.data || []);
             }
         } catch (error) {
             console.error('Failed to fetch services:', error);
@@ -86,23 +85,22 @@ const ServiceRevenues: React.FC = () => {
     const handleUpsert = async (e: React.FormEvent) => {
         e.preventDefault();
         const url = editingRevenue
-            ? `http://localhost:8083/api/v1/accounting/service-revenues/${editingRevenue.id}`
-            : 'http://localhost:8083/api/v1/accounting/service-revenues';
-        const method = editingRevenue ? 'PUT' : 'POST';
+            ? `/admin/accounting/service-revenues/${editingRevenue.id}`
+            : '/admin/accounting/service-revenues';
+        const method = editingRevenue ? 'put' : 'post';
 
         try {
-            const res = await fetch(url, {
+            const res = await api({
                 method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+                url,
+                data: {
                     ...formData,
                     amount: Number(formData.amount),
                     service_id: formData.service_id ? Number(formData.service_id) : null,
                     date: new Date(formData.date).toISOString()
-                })
+                }
             });
-            const result = await res.json();
-            if (result.success) {
+            if (res.data.success) {
                 resetForm();
                 fetchRevenues();
             }
@@ -125,10 +123,8 @@ const ServiceRevenues: React.FC = () => {
     const handleDelete = async (id: number) => {
         if (!confirm('Are you sure you want to delete this revenue record?')) return;
         try {
-            const res = await fetch(`http://localhost:8083/api/v1/accounting/service-revenues/${id}`, {
-                method: 'DELETE'
-            });
-            if ((await res.json()).success) fetchRevenues();
+            const res = await api.delete(`/admin/accounting/service-revenues/${id}`);
+            if (res.data.success) fetchRevenues();
         } catch (error) {
             console.error('Failed to delete service revenue:', error);
         }

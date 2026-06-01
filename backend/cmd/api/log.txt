@@ -1,0 +1,35 @@
+2026/05/11 16:51:49 db connected successfully
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /                         --> github.com/robinncode/vwt/internal/http.NewRouter.func1 (4 handlers)
+[GIN-debug] GET    /health                   --> github.com/robinncode/vwt/internal/http.NewRouter.func2 (4 handlers)
+[GIN-debug] GET    /uploads/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (4 handlers)
+[GIN-debug] HEAD   /uploads/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (4 handlers)
+[GIN-debug] POST   /api/v1/auth/login        --> github.com/robinncode/vwt/internal/http/handlers.(*AuthHandler).AdminLogin-fm (4 handlers)
+[GIN-debug] POST   /api/v1/auth/customers/register --> github.com/robinncode/vwt/internal/http/handlers.(*AuthHandler).CustomerRegister-fm (4 handlers)
+[GIN-debug] GET    /api/v1/products          --> github.com/robinncode/vwt/internal/http/handlers.(*ProductsHandler).ListPublic-fm (4 handlers)
+[GIN-debug] GET    /api/v1/services          --> github.com/robinncode/vwt/internal/http/handlers.(*ServicesHandler).List-fm (4 handlers)
+[GIN-debug] GET    /api/v1/orders/track/:id  --> github.com/robinncode/vwt/internal/http/handlers.(*OrdersHandler).TrackByNumber-fm (4 handlers)
+[GIN-debug] GET    /api/v1/orders/:id        --> github.com/robinncode/vwt/internal/http/handlers.(*OrdersHandler).GetByID-fm (4 handlers)
+[GIN-debug] POST   /api/v1/orders            --> github.com/robinncode/vwt/internal/http/handlers.(*OrdersHandler).Create-fm (4 handlers)
+[GIN-debug] POST   /api/v1/quotations        --> github.com/robinncode/vwt/internal/http/handlers.(*QuotationsHandler).Create-fm (4 handlers)
+[GIN-debug] POST   /api/v1/contact-messages  --> github.com/robinncode/vwt/internal/http/handlers.(*ContactsHandler).Create-fm (4 handlers)
+[GIN-debug] GET    /api/v1/products          --> github.com/robinncode/vwt/internal/http/handlers.(*ProductsHandler).List-fm (6 handlers)
+panic: handlers are already registered for path '/api/v1/products'
+
+goroutine 1 [running]:
+github.com/gin-gonic/gin.(*node).addRoute(0x1167327?, {0xc0000a0a50, 0x10}, {0xc000194360, 0x6, 0x6})
+	C:/Users/VPN Technology/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/tree.go:260 +0x6eb
+github.com/gin-gonic/gin.(*Engine).addRoute(0xc00007b6c0, {0x1167327, 0x3}, {0xc0000a0a50, 0x10}, {0xc000194360, 0x6, 0x6})
+	C:/Users/VPN Technology/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/gin.go:352 +0x252
+github.com/gin-gonic/gin.(*RouterGroup).handle(0xc0000a8300, {0x1167327, 0x3}, {0x1173179?, 0x10b2840?}, {0xc000066990, 0x1, 0x6?})
+	C:/Users/VPN Technology/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/routergroup.go:89 +0x13e
+github.com/gin-gonic/gin.(*RouterGroup).GET(...)
+	C:/Users/VPN Technology/go/pkg/mod/github.com/gin-gonic/gin@v1.10.1/routergroup.go:117
+github.com/robinncode/vwt/internal/http.NewRouter({{0x1168d0c, 0x5}, {0x1167d6c, 0x4}, {0x1173167, 0x9}, {0x1167d70, 0x4}, {0x1167d74, 0x4}, ...}, ...)
+	E:/xampp/htdocs/go_works/vwt/backend/internal/http/router.go:86 +0x12c6
+main.main()
+	E:/xampp/htdocs/go_works/vwt/backend/cmd/api/main.go:25 +0x1c9
+exit status 2

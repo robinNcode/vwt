@@ -23,10 +23,12 @@ import AdminSales from './pages/admin/Sales'
 import AdminPurchases from './pages/admin/Purchases'
 import AdminExpenses from './pages/admin/Expenses'
 import AdminServiceRevenues from './pages/admin/ServiceRevenues'
+import AdminUsers from './pages/admin/Users'
+import AdminProfile from './pages/admin/Profile'
 
 function App() {
     return (
-        <Router>
+        <Router basename={import.meta.env.BASE_URL}>
             <Suspense fallback={<div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-[#0D0F14] text-slate-900 dark:text-white transition-colors duration-300">Loading...</div>}>
                 <Routes>
                     {/* Public Routes */}
@@ -78,6 +80,8 @@ function App() {
                     <Route path="/admin/accounting/purchases" element={<AdminLayout children={<AdminPurchases />} />} />
                     <Route path="/admin/accounting/expenses" element={<AdminLayout children={<AdminExpenses />} />} />
                     <Route path="/admin/accounting/service-revenues" element={<AdminLayout children={<AdminServiceRevenues />} />} />
+                    <Route path="/admin/users" element={<AdminLayout children={<AdminUsers />} />} />
+                    <Route path="/admin/profile" element={<AdminLayout children={<AdminProfile />} />} />
                 </Routes>
             </Suspense>
         </Router>

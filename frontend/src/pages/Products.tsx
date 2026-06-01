@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Skeleton from '../components/ui/Skeleton';
 import { ShoppingCart, Heart, Eye } from 'lucide-react';
+import api from '../lib/axios';
 
 interface Product {
     id: number;
@@ -21,10 +22,9 @@ const Products: React.FC = () => {
             try {
                 // Simulate network delay for skeleton visibility
                 await new Promise(resolve => setTimeout(resolve, 1500));
-                const response = await fetch('http://localhost:8083/api/v1/products');
-                const data = await response.json();
-                if (data.success) {
-                    setProducts(data.data);
+                const response = await api.get('/products');
+                if (response.data.success) {
+                    setProducts(response.data.data);
                 }
             } catch (error) {
                 console.error('Failed to fetch products:', error);

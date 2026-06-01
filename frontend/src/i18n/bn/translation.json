@@ -25,6 +25,8 @@
         "accounting_expenses": "খরচ",
         "accounting_revenue": "পরিষেবা আয়",
         "settings": "সেটিংস",
+        "users": "ব্যবহারকারী এবং অনুমতি",
+        "profile": "আমার প্রোফাইল",
         "logout": "লগআউট",
         "search_placeholder": "অনুসন্ধান করুন..."
     },
@@ -39,7 +41,9 @@
             "templates": "ইনভয়েস/উদ্ধৃতি টেমপ্লেট",
             "order": "অর্ডার কনফিগারেশন",
             "security": "নিরাপত্তা সেটিংস",
-            "notifications": "বিজ্ঞপ্তি পছন্দসমূহ"
+            "notifications": "বিজ্ঞপ্তি পছন্দসমূহ",
+            "logistics": "মেশিনারি ও লজিস্টিকস",
+            "social": "সোশ্যাল মিডিয়া উপস্থিতি"
         }
     },
     "dashboard": {

@@ -11,6 +11,7 @@ import {
 import { cn } from '@/lib/utils';
 import Pagination from '@/components/Pagination';
 import { useTranslation } from 'react-i18next';
+import api from '@/lib/axios';
 
 interface Invoice {
     id: number;
@@ -41,17 +42,16 @@ const Invoices: React.FC = () => {
     const fetchInvoices = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:8083/api/v1/invoices?search=${searchTerm}&page=${currentPage}`);
-            const data = await res.json();
-            if (data.success) {
-                if (data.data.items) {
-                    setInvoices(data.data.items);
-                    setTotalPages(data.data.totalPages || 1);
-                    setTotalItems(data.data.totalItems || 0);
+            const res = await api.get(`/admin/invoices?search=${searchTerm}&page=${currentPage}`);
+            if (res.data.success) {
+                if (res.data.data.items) {
+                    setInvoices(res.data.data.items);
+                    setTotalPages(res.data.data.totalPages || 1);
+                    setTotalItems(res.data.data.totalItems || 0);
                 } else {
-                    setInvoices(data.data);
+                    setInvoices(res.data.data);
                     setTotalPages(1);
-                    setTotalItems(data.data.length);
+                    setTotalItems(res.data.data.length);
                 }
             }
         } catch (error) {

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import Skeleton from '../components/ui/Skeleton';
 import watermark from '@/assets/images/invoice_quatation_watermark.png';
 import { Zap, Shield, Clock } from 'lucide-react';
+import api from '../lib/axios';
 
 interface Service {
     id: number;
@@ -21,10 +22,9 @@ const Services: React.FC = () => {
             try {
                 // Simulate network delay for skeleton visibility
                 await new Promise(resolve => setTimeout(resolve, 1500));
-                const response = await fetch('http://localhost:8083/api/v1/services');
-                const data = await response.json();
-                if (data.success) {
-                    setServices(data.data);
+                const response = await api.get('/services');
+                if (response.data.success) {
+                    setServices(response.data.data.items || response.data.data);
                 }
             } catch (error) {
                 console.error('Failed to fetch services:', error);
