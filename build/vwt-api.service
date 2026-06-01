@@ -1,0 +1,21 @@
+[Unit]
+Description=Volt Wave Tech API (Go Backend)
+After=network.target mysql.service
+Wants=mysql.service
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/var/www/api.voltwavebd.com
+ExecStart=/var/www/api.voltwavebd.com/api
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=vwt-api
+
+# Environment
+Environment=APP_ENV=production
+
+[Install]
+WantedBy=multi-user.target
