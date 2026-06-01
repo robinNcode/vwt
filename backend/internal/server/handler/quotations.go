@@ -4,10 +4,11 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/robinncode/vwt/internal/server/response"
 	"github.com/robinncode/vwt/internal/model"
+	"github.com/robinncode/vwt/internal/server/response"
 	"github.com/robinncode/vwt/internal/service"
 )
 
@@ -20,17 +21,29 @@ func NewQuotationsHandler(svc service.QuotationService) *QuotationsHandler {
 }
 
 type quotationCreateReq struct {
-	CustomerName  *string `json:"customer_name"`
-	CustomerEmail *string `json:"customer_email"`
-	CustomerPhone *string `json:"customer_phone"`
-	Notes         *string `json:"notes"`
-	Items         []struct {
+	CustomerName    *string `json:"customer_name"`
+	CustomerEmail   *string `json:"customer_email"`
+	CustomerPhone   *string `json:"customer_phone"`
+	CustomerAddress *string `json:"customer_address"`
+	QuotationNumber *string `json:"quotation_number"`
+	Notes           *string `json:"notes"`
+	ExpiresAt       *string `json:"expires_at"`
+	Items           []struct {
 		VariantID     *uint   `json:"variant_id"`
 		ProductNameEN string  `json:"product_name_en"`
 		SKU           string  `json:"sku"`
 		UnitPrice     float64 `json:"unit_price"`
 		Quantity      int     `json:"quantity"`
 	} `json:"items"`
+}
+
+func (h *QuotationsHandler) NextNumber(c *gin.Context) {
+	num, err := h.svc.GetNextQuotationNumber()
+	if err != nil {
+		response.Fail(c, http.StatusInternalServerError, "Failed to generate quotation number", nil)
+		return
+	}
+	response.OK(c, "Success", gin.H{"quotation_number": num})
 }
 
 func (h *QuotationsHandler) Create(c *gin.Context) {
@@ -45,10 +58,29 @@ func (h *QuotationsHandler) Create(c *gin.Context) {
 	}
 
 	q := model.Quotation{
-		CustomerName:  req.CustomerName,
-		CustomerEmail: req.CustomerEmail,
-		CustomerPhone: req.CustomerPhone,
-		Notes:         req.Notes,
+		CustomerName:    req.CustomerName,
+		CustomerEmail:   req.CustomerEmail,
+		CustomerPhone:   req.CustomerPhone,
+		CustomerAddress: req.CustomerAddress,
+		Notes:           req.Notes,
+	}
+
+	if req.QuotationNumber != nil && *req.QuotationNumber != "" {
+		q.QuotationNumber = *req.QuotationNumber
+	} else {
+		num, err := h.svc.GetNextQuotationNumber()
+		if err == nil {
+			q.QuotationNumber = num
+		} else {
+			q.QuotationNumber = "QTN-" + strconv.FormatInt(time.Now().Unix(), 10)
+		}
+	}
+
+	if req.ExpiresAt != nil && *req.ExpiresAt != "" {
+		t, err := time.Parse("2006-01-02", *req.ExpiresAt)
+		if err == nil {
+			q.ExpiresAt = &t
+		}
 	}
 
 	for _, it := range req.Items {

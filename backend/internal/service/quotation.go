@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/robinncode/vwt/internal/model"
 	"github.com/robinncode/vwt/internal/repository"
 )
@@ -10,6 +12,7 @@ type QuotationService interface {
 	GetQuotationByID(id uint) (*model.Quotation, error)
 	RequestQuotation(q *model.Quotation) error
 	UpdateQuotationStatus(id uint, status string) error
+	GetNextQuotationNumber() (string, error)
 }
 
 type quotationService struct {
@@ -37,4 +40,22 @@ func (s *quotationService) RequestQuotation(q *model.Quotation) error {
 
 func (s *quotationService) UpdateQuotationStatus(id uint, status string) error {
 	return s.repo.UpdateStatus(id, status)
+}
+
+func (s *quotationService) GetNextQuotationNumber() (string, error) {
+	lastNum, err := s.repo.GetLatestQuotationNumber()
+	if err != nil {
+		return "", err
+	}
+	if lastNum == "" {
+		return "QTN-1001", nil
+	}
+	if len(lastNum) > 4 && lastNum[:4] == "QTN-" {
+		var num int
+		fmt.Sscanf(lastNum[4:], "%d", &num)
+		if num > 0 {
+			return fmt.Sprintf("QTN-%d", num+1), nil
+		}
+	}
+	return "QTN-1001", nil
 }

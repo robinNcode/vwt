@@ -9,6 +9,7 @@ type ContactService interface {
 	ListMessages(search string) ([]model.ContactMessage, error)
 	CreateMessage(m *model.ContactMessage) error
 	MarkAsRead(id uint) error
+	GetUnreadCount() (int64, error)
 }
 
 type contactService struct {
@@ -29,4 +30,8 @@ func (s *contactService) CreateMessage(m *model.ContactMessage) error {
 
 func (s *contactService) MarkAsRead(id uint) error {
 	return s.repo.MarkRead(id)
+}
+
+func (s *contactService) GetUnreadCount() (int64, error) {
+	return s.repo.CountUnread()
 }

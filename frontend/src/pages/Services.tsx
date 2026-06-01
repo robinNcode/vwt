@@ -2,26 +2,36 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import Skeleton from '../components/ui/Skeleton';
 import watermark from '@/assets/images/invoice_quatation_watermark.png';
-import { Zap, Shield, Clock } from 'lucide-react';
+import { Zap, Shield, Clock, Wrench, ShoppingCart } from 'lucide-react';
 import api from '../lib/axios';
+import { useCartStore } from '../lib/cart';
+import ServiceModal from '../components/services/ServiceModal';
 
-interface Service {
+
+export interface Service {
     id: number;
-    name: string;
-    description: string;
-    price: number;
+    name_en: string;
+    name_bn: string;
+    description_en?: string;
+    description_bn?: string;
+    price: number | null;
+    image_url?: string;
+    slug: string;
+    is_active: boolean;
+    sort_order: number;
 }
 
 const Services: React.FC = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [services, setServices] = useState<Service[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedService, setSelectedService] = useState<Service | null>(null);
+    const addToCart = useCartStore((state) => state.addToCart);
+
 
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                // Simulate network delay for skeleton visibility
-                await new Promise(resolve => setTimeout(resolve, 1500));
                 const response = await api.get('/services');
                 if (response.data.success) {
                     setServices(response.data.data.items || response.data.data);
@@ -32,13 +42,16 @@ const Services: React.FC = () => {
                 setLoading(false);
             }
         };
-
         fetchServices();
     }, []);
 
+    const getName = (s: Service) => i18n.language === 'bn' ? s.name_bn : s.name_en;
+    const getDesc = (s: Service) =>
+        i18n.language === 'bn' ? (s.description_bn || s.description_en || '') : (s.description_en || s.description_bn || '');
+
     const ServiceSkeleton = () => (
         <div className="bg-white rounded-3xl border border-slate-100 p-8 space-y-4">
-            <Skeleton className="w-12 h-12 rounded-2xl" />
+            <Skeleton className="w-14 h-14 rounded-2xl" />
             <Skeleton className="h-8 w-2/3" variant="text" />
             <Skeleton className="h-20 w-full" variant="text" />
             <div className="flex items-center justify-between pt-4">
@@ -49,7 +62,7 @@ const Services: React.FC = () => {
     );
 
     return (
-        <div className="relative min-h-screen pt-32 pb-20 overflow-hidden bg-slate-50/50">
+        <div className="relative min-h-screen pt-32 pb-20 overflow-hidden bg-slate-50/50 dark:bg-[#0D0F14]">
             {/* Watermark Background */}
             <div
                 className="absolute inset-0 opacity-[0.03] pointer-events-none grayscale"
@@ -58,12 +71,12 @@ const Services: React.FC = () => {
                     backgroundSize: '400px',
                     backgroundRepeat: 'repeat'
                 }}
-            ></div>
+            />
 
             <div className="container-custom relative z-10">
                 <div className="max-w-3xl mb-16">
-                    <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6">{t('nav.services')}</h1>
-                    <p className="text-slate-600 text-xl leading-relaxed">
+                    <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 dark:text-white mb-6">{t('nav.services')}</h1>
+                    <p className="text-slate-600 dark:text-slate-400 text-xl leading-relaxed">
                         Professional electrical engineering and support services tailored for your industrial and commercial needs.
                     </p>
                 </div>
@@ -72,28 +85,72 @@ const Services: React.FC = () => {
                     {loading ? (
                         Array(4).fill(0).map((_, i) => <ServiceSkeleton key={i} />)
                     ) : services.length > 0 ? (
-                        services.map((service) => (
-                            <div key={service.id} className="group bg-white rounded-3xl border border-slate-100 p-8 hover:shadow-2xl hover:shadow-slate-200 transition-all duration-500 hover:-translate-y-1">
-                                <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
-                                    <Zap size={28} />
-                                </div>
-                                <h3 className="text-2xl font-bold text-slate-900 mb-4">{service.name}</h3>
-                                <p className="text-slate-500 leading-relaxed mb-8">
-                                    {service.description || "Expert electrical solutions provided by our certified team of professionals."}
-                                </p>
-                                <div className="flex items-center justify-between pt-6 border-t border-slate-50">
-                                    <div className="flex flex-col">
-                                        <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Starts from</span>
-                                        <span className="text-2xl font-extrabold text-slate-900">${service.price}</span>
+                        services.map((service) => {
+                            const name = getName(service);
+                            const desc = getDesc(service);
+                            return (
+                                <div
+                                    key={service.id}
+                                    onClick={() => setSelectedService(service)}
+                                    className="group bg-white dark:bg-[#1A1E29] rounded-3xl border border-slate-100 dark:border-white/5 p-8 hover:shadow-2xl hover:shadow-slate-200 dark:hover:shadow-black/30 transition-all duration-500 hover:-translate-y-1 cursor-pointer"
+                                >
+                                    <div className="w-14 h-14 rounded-2xl overflow-hidden bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-[#F5A623] flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300 border border-blue-100 dark:border-blue-500/20">
+                                        {service.image_url ? (
+                                            <img
+                                                src={`${import.meta.env.VITE_SERVER_URL}${service.image_url}`}
+                                                alt={name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <Wrench size={28} />
+                                        )}
                                     </div>
-                                    <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200">
-                                        Book Now
-                                    </button>
+                                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 group-hover:text-blue-600 dark:group-hover:text-[#F5A623] transition-colors">
+                                        {name}
+                                    </h3>
+                                    <p className="text-slate-500 dark:text-slate-400 leading-relaxed mb-8 line-clamp-3">
+                                        {desc || "Expert electrical solutions provided by our certified team of professionals."}
+                                    </p>
+                                    <div className="flex items-center justify-between pt-6 border-t border-slate-50 dark:border-white/5">
+                                        <div className="flex flex-col">
+                                            <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                                                {service.price ? 'Starts from' : 'Pricing'}
+                                            </span>
+                                            <span className="text-xl font-extrabold text-slate-900 dark:text-white">
+                                                {service.price ? `৳${service.price.toLocaleString()}` : 'Contact Us'}
+                                            </span>
+                                        </div>
+                                        <div className="flex flex-col sm:flex-row gap-3">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedService(service);
+                                                }}
+                                                className="flex-1 bg-slate-900/5 dark:bg-white/5 text-slate-900 dark:text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-900/10 dark:hover:bg-white/10 transition-colors"
+                                            >
+                                                Details
+                                            </button>
+                                            {service.price && (
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        addToCart({ serviceId: service.id, quantity: 1 });
+                                                    }}
+                                                    className="flex-1 bg-blue-600 dark:bg-[#F5A623] text-white dark:text-[#0D0F14] px-6 py-3 rounded-xl font-bold hover:bg-blue-700 dark:hover:bg-[#D48E1D] transition-colors shadow-lg shadow-blue-200 dark:shadow-[#F5A623]/10 flex items-center justify-center gap-2"
+                                                >
+                                                    <ShoppingCart size={18} />
+                                                    Add
+                                                </button>
+                                            )}
+                                        </div>
+
+                                    </div>
                                 </div>
-                            </div>
-                        ))
+                            );
+                        })
                     ) : (
-                        <div className="col-span-full py-20 text-center bg-white rounded-3xl border border-slate-100">
+                        <div className="col-span-full py-20 text-center bg-white dark:bg-[#1A1E29] rounded-3xl border border-slate-100 dark:border-white/5">
+                            <Wrench size={48} className="mx-auto text-slate-200 dark:text-slate-700 mb-4" strokeWidth={1} />
                             <p className="text-slate-500 text-xl font-medium">No services listed at the moment.</p>
                         </div>
                     )}
@@ -106,8 +163,8 @@ const Services: React.FC = () => {
                         { icon: <Clock size={20} />, text: "24/7 Priority Support" },
                         { icon: <Zap size={20} />, text: "Quick Turnaround" }
                     ].map((badge, i) => (
-                        <div key={i} className="flex items-center gap-4 text-slate-600">
-                            <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-blue-600 border border-slate-100">
+                        <div key={i} className="flex items-center gap-4 text-slate-600 dark:text-slate-400">
+                            <div className="w-10 h-10 rounded-full bg-white dark:bg-white/5 shadow-sm flex items-center justify-center text-blue-600 dark:text-[#F5A623] border border-slate-100 dark:border-white/5">
                                 {badge.icon}
                             </div>
                             <span className="font-bold text-sm uppercase tracking-wider">{badge.text}</span>
@@ -115,9 +172,14 @@ const Services: React.FC = () => {
                     ))}
                 </div>
             </div>
+
+            <ServiceModal
+                service={selectedService}
+                isOpen={!!selectedService}
+                onClose={() => setSelectedService(null)}
+            />
         </div>
     );
 };
 
 export default Services;
-

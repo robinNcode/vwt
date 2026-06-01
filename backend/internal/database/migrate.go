@@ -52,6 +52,10 @@ func RunMigrations(db *gorm.DB) error {
 		&model.Quotation{},
 		&model.QuotationItem{},
 
+		// Cart
+		&model.Cart{},
+		&model.CartItem{},
+
 		// CMS
 		&model.Page{},
 		&model.PageSection{},

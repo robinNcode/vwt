@@ -120,15 +120,15 @@ const Navbar = () => {
                     {user ? (
                         <div className="flex items-center gap-3">
                             <Link to="/admin/dashboard" className="text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors">
-                                Dashboard
+                                {t('admin_nav.dashboard')}
                             </Link>
                             <button onClick={handleLogout} className="btn-primary py-2 px-5 text-xs bg-red-500 hover:bg-red-600 border-red-500 shadow-red-500/10">
-                                Logout
+                                {t('nav.logout')}
                             </button>
                         </div>
                     ) : (
                         <Link to="/login" className="btn-primary py-2 px-5 text-xs">
-                            Login
+                            {t('nav.login')}
                         </Link>
                     )}
                 </div>
@@ -175,15 +175,15 @@ const Navbar = () => {
                                 {user ? (
                                     <>
                                         <Link to="/admin/dashboard" className="btn-secondary w-full text-center py-3 dark:bg-white/5 dark:text-white dark:border-white/10" onClick={() => setIsOpen(false)}>
-                                            Dashboard
+                                            {t('admin_nav.dashboard')}
                                         </Link>
                                         <button onClick={handleLogout} className="btn-primary w-full bg-red-500 border-red-500">
-                                            Logout
+                                            {t('nav.logout')}
                                         </button>
                                     </>
                                 ) : (
                                     <Link to="/login" className="btn-primary w-full" onClick={() => setIsOpen(false)}>
-                                        Login
+                                        {t('nav.login')}
                                     </Link>
                                 )}
                             </div>

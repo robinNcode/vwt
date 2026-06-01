@@ -1,0 +1,52 @@
+[
+  {
+    "id": 1,
+    "group": "general",
+    "key": "site_name",
+    "value": "Volt Wave Tech",
+    "label_bn": "সাইটের নাম",
+    "label_en": "Site Name",
+    "updated_by": 1,
+    "updated_at": "2026-05-29T21:47:04.0406008+06:00"
+  },
+  {
+    "id": 2,
+    "group": "general",
+    "key": "site_description",
+    "value": "Advanced Engineering Solutions",
+    "label_bn": "সাইটের বিবরণ",
+    "label_en": "Site Description",
+    "updated_by": 1,
+    "updated_at": "2026-05-29T21:47:04.0406008+06:00"
+  },
+  {
+    "id": 3,
+    "group": "general",
+    "key": "contact_email",
+    "value": "admin@voltwavebd.com",
+    "label_bn": "যোগাযোগের ইমেল",
+    "label_en": "Contact Email",
+    "updated_by": 1,
+    "updated_at": "2026-05-29T21:47:04.0406008+06:00"
+  },
+  {
+    "id": 4,
+    "group": "general",
+    "key": "contact_phone",
+    "value": "+880 184962210",
+    "label_bn": "যোগাযোগের ফোন",
+    "label_en": "Contact Phone",
+    "updated_by": 1,
+    "updated_at": "2026-05-29T21:47:04.0406008+06:00"
+  },
+  {
+    "id": 5,
+    "group": "seo",
+    "key": "meta_title",
+    "value": "Volt Wave Tech | Engineering Excellence",
+    "label_bn": "মেটা টাইটেল",
+    "label_en": "Meta Title",
+    "updated_by": 1,
+    "updated_at": "2026-05-29T21:47:04.0406008+06:00"
+  }
+]

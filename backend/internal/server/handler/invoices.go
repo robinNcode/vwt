@@ -4,10 +4,11 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/robinncode/vwt/internal/server/response"
 	"github.com/robinncode/vwt/internal/model"
+	"github.com/robinncode/vwt/internal/server/response"
 	"github.com/robinncode/vwt/internal/service"
 )
 
@@ -28,9 +29,21 @@ func (h *InvoicesHandler) List(c *gin.Context) {
 	response.OK(c, "Invoices fetched successfully", out)
 }
 
+func (h *InvoicesHandler) NextNumber(c *gin.Context) {
+	num, err := h.svc.GetNextInvoiceNumber()
+	if err != nil {
+		response.Fail(c, http.StatusInternalServerError, "Failed to generate invoice number", nil)
+		return
+	}
+	response.OK(c, "Success", gin.H{"invoice_number": num})
+}
+
 type invoiceUpsertReq struct {
-	OrderID       uint   `json:"order_id"`
-	InvoiceNumber string `json:"invoice_number"`
+	OrderID        uint    `json:"order_id"`
+	InvoiceNumber  string  `json:"invoice_number"`
+	DueDate        *string `json:"due_date"`
+	Notes          *string `json:"notes"`
+	TemplateConfig *string `json:"template_config"`
 }
 
 func (h *InvoicesHandler) Create(c *gin.Context) {
@@ -40,14 +53,31 @@ func (h *InvoicesHandler) Create(c *gin.Context) {
 		return
 	}
 	req.InvoiceNumber = strings.TrimSpace(req.InvoiceNumber)
-	if req.OrderID == 0 || req.InvoiceNumber == "" {
-		response.Fail(c, http.StatusBadRequest, "order_id and invoice_number are required", nil)
+	if req.InvoiceNumber == "" {
+		response.Fail(c, http.StatusBadRequest, "invoice_number is required", nil)
 		return
 	}
-	inv := model.Invoice{
-		OrderID:       req.OrderID,
-		InvoiceNumber: req.InvoiceNumber,
+
+	var orderIdPtr *uint
+	if req.OrderID > 0 {
+		oID := req.OrderID
+		orderIdPtr = &oID
 	}
+
+	inv := model.Invoice{
+		OrderID:        orderIdPtr,
+		InvoiceNumber:  req.InvoiceNumber,
+		Notes:          req.Notes,
+		TemplateConfig: req.TemplateConfig,
+	}
+
+	if req.DueDate != nil && *req.DueDate != "" {
+		t, err := time.Parse("2006-01-02", *req.DueDate)
+		if err == nil {
+			inv.DueDate = &t
+		}
+	}
+
 	if err := h.svc.CreateInvoice(&inv); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to create invoice", nil)
 		return
@@ -73,8 +103,24 @@ func (h *InvoicesHandler) Update(c *gin.Context) {
 		return
 	}
 
-	inv.OrderID = req.OrderID
+	var orderIdPtr *uint
+	if req.OrderID > 0 {
+		oID := req.OrderID
+		orderIdPtr = &oID
+	}
+
+	inv.OrderID = orderIdPtr
 	inv.InvoiceNumber = strings.TrimSpace(req.InvoiceNumber)
+	inv.Notes = req.Notes
+	inv.TemplateConfig = req.TemplateConfig
+
+	if req.DueDate != nil && *req.DueDate != "" {
+		t, err := time.Parse("2006-01-02", *req.DueDate)
+		if err == nil {
+			inv.DueDate = &t
+		}
+	}
+
 	if err := h.svc.UpdateInvoice(inv); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to update invoice", nil)
 		return

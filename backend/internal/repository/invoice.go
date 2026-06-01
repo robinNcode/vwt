@@ -11,6 +11,7 @@ type InvoiceRepository interface {
 	Create(inv *model.Invoice) error
 	Update(inv *model.Invoice) error
 	Delete(id uint) error
+	GetLatestInvoiceNumber() (string, error)
 }
 
 type invoiceRepository struct {
@@ -43,4 +44,16 @@ func (r *invoiceRepository) Update(inv *model.Invoice) error {
 
 func (r *invoiceRepository) Delete(id uint) error {
 	return r.db.Delete(&model.Invoice{}, id).Error
+}
+
+func (r *invoiceRepository) GetLatestInvoiceNumber() (string, error) {
+	var inv model.Invoice
+	err := r.db.Where("deleted_at IS NULL").Order("id DESC").First(&inv).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return "", nil
+		}
+		return "", err
+	}
+	return inv.InvoiceNumber, nil
 }

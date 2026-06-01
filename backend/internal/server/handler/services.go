@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/robinncode/vwt/internal/server/response"
 	"github.com/robinncode/vwt/internal/model"
+	"github.com/robinncode/vwt/internal/server/response"
 	"github.com/robinncode/vwt/internal/service"
 )
 
@@ -70,7 +70,7 @@ func (h *ServicesHandler) Create(c *gin.Context) {
 		filename := "service_" + strconv.FormatInt(time.Now().Unix(), 10) + "_" + file.Filename
 		filepath := "public/uploads/services/" + filename
 		if err := c.SaveUploadedFile(file, filepath); err == nil {
-			url := "/" + filepath
+			url := "/public/uploads/services/" + filename
 			s.ImageURL = &url
 		}
 	}
@@ -122,7 +122,7 @@ func (h *ServicesHandler) Update(c *gin.Context) {
 		filename := "service_" + strconv.FormatInt(time.Now().Unix(), 10) + "_" + file.Filename
 		filepath := "public/uploads/services/" + filename
 		if err := c.SaveUploadedFile(file, filepath); err == nil {
-			url := "/" + filepath
+			url := "/public/uploads/services/" + filename
 			s.ImageURL = &url
 		}
 	}
