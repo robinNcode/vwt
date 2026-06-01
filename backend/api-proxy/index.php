@@ -38,7 +38,11 @@ curl_close($ch);
 if ($curlError) {
     http_response_code(502);
     header('Content-Type: application/json');
-    echo json_encode(['success' => false, 'message' => 'API backend unavailable. Please try again later.']);
+    echo json_encode([
+        'success' => false,
+        'message' => 'API backend unavailable. Please try again later.',
+        'error_details' => $curlError
+    ]);
     exit;
 }
 

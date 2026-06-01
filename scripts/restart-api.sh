@@ -24,7 +24,7 @@ sleep 1
 chmod +x api
 
 # Start in a detached screen session, logging to file
-screen -dmS "$SCREEN_NAME" bash -c "cd $APP_DIR && ./api >> $LOG_FILE 2>&1"
+screen -dmS "$SCREEN_NAME" bash -c "cd $APP_DIR && GOMAXPROCS=1 GOGC=50 DB_AUTO_MIGRATE=true ./api >> $LOG_FILE 2>&1"
 
 sleep 2
 
