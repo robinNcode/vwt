@@ -4,30 +4,12 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
 	"github.com/robinncode/vwt/internal/config"
 	"github.com/robinncode/vwt/internal/database"
 	"github.com/robinncode/vwt/internal/server"
 )
 
 func main() {
-	// Load environment specific .env if APP_ENV is set
-	env := os.Getenv("APP_ENV")
-	if env != "" {
-		err := godotenv.Overload(".env." + env)
-		if err != nil {
-			log.Printf("Warning: .env.%s not loaded: %v", env, err)
-		} else {
-			log.Printf("Successfully loaded .env.%s", env)
-		}
-	}
-
-	// Load primary .env (will not override existing)
-	err := godotenv.Load()
-	if err == nil {
-		log.Println("Successfully loaded .env")
-	}
-
 	cfg := config.Load()
 	gormDB, err := database.Connect(cfg)
 	if err != nil {

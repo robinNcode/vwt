@@ -1,0 +1,4 @@
+RewriteEngine On
+# Route every request through the PHP proxy (which forwards to Go on :8083)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php [QSA,L]
