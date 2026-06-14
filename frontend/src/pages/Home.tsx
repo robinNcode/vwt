@@ -7,6 +7,8 @@ import voltWaveTech from '@/assets/images/volt_wave_tech.png'
 import visitingCard from '@/assets/images/visiting_card_volt_wave_tech.png'
 import signWithSeal from '@/assets/images/Sign_with_seal.jpg'
 import sign from '@/assets/images/sign.jpg'
+import voltwaveLightBg from '@/assets/images/voltwave_light_bg.svg'
+import voltwaveDarkBg from '@/assets/images/voltwave_dark_bg.svg'
 
 const Home = () => {
     const { t } = useTranslation()
@@ -44,16 +46,28 @@ const Home = () => {
     return (
         <div className="pb-20 bg-white dark:bg-[#0D0F14] transition-colors duration-300">
             {/* Hero Section */}
-            <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+            <section className="relative isolate pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+                <div
+                    className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-100 dark:hidden"
+                    style={{ backgroundImage: `url(${voltwaveLightBg})` }}
+                    aria-hidden="true"
+                />
+                <div
+                    className="absolute inset-0 z-0 hidden bg-cover bg-center bg-no-repeat opacity-100 dark:block"
+                    style={{ backgroundImage: `url(${voltwaveDarkBg})` }}
+                    aria-hidden="true"
+                />
+                <div className="absolute inset-0 z-[1] bg-white/45 dark:bg-[#0D0F14]/35" aria-hidden="true" />
+
                 {/* Background Accents */}
-                <div className="absolute top-0 right-0 -z-10 translate-x-1/4 -translate-y-1/4 transition-colors">
+                <div className="absolute top-0 right-0 z-[2] translate-x-1/4 -translate-y-1/4 transition-colors">
                     <div className="w-[600px] h-[600px] bg-blue-50/50 dark:bg-blue-500/5 rounded-full blur-3xl opacity-60 animate-pulse"></div>
                 </div>
-                <div className="absolute bottom-0 left-0 -z-10 -translate-x-1/4 translate-y-1/4">
+                <div className="absolute bottom-0 left-0 z-[2] -translate-x-1/4 translate-y-1/4">
                     <div className="w-[500px] h-[500px] bg-indigo-50/50 dark:bg-indigo-500/5 rounded-full blur-3xl opacity-60"></div>
                 </div>
 
-                <div className="container-custom">
+                <div className="container-custom relative z-10">
                     <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -288,4 +302,3 @@ const Home = () => {
 }
 
 export default Home
-

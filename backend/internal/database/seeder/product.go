@@ -2,6 +2,7 @@ package seeder
 
 import (
 	"log"
+	"net/url"
 	"strings"
 
 	"github.com/robinncode/vwt/internal/model"
@@ -640,7 +641,7 @@ func seedProductRelations(db *gorm.DB, products []model.Product) {
 func seedProductImages(db *gorm.DB, product model.Product, relation productRelationSpec) {
 	for i, imageURL := range relation.Images {
 		img := model.ProductImage{ProductID: product.ID, URL: imageURL, IsPrimary: i == 0, SortOrder: i + 1}
-		db.Where(model.ProductImage{ProductID: product.ID, URL: imageURL}).Assign(img).FirstOrCreate(&img)
+		db.Where(model.ProductImage{ProductID: product.ID, SortOrder: i + 1}).Assign(img).FirstOrCreate(&img)
 	}
 }
 
@@ -847,5 +848,9 @@ func productImagePath(product model.Product, index int) string {
 	if strings.Contains(strings.ToLower(product.NameEN), "boiler") || strings.Contains(strings.ToLower(product.ProductType), "boiler") {
 		folder = "boiler"
 	}
-	return "/uploads/products/" + folder + "/" + product.Slug + "-" + string(rune('0'+index)) + ".jpg"
+	label := product.NameEN
+	if index > 1 {
+		label += " alternate view"
+	}
+	return "https://placehold.co/900x700/e8eef8/172033.jpg?text=" + url.QueryEscape(folder+" - "+label)
 }
