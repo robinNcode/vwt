@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { motion } from 'framer-motion'
-import { ArrowRight, Zap, Shield, Clock, Battery, Cpu, Wifi } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { ArrowRight, Zap, Shield, Clock, Battery, Cpu, Wifi, Search } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
 import voltWaveTech from '@/assets/images/volt_wave_tech.png'
 import visitingCard from '@/assets/images/visiting_card_volt_wave_tech.png'
 import signWithSeal from '@/assets/images/Sign_with_seal.jpg'
@@ -9,6 +10,8 @@ import sign from '@/assets/images/sign.jpg'
 
 const Home = () => {
     const { t } = useTranslation()
+    const navigate = useNavigate()
+    const [searchTerm, setSearchTerm] = useState('')
 
     const features = [
         {
@@ -27,6 +30,16 @@ const Home = () => {
             description: t('features.support.desc')
         }
     ]
+
+    const handleSearch = (event: React.FormEvent) => {
+        event.preventDefault()
+        const term = searchTerm.trim()
+        if (!term) {
+            navigate('/products')
+            return
+        }
+        navigate(`/products?search=${encodeURIComponent(term)}`)
+    }
 
     return (
         <div className="pb-20 bg-white dark:bg-[#0D0F14] transition-colors duration-300">
@@ -84,6 +97,47 @@ const Home = () => {
                                 {t('hero.cta_services')}
                             </Link>
                         </motion.div>
+
+                        <motion.form
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.4 }}
+                            onSubmit={handleSearch}
+                            className="mt-10 w-full max-w-3xl rounded-3xl border border-slate-200/70 dark:border-white/10 bg-white/90 dark:bg-white/5 backdrop-blur p-3 shadow-xl shadow-slate-200/50 dark:shadow-none"
+                        >
+                            <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3">
+                                <div className="relative">
+                                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                                    <input
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        placeholder="Search AirTAC products, boiler spares, or services"
+                                        className="w-full rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-[#0D0F14] py-4 pl-11 pr-4 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20"
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="rounded-2xl bg-blue-600 px-6 py-4 font-bold text-white transition-colors hover:bg-blue-700 dark:bg-[#F5A623] dark:text-[#0D0F14] dark:hover:bg-[#D48E1D]"
+                                >
+                                    Search Catalog
+                                </button>
+                            </div>
+                            <div className="mt-3 flex flex-wrap gap-2">
+                                {['AirTAC solenoid valve', 'Boiler spare parts', 'AC installation', 'Heat seal machine'].map((item) => (
+                                    <button
+                                        key={item}
+                                        type="button"
+                                        onClick={() => {
+                                            setSearchTerm(item)
+                                            navigate(`/products?search=${encodeURIComponent(item)}`)
+                                        }}
+                                        className="rounded-full border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/10"
+                                    >
+                                        {item}
+                                    </button>
+                                ))}
+                            </div>
+                        </motion.form>
                     </div>
                 </div>
             </section>
