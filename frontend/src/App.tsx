@@ -8,6 +8,7 @@ import Services from './pages/Services'
 import Contact from './pages/Contact'
 import About from './pages/About'
 import Login from './pages/Login'
+import Checkout from './pages/Checkout'
 
 import AdminLayout from './components/layout/AdminLayout'
 import AdminDashboard from './pages/admin/Dashboard'
@@ -65,6 +66,13 @@ function App() {
                     <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] font-sans text-slate-900 transition-colors duration-300">
                         <Navbar />
                         <main><Contact /></main>
+                        <Footer />
+                    </div>
+                } />
+                <Route path="/checkout" element={
+                    <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] font-sans text-slate-900 transition-colors duration-300">
+                        <Navbar />
+                        <main><Checkout /></main>
                         <Footer />
                     </div>
                 } />

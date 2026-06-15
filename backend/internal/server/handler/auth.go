@@ -39,6 +39,10 @@ func (h *AuthHandler) AdminLogin(c *gin.Context) {
 		response.Fail(c, http.StatusBadRequest, "Email and password are required", nil)
 		return
 	}
+	if strings.EqualFold(strings.TrimSpace(req.Type), "customer") {
+		h.customerLogin(c, req.Email, req.Password)
+		return
+	}
 
 	var user model.User
 	if err := h.db.Where("email = ? AND deleted_at IS NULL", req.Email).First(&user).Error; err != nil {
@@ -67,6 +71,39 @@ func (h *AuthHandler) AdminLogin(c *gin.Context) {
 			"name":  user.Name,
 			"email": user.Email,
 			"type":  "admin",
+		},
+	})
+}
+
+func (h *AuthHandler) customerLogin(c *gin.Context, email string, password string) {
+	var customer model.Customer
+	if err := h.db.Where("email = ? AND deleted_at IS NULL", email).First(&customer).Error; err != nil {
+		response.Fail(c, http.StatusUnauthorized, "Invalid credentials", nil)
+		return
+	}
+	if !customer.IsActive {
+		response.Fail(c, http.StatusForbidden, "Account disabled", nil)
+		return
+	}
+	if err := bcrypt.CompareHashAndPassword([]byte(customer.Password), []byte(password)); err != nil {
+		response.Fail(c, http.StatusUnauthorized, "Invalid credentials", nil)
+		return
+	}
+
+	jwtStr, err := middleware.SignJWT(h.cfg, customer.ID, 0, "customer")
+	if err != nil {
+		response.Fail(c, http.StatusInternalServerError, "Token generation failed", nil)
+		return
+	}
+
+	response.OK(c, "Login successful", gin.H{
+		"token": jwtStr,
+		"user": gin.H{
+			"id":    customer.ID,
+			"name":  customer.Name,
+			"email": customer.Email,
+			"phone": customer.Phone,
+			"type":  "customer",
 		},
 	})
 }
