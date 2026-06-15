@@ -173,7 +173,7 @@ pipeline {
 
     post {
         success {
-            echo '✅ Deployment Successful — API is live at http://api.voltwavebd.com'
+            echo '✅ Deployment Successful — API is live at https://api.voltwavebd.com'
         }
         failure {
             echo '❌ Deployment Failed — check the logs above'

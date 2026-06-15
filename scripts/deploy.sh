@@ -49,5 +49,5 @@ echo "Command: pkill -f api; cd $BACKEND_DIR; chmod +x api; screen -dmS vwt-api 
 
 echo "==================================="
 echo "Deployment initiated!"
-echo "Check: http://voltwavebd.com/ and http://voltwavebd.com:8083/health"
+echo "Check: https://voltwavebd.com/ and https://api.voltwavebd.com/health"
 echo "==================================="

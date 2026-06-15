@@ -4,6 +4,7 @@ import Skeleton from '../components/ui/Skeleton';
 import { ShoppingCart, Heart, Eye, Search, SlidersHorizontal, X } from 'lucide-react';
 import api from '../lib/axios';
 import { useCartStore } from '../lib/cart';
+import { getMediaUrl } from '../lib/media';
 import ProductModal from '../components/products/ProductModal';
 import { useSearchParams } from 'react-router-dom';
 
@@ -283,7 +284,7 @@ const Products: React.FC = () => {
                                 <div className="relative h-64 overflow-hidden bg-slate-50 dark:bg-black/20">
                                     {primaryImage ? (
                                         <img
-                                            src={`${import.meta.env.VITE_SERVER_URL}${primaryImage.url}`}
+                                            src={getMediaUrl(primaryImage.url)}
                                             alt={name}
                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                         />
