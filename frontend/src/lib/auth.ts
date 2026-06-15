@@ -6,6 +6,7 @@ export interface User {
     name: string;
     email: string;
     type: string;
+    phone?: string;
 }
 
 interface AuthResponse {
@@ -21,6 +22,17 @@ export const authService = {
     async login(email: string, password: string, type: string = 'admin'): Promise<AuthResponse> {
         const response = await api.post('/auth/login', { email, password, type });
 
+        const data = response.data;
+        if (data.success && data.data.token) {
+            localStorage.setItem('vwt_token', data.data.token);
+            localStorage.setItem('vwt_user', JSON.stringify(data.data.user));
+            await useCartStore.getState().syncGuestCartToServer();
+        }
+        return data;
+    },
+
+    async registerCustomer(params: { name: string; email: string; phone?: string; password: string }): Promise<AuthResponse> {
+        const response = await api.post('/auth/customers/register', params);
         const data = response.data;
         if (data.success && data.data.token) {
             localStorage.setItem('vwt_token', data.data.token);
