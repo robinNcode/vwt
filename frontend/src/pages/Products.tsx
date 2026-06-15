@@ -323,7 +323,7 @@ const Products: React.FC = () => {
                                     <div className="flex items-center justify-between mt-4">
                                         <span className="text-xl font-extrabold text-slate-900 dark:text-white">৳{product.price.toLocaleString()}</span>
                                         <button
-                                            onClick={() => addToCart({ productId: product.id, quantity: 1 })}
+                                            onClick={() => addToCart({ productId: product.id, quantity: 1, product })}
                                             className="bg-slate-900 dark:bg-[#F5A623] text-white dark:text-[#0D0F14] px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-600 dark:hover:bg-[#D48E1D] transition-colors"
                                         >
 

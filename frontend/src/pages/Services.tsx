@@ -135,7 +135,7 @@ const Services: React.FC = () => {
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        addToCart({ serviceId: service.id, quantity: 1 });
+                                                        addToCart({ serviceId: service.id, quantity: 1, service });
                                                     }}
                                                     className="flex-1 bg-blue-600 dark:bg-[#F5A623] text-white dark:text-[#0D0F14] px-6 py-3 rounded-xl font-bold hover:bg-blue-700 dark:hover:bg-[#D48E1D] transition-colors shadow-lg shadow-blue-200 dark:shadow-[#F5A623]/10 flex items-center justify-center gap-2"
                                                 >

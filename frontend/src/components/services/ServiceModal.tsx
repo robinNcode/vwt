@@ -32,7 +32,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ service, isOpen, onClose })
         }
         setAdding(true);
         try {
-            await addToCart({ serviceId: service.id, quantity: 1 });
+            await addToCart({ serviceId: service.id, quantity: 1, service });
             onClose();
         } catch {
             // error handled in store
