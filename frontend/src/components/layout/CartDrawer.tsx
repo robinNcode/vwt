@@ -4,6 +4,7 @@ import { X, ShoppingCart, Plus, Minus, Trash2, Package, Wrench } from 'lucide-re
 import { useCartStore } from '../../lib/cart';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { getMediaUrl } from '../../lib/media';
 
 const CartDrawer: React.FC = () => {
     const { i18n } = useTranslation();
@@ -97,7 +98,7 @@ const CartDrawer: React.FC = () => {
                                             <div className="w-14 h-14 rounded-xl overflow-hidden bg-white dark:bg-black/20 flex items-center justify-center shrink-0 border border-slate-100 dark:border-white/5">
                                                 {imgUrl ? (
                                                     <img
-                                                        src={`${import.meta.env.VITE_SERVER_URL}${imgUrl}`}
+                                                        src={getMediaUrl(imgUrl)}
                                                         alt={name}
                                                         className="w-full h-full object-cover"
                                                     />
