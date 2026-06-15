@@ -7,8 +7,8 @@ import voltWaveTech from '@/assets/images/volt_wave_tech.png'
 import visitingCard from '@/assets/images/visiting_card_volt_wave_tech.png'
 import signWithSeal from '@/assets/images/Sign_with_seal.jpg'
 import sign from '@/assets/images/sign.jpg'
-import voltwaveLightBg from '@/assets/images/voltwave_light_bg.svg'
-import voltwaveDarkBg from '@/assets/images/voltwave_dark_bg.svg'
+import voltwaveLightBg from '@/assets/images/voltwave_light_clean.svg'
+import voltwaveDarkBg from '@/assets/images/voltwave_dark_clean.svg'
 
 const Home = () => {
     const { t } = useTranslation()
