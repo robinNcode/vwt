@@ -17,6 +17,9 @@ Route::post('/v1/auth/customers/register', [AuthController::class, 'customerRegi
 
 Route::get('/v1/products', [ProductController::class, 'listPublic']);
 Route::get('/v1/services', [ServiceController::class, 'index']);
+Route::get('/v1/banners', [\App\Http\Controllers\BannerController::class, 'listPublic']);
+Route::get('/v1/blog', [\App\Http\Controllers\BlogController::class, 'listPublic']);
+Route::get('/v1/blog/{slug}', [\App\Http\Controllers\BlogController::class, 'showPublic']);
 
 // Protected routes (Customer & Admin)
 Route::middleware('auth:api')->group(function () {
@@ -63,4 +66,12 @@ Route::middleware(['auth:api', 'role:admin'])->prefix('v1/admin')->group(functio
     Route::post('/accounting/purchases', [AccountingController::class, 'storePurchase']);
     Route::get('/accounting/expenses', [AccountingController::class, 'expenses']);
     Route::post('/accounting/expenses', [AccountingController::class, 'storeExpense']);
+
+    // Banner Management
+    Route::get('/banners', [\App\Http\Controllers\BannerController::class, 'index']);
+    Route::post('/banners', [\App\Http\Controllers\BannerController::class, 'store']);
+
+    // Blog Management
+    Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'index']);
+    Route::post('/blog', [\App\Http\Controllers\BlogController::class, 'store']);
 });
