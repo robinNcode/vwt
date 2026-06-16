@@ -25,7 +25,7 @@ echo "📡 Starting Backend (Go)..."
 
 # Start Frontend
 echo "💻 Starting Frontend (Vite)..."
-(cd frontend && npm run dev) &
+(cd frontend && nvm use 22.17.0 && npm run dev) &
 
 echo "-----------------------------------"
 echo "✅ Both servers are running!"

@@ -21,7 +21,7 @@ const Contact = () => {
         setIsSubmitting(true)
 
         try {
-            const apiBaseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8083/api/v1'
+            const apiBaseURL = import.meta.env.VITE_API_BASE_URL || 'https://api.voltwavebd.com/api/v1'
             await axios.post(`${apiBaseURL}/contact-messages`, formData)
             toast.success(t('contact_page.form.success'))
             setFormData({
