@@ -4,6 +4,7 @@ import { X, Calendar, Zap, Shield, Clock, Wrench, ShoppingCart } from 'lucide-re
 import type { Service } from '../../pages/Services';
 import { useTranslation } from 'react-i18next';
 import { useCartStore } from '../../lib/cart';
+import { getMediaUrl } from '../../lib/media';
 
 interface ServiceModalProps {
     service: Service | null;
@@ -31,7 +32,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ service, isOpen, onClose })
         }
         setAdding(true);
         try {
-            await addToCart({ serviceId: service.id, quantity: 1 });
+            await addToCart({ serviceId: service.id, quantity: 1, service });
             onClose();
         } catch {
             // error handled in store
@@ -61,7 +62,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ service, isOpen, onClose })
                         <div className="relative h-48 bg-gradient-to-br from-blue-600 to-indigo-700 dark:from-[#1A1E29] dark:to-[#0D0F14] overflow-hidden">
                             {service.image_url ? (
                                 <img
-                                    src={`${import.meta.env.VITE_SERVER_URL}${service.image_url}`}
+                                    src={getMediaUrl(service.image_url)}
                                     alt={name}
                                     className="w-full h-full object-cover opacity-60 mix-blend-overlay"
                                 />
@@ -71,7 +72,7 @@ const ServiceModal: React.FC<ServiceModalProps> = ({ service, isOpen, onClose })
                                 <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white mb-3 overflow-hidden">
                                     {service.image_url ? (
                                         <img
-                                            src={`${import.meta.env.VITE_SERVER_URL}${service.image_url}`}
+                                            src={getMediaUrl(service.image_url)}
                                             alt={name}
                                             className="w-full h-full object-cover"
                                         />

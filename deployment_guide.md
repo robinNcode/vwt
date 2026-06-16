@@ -100,14 +100,14 @@ screen -ls
 # Expected: There is a screen on: XXXX.vwt (Detached)
 
 # Test preflight (CORS)
-curl -si http://api.voltwavebd.com/api/v1/auth/login \
+curl -si https://api.voltwavebd.com/api/v1/auth/login \
   -X OPTIONS \
-  -H 'Origin: http://voltwavebd.com' \
+  -H 'Origin: https://voltwavebd.com' \
   -H 'Access-Control-Request-Method: POST'
-# Expected: HTTP 204, Access-Control-Allow-Origin: http://voltwavebd.com
+# Expected: HTTP 204, Access-Control-Allow-Origin: https://voltwavebd.com
 
 # Test login
-curl -s http://api.voltwavebd.com/api/v1/auth/login \
+curl -s https://api.voltwavebd.com/api/v1/auth/login \
   -X POST \
   -H 'Content-Type: application/json' \
   -d '{"email":"admin@voltwave.tech","password":"Admin@123","type":"admin"}'
