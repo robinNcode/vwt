@@ -3,37 +3,43 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
-use App\Models\BlogCategory;
+use App\Support\ApiResponse;
 use Illuminate\Http\Request;
 
 class BlogController extends Controller
 {
     public function listPublic()
     {
-        return response()->json(['data' => BlogPost::where('status', 'published')->with('category')->paginate(10)]);
+        $posts = BlogPost::where('status', 'published')->with('category')->orderByDesc('id')->get();
+
+        return ApiResponse::ok('Posts fetched successfully', $posts);
     }
 
     public function showPublic($slug)
     {
-        return response()->json(['data' => BlogPost::where('slug', $slug)->with('category')->firstOrFail()]);
+        $post = BlogPost::where('slug', $slug)->with('category')->first();
+        if (! $post) {
+            return ApiResponse::fail('Post not found', 404);
+        }
+
+        return ApiResponse::ok('Post fetched successfully', $post);
     }
 
     public function index()
     {
-        return response()->json(['data' => BlogPost::with('category')->paginate(10)]);
+        return ApiResponse::ok('Posts fetched successfully', BlogPost::with('category')->orderByDesc('id')->get());
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $data = $request->validate([
             'title_en' => 'required|string',
             'title_bn' => 'required|string',
             'slug' => 'required|string|unique:blog_posts,slug',
-            'category_id' => 'required|exists:blog_categories,id',
+            'category_id' => 'nullable|exists:blog_categories,id',
             'status' => 'required|string',
         ]);
-        
-        $post = BlogPost::create($validated);
-        return response()->json(['data' => $post, 'message' => 'Post created'], 201);
+
+        return ApiResponse::created('Post created successfully', BlogPost::create($data));
     }
 }

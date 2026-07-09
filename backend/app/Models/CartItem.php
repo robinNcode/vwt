@@ -15,4 +15,9 @@ class CartItem extends Model
     {
         return $this->belongsTo(Product::class, 'product_id');
     }
+
+    public function service()
+    {
+        return $this->belongsTo(Service::class, 'service_id');
+    }
 }

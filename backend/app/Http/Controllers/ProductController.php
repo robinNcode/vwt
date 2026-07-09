@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\DTOs\ProductDTO;
 use App\Http\Requests\StoreProductRequest;
 use App\Services\ProductService;
+use App\Support\ApiResponse;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
@@ -15,35 +16,34 @@ class ProductController extends Controller
 
     public function listPublic(Request $request)
     {
-        $products = $this->productService->getPublicProducts();
-        return response()->json(['data' => $products]);
+        return ApiResponse::ok('Products fetched successfully', $this->productService->getPublicProducts());
     }
 
     public function index(Request $request)
     {
-        $products = $this->productService->getAdminProducts();
-        return response()->json(['data' => $products]);
+        return ApiResponse::ok('Products fetched successfully', $this->productService->getAdminProducts());
     }
 
     public function store(StoreProductRequest $request)
     {
         $dto = ProductDTO::fromRequest($request->validated());
         $product = $this->productService->createProduct($dto);
-        
-        return response()->json(['data' => $product, 'message' => 'Product created successfully'], 201);
+
+        return ApiResponse::created('Product created successfully', $product);
     }
 
     public function update(StoreProductRequest $request, $id)
     {
         $dto = ProductDTO::fromRequest($request->validated());
         $product = $this->productService->updateProduct($id, $dto);
-        
-        return response()->json(['data' => $product, 'message' => 'Product updated successfully']);
+
+        return ApiResponse::ok('Product updated successfully', $product);
     }
 
     public function destroy($id)
     {
         $this->productService->deleteProduct($id);
-        return response()->json(['message' => 'Product deleted successfully']);
+
+        return ApiResponse::ok('Product deleted successfully');
     }
 }

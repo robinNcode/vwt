@@ -9,12 +9,13 @@ class ProductRepository implements ProductRepositoryInterface
 {
     public function getAllPaginated(int $perPage = 15)
     {
-        return Product::with('images')->paginate($perPage);
+        // Returns a full collection (Go parity: the API returns arrays, not paginators).
+        return Product::with('images')->orderByDesc('id')->get();
     }
 
     public function getActivePaginated(int $perPage = 15)
     {
-        return Product::where('is_active', true)->with('images')->paginate($perPage);
+        return Product::where('is_active', true)->with('images')->orderByDesc('id')->get();
     }
 
     public function findById(int $id)

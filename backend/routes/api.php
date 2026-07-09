@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
@@ -10,68 +9,141 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\AccountingController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\WebSettingController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\BannerController;
+use App\Http\Controllers\BlogController;
 
-// Public routes
-Route::post('/v1/auth/login', [AuthController::class, 'adminLogin']);
-Route::post('/v1/auth/customers/register', [AuthController::class, 'customerRegister']);
+/*
+|--------------------------------------------------------------------------
+| Public routes
+|--------------------------------------------------------------------------
+*/
+Route::prefix('v1')->group(function () {
+    Route::post('/auth/login', [AuthController::class, 'adminLogin']);
+    Route::post('/auth/customers/register', [AuthController::class, 'customerRegister']);
 
-Route::get('/v1/products', [ProductController::class, 'listPublic']);
-Route::get('/v1/services', [ServiceController::class, 'index']);
-Route::get('/v1/banners', [\App\Http\Controllers\BannerController::class, 'listPublic']);
-Route::get('/v1/blog', [\App\Http\Controllers\BlogController::class, 'listPublic']);
-Route::get('/v1/blog/{slug}', [\App\Http\Controllers\BlogController::class, 'showPublic']);
+    Route::get('/products', [ProductController::class, 'listPublic']);
+    Route::get('/services', [ServiceController::class, 'index']);
+    Route::get('/web-settings', [WebSettingController::class, 'show']);
+    Route::get('/banners', [BannerController::class, 'listPublic']);
+    Route::get('/blog', [BlogController::class, 'listPublic']);
+    Route::get('/blog/{slug}', [BlogController::class, 'showPublic']);
 
-// Protected routes (Customer & Admin)
-Route::middleware('auth:api')->group(function () {
-    // Cart APIs
-    Route::get('/v1/cart', [CartController::class, 'getCart']);
-    Route::post('/v1/cart/items', [CartController::class, 'addItem']);
-    Route::delete('/v1/cart/items/{id}', [CartController::class, 'removeItem']);
-    
-    // Checkout API
-    Route::post('/v1/checkout', [OrderController::class, 'checkout']);
+    // Orders (public create + tracking)
+    Route::get('/orders/track/{id}', [OrderController::class, 'trackByNumber']);
+    Route::get('/orders/{id}', [OrderController::class, 'getById']);
+    Route::post('/orders', [OrderController::class, 'store']);
+
+    Route::post('/quotations', [QuotationController::class, 'store']);
+    Route::post('/contact-messages', [ContactController::class, 'store']);
 });
 
-// Admin only routes
-Route::middleware(['auth:api', 'role:admin'])->prefix('v1/admin')->group(function () {
-    // Product Management
+/*
+|--------------------------------------------------------------------------
+| Protected routes (Customer or Admin)
+|--------------------------------------------------------------------------
+*/
+Route::prefix('v1')->middleware('auth:api,customer-api')->group(function () {
+    Route::get('/cart', [CartController::class, 'getCart']);
+    Route::post('/cart/items', [CartController::class, 'addItem']);
+    Route::put('/cart/items/{id}', [CartController::class, 'updateQuantity']);
+    Route::delete('/cart/items/{id}', [CartController::class, 'removeItem']);
+    Route::delete('/cart', [CartController::class, 'clearCart']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Admin routes
+|--------------------------------------------------------------------------
+*/
+Route::prefix('v1/admin')->middleware(['auth:api', 'admin'])->group(function () {
+    // Products
     Route::get('/products', [ProductController::class, 'index']);
     Route::post('/products', [ProductController::class, 'store']);
     Route::put('/products/{id}', [ProductController::class, 'update']);
     Route::delete('/products/{id}', [ProductController::class, 'destroy']);
-    
-    // Order Management
-    Route::get('/orders', [OrderController::class, 'index']);
-    Route::put('/orders/{id}', [OrderController::class, 'updateStatus']);
 
-    // Service Management
+    // Services
+    Route::get('/services', [ServiceController::class, 'index']);
     Route::post('/services', [ServiceController::class, 'store']);
     Route::put('/services/{id}', [ServiceController::class, 'update']);
     Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
 
-    // Invoice Management
+    // Orders
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::put('/orders/{id}', [OrderController::class, 'updateStatus']);
+
+    // Invoices
     Route::get('/invoices', [InvoiceController::class, 'index']);
+    Route::get('/invoices/next-number', [InvoiceController::class, 'nextNumber']);
     Route::get('/invoices/{id}', [InvoiceController::class, 'show']);
     Route::post('/invoices', [InvoiceController::class, 'store']);
+    Route::put('/invoices/{id}', [InvoiceController::class, 'update']);
+    Route::delete('/invoices/{id}', [InvoiceController::class, 'destroy']);
 
-    // Quotation Management
+    // Quotations
     Route::get('/quotations', [QuotationController::class, 'index']);
+    Route::get('/quotations/next-number', [QuotationController::class, 'nextNumber']);
     Route::get('/quotations/{id}', [QuotationController::class, 'show']);
     Route::post('/quotations', [QuotationController::class, 'store']);
+    Route::put('/quotations/{id}/status', [QuotationController::class, 'updateStatus']);
 
-    // Accounting Management
+    // Settings
+    Route::get('/settings', [SettingController::class, 'index']);
+    Route::post('/settings', [SettingController::class, 'store']);
+    Route::patch('/settings/bulk', [SettingController::class, 'bulkUpdate']);
+    Route::put('/settings/{id}', [SettingController::class, 'update']);
+    Route::delete('/settings/{id}', [SettingController::class, 'destroy']);
+
+    // Web settings (single JSON document)
+    Route::put('/web-settings', [WebSettingController::class, 'update']);
+
+    // Contact messages
+    Route::get('/contact-messages', [ContactController::class, 'index']);
+    Route::get('/contact-messages/unread-count', [ContactController::class, 'unreadCount']);
+    Route::put('/contact-messages/{id}/read', [ContactController::class, 'markRead']);
+
+    // Profile
+    Route::get('/profile', [UserController::class, 'getProfile']);
+    Route::put('/profile', [UserController::class, 'updateProfile']);
+    Route::post('/profile/avatar', [UserController::class, 'updateAvatar']);
+
+    // Users
+    Route::get('/users', [UserController::class, 'index']);
+    Route::put('/users/{id}', [UserController::class, 'update']);
+
+    // Roles & Permissions
+    Route::get('/roles', [RoleController::class, 'index']);
+    Route::post('/roles', [RoleController::class, 'store']);
+    Route::get('/permissions', [RoleController::class, 'listPermissions']);
+    Route::put('/roles/{id}/permissions', [RoleController::class, 'updatePermissions']);
+
+    // Accounting
     Route::get('/accounting/sales', [AccountingController::class, 'sales']);
     Route::post('/accounting/sales', [AccountingController::class, 'storeSale']);
+    Route::delete('/accounting/sales/{id}', [AccountingController::class, 'destroySale']);
+
     Route::get('/accounting/purchases', [AccountingController::class, 'purchases']);
     Route::post('/accounting/purchases', [AccountingController::class, 'storePurchase']);
+    Route::delete('/accounting/purchases/{id}', [AccountingController::class, 'destroyPurchase']);
+
     Route::get('/accounting/expenses', [AccountingController::class, 'expenses']);
     Route::post('/accounting/expenses', [AccountingController::class, 'storeExpense']);
+    Route::delete('/accounting/expenses/{id}', [AccountingController::class, 'destroyExpense']);
 
-    // Banner Management
-    Route::get('/banners', [\App\Http\Controllers\BannerController::class, 'index']);
-    Route::post('/banners', [\App\Http\Controllers\BannerController::class, 'store']);
+    Route::get('/accounting/service-revenues', [AccountingController::class, 'serviceRevenues']);
+    Route::post('/accounting/service-revenues', [AccountingController::class, 'storeServiceRevenue']);
+    Route::delete('/accounting/service-revenues/{id}', [AccountingController::class, 'destroyServiceRevenue']);
 
-    // Blog Management
-    Route::get('/blog', [\App\Http\Controllers\BlogController::class, 'index']);
-    Route::post('/blog', [\App\Http\Controllers\BlogController::class, 'store']);
+    // Banners
+    Route::get('/banners', [BannerController::class, 'index']);
+    Route::post('/banners', [BannerController::class, 'store']);
+
+    // Blog
+    Route::get('/blog', [BlogController::class, 'index']);
+    Route::post('/blog', [BlogController::class, 'store']);
 });
