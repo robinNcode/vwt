@@ -91,6 +91,8 @@ type Order struct {
 	PaymentReference *string `gorm:"column:payment_reference;size:255" json:"payment_reference,omitempty"`
 	Notes            *string `gorm:"type:text" json:"notes,omitempty"`
 	CreatedBy        *uint   `json:"created_by,omitempty"`
+	Notes            *string `gorm:"type:text" json:"notes,omitempty"`
+	CreatedBy        *uint   `json:"created_by,omitempty"`
 
 	Items         []OrderItem          `gorm:"foreignKey:OrderID" json:"items,omitempty"`
 	StatusHistory []OrderStatusHistory `gorm:"foreignKey:OrderID" json:"status_history,omitempty"`

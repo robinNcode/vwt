@@ -78,6 +78,7 @@ func (h *InvoicesHandler) Create(c *gin.Context) {
 		}
 	}
 
+
 	if err := h.svc.CreateInvoice(&inv); err != nil {
 		response.Fail(c, http.StatusInternalServerError, "Failed to create invoice", nil)
 		return
