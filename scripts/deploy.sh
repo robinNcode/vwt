@@ -7,7 +7,7 @@
 # Configuration
 FTP_HOST="voltwavebd.com"
 FTP_USER="deploy@voltwavebd.com"
-FTP_PASS="PifqCVU)uq9E@z90"
+FTP_PASS="Volt_wave#123"
 FRONTEND_DIR="public_html/"
 BACKEND_DIR="app/"
 

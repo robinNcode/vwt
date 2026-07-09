@@ -46,9 +46,23 @@ pipeline {
 
         stage('Checkout Latest Commit') {
             steps {
-                git branch: 'master',
-                    url: 'https://github.com/robinNcode/vwt.git',
-                    credentialsId: 'github-https'
+                // Shallow, single-branch, no-tags checkout of the latest commit.
+                // The repo has a large history (148+ MB) with a bad object on the
+                // remote; a full clone aborts with "fetch-pack: invalid index-pack".
+                // depth:1 fetches only the tip snapshot, avoiding that history.
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/master']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/robinNcode/vwt.git',
+                        credentialsId: 'github-https',
+                        refspec: '+refs/heads/master:refs/remotes/origin/master'
+                    ]],
+                    extensions: [
+                        [$class: 'CloneOption', shallow: true, depth: 1, noTags: true, honorRefspec: true, timeout: 30],
+                        [$class: 'CheckoutOption', timeout: 30]
+                    ]
+                ])
                 bat 'git rev-parse --short HEAD'
             }
         }
