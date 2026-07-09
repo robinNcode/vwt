@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Menu, X, ShoppingCart, Search, Globe, ChevronDown } from 'lucide-react'
+import { Menu, X, ShoppingCart, Search, Globe } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { authService } from '@/lib/auth'
+import { useCartStore } from '@/lib/cart'
 import ThemeToggle from '../ThemeToggle'
+import CartDrawer from './CartDrawer'
 import finalLogo from '@/assets/images/final_logo.png'
-import finalIcon from '@/assets/images/final_icon.png'
 
 const Navbar = () => {
     const { t, i18n } = useTranslation()
@@ -15,14 +16,21 @@ const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [scrolled, setScrolled] = useState(false)
     const [user, setUser] = useState(authService.getUser())
+    const { items, setIsOpen: setCartOpen, fetchCart } = useCartStore()
+    const cartCount = items.reduce((sum, item) => sum + item.quantity, 0)
 
     useEffect(() => {
         const checkUser = () => {
             setUser(authService.getUser())
+            fetchCart()
         }
         window.addEventListener('storage', checkUser)
         return () => window.removeEventListener('storage', checkUser)
-    }, [])
+    }, [fetchCart])
+
+    useEffect(() => {
+        fetchCart()
+    }, [fetchCart])
 
     const handleLogout = () => {
         authService.logout()
@@ -83,10 +91,13 @@ const Navbar = () => {
                     <button className="p-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors">
                         <Search size={20} />
                     </button>
-                    <button className="p-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors relative">
+                    <button
+                        onClick={() => setCartOpen(true)}
+                        className="p-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623] transition-colors relative"
+                    >
                         <ShoppingCart size={20} />
                         <span className="absolute top-1 right-1 w-4 h-4 bg-blue-600 dark:bg-[#F5A623] text-[10px] font-bold text-white flex items-center justify-center rounded-full">
-                            0
+                            {cartCount}
                         </span>
                     </button>
 
@@ -135,6 +146,17 @@ const Navbar = () => {
 
                 {/* Mobile menu button */}
                 <div className="md:hidden flex items-center gap-4">
+                    <button
+                        onClick={() => setCartOpen(true)}
+                        className="p-2 text-slate-600 dark:text-slate-400 relative"
+                    >
+                        <ShoppingCart size={20} />
+                        {cartCount > 0 && (
+                            <span className="absolute top-1 right-1 min-w-4 h-4 px-1 bg-blue-600 dark:bg-[#F5A623] text-[10px] font-bold text-white flex items-center justify-center rounded-full">
+                                {cartCount}
+                            </span>
+                        )}
+                    </button>
                     <button
                         onClick={toggleLanguage}
                         className="p-2 text-slate-600 dark:text-slate-400"
@@ -191,9 +213,9 @@ const Navbar = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+            <CartDrawer />
         </nav>
     )
 }
 
 export default Navbar
-

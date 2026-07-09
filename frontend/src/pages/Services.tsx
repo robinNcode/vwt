@@ -5,6 +5,7 @@ import watermark from '@/assets/images/invoice_quatation_watermark.png';
 import { Zap, Shield, Clock, Wrench, ShoppingCart } from 'lucide-react';
 import api from '../lib/axios';
 import { useCartStore } from '../lib/cart';
+import { getMediaUrl } from '../lib/media';
 import ServiceModal from '../components/services/ServiceModal';
 
 
@@ -97,7 +98,7 @@ const Services: React.FC = () => {
                                     <div className="w-14 h-14 rounded-2xl overflow-hidden bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-[#F5A623] flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300 border border-blue-100 dark:border-blue-500/20">
                                         {service.image_url ? (
                                             <img
-                                                src={`${import.meta.env.VITE_SERVER_URL}${service.image_url}`}
+                                                src={getMediaUrl(service.image_url)}
                                                 alt={name}
                                                 className="w-full h-full object-cover"
                                             />
@@ -134,7 +135,7 @@ const Services: React.FC = () => {
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        addToCart({ serviceId: service.id, quantity: 1 });
+                                                        addToCart({ serviceId: service.id, quantity: 1, service });
                                                     }}
                                                     className="flex-1 bg-blue-600 dark:bg-[#F5A623] text-white dark:text-[#0D0F14] px-6 py-3 rounded-xl font-bold hover:bg-blue-700 dark:hover:bg-[#D48E1D] transition-colors shadow-lg shadow-blue-200 dark:shadow-[#F5A623]/10 flex items-center justify-center gap-2"
                                                 >

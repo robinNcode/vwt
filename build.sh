@@ -21,7 +21,7 @@ if [ $? -ne 0 ]; then
     echo "Backend build failed!"
     exit 1
 fi
-cp .env.production ../build/.env
+cp .env.production ../build/
 cd ..
 
 # Build Frontend

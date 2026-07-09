@@ -29,7 +29,7 @@ const AdminMessages = () => {
         try {
             setLoading(true)
             const token = authService.getToken()
-            const apiBaseURL = import.meta.env.VITE_API_URL || 'http://localhost:8083/api/v1'
+            const apiBaseURL = import.meta.env.VITE_API_URL || 'https://api.voltwavebd.com/api/v1'
             const response = await axios.get(`${apiBaseURL}/admin/contact-messages`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
@@ -51,7 +51,7 @@ const AdminMessages = () => {
     const handleMarkAsRead = async (id: number) => {
         try {
             const token = authService.getToken()
-            const apiBaseURL = import.meta.env.VITE_API_URL || 'http://localhost:8083/api/v1'
+            const apiBaseURL = import.meta.env.VITE_API_URL || 'https://api.voltwavebd.com/api/v1'
             await axios.put(`${apiBaseURL}/admin/contact-messages/${id}/read`, {}, {
                 headers: { Authorization: `Bearer ${token}` }
             })

@@ -5,6 +5,7 @@ import { useCartStore } from '../../lib/cart';
 import { cn } from '../../lib/utils';
 import type { Product } from '../../pages/Products';
 import { useTranslation } from 'react-i18next';
+import { getMediaUrl } from '../../lib/media';
 
 interface ProductModalProps {
     product: Product | null;
@@ -29,7 +30,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
     const handleAddToCart = async () => {
         setAdding(true);
         try {
-            await addToCart({ productId: product.id, quantity: 1 });
+            await addToCart({ productId: product.id, quantity: 1, product });
             onClose();
         } catch {
 
@@ -70,7 +71,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
                                 {images.length > 0 ? (
                                     <img
                                         key={activeImg}
-                                        src={`${import.meta.env.VITE_SERVER_URL}${images[activeImg]?.url}`}
+                                        src={getMediaUrl(images[activeImg]?.url)}
                                         alt={name}
                                         className="max-w-full max-h-[300px] object-contain drop-shadow-2xl transition-opacity duration-300"
                                     />
@@ -105,7 +106,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, isOpen, onClose })
                                                 )}
                                             >
                                                 <img
-                                                    src={`${import.meta.env.VITE_SERVER_URL}${img.url}`}
+                                                    src={getMediaUrl(img.url)}
                                                     alt=""
                                                     className="w-full h-full object-cover"
                                                 />

@@ -25,7 +25,14 @@ api.interceptors.response.use(
         if (error.response && error.response.status === 401) {
             localStorage.removeItem('vwt_token');
             localStorage.removeItem('vwt_user');
-            window.location.href = '/login';
+            let basePath = window.location.pathname;
+            if (basePath.endsWith('/login')) {
+                basePath = basePath.slice(0, -6);
+            }
+            if (!basePath.endsWith('/')) {
+                basePath += '/';
+            }
+            window.location.href = window.location.origin + basePath + '#/login';
         }
         return Promise.reject(error);
     }

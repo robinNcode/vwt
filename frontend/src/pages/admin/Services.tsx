@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Pagination from '@/components/Pagination';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/axios';
+import { getMediaUrl } from '@/lib/media';
 
 interface Service {
     id: number;
@@ -163,7 +164,7 @@ const Services: React.FC = () => {
             is_active: svc.is_active,
             sort_order: svc.sort_order
         });
-        setPreviewUrl(svc.image_url ? `${import.meta.env.VITE_SERVER_URL}${svc.image_url}` : null);
+        setPreviewUrl(svc.image_url ? getMediaUrl(svc.image_url) : null);
         setIsModalOpen(true);
     };
 
@@ -221,7 +222,7 @@ const Services: React.FC = () => {
                                         <div className="flex items-center gap-4">
                                             <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-[#d48e1d] overflow-hidden border border-[#F5A623]/20">
                                                 {svc.image_url ? (
-                                                    <img src={`${import.meta.env.VITE_SERVER_URL}${svc.image_url}`} alt="" className="w-full h-full object-cover" />
+                                                    <img src={getMediaUrl(svc.image_url)} alt="" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <Wrench size={18} />
                                                 )}

@@ -1,13 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShoppingCart, Plus, Minus, Trash2, Package, Wrench } from 'lucide-react';
 import { useCartStore } from '../../lib/cart';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { getMediaUrl } from '../../lib/media';
 
 const CartDrawer: React.FC = () => {
     const { i18n } = useTranslation();
     const { items, isOpen, setIsOpen, updateQuantity, removeItem, clearCart } = useCartStore();
+
+    useEffect(() => {
+        if (!isOpen) return;
+
+        const originalOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            document.body.style.overflow = originalOverflow;
+        };
+    }, [isOpen]);
 
     const total = items.reduce((sum, item) => {
         const price = item.product?.price ?? item.service?.price ?? 0;
@@ -29,7 +42,7 @@ const CartDrawer: React.FC = () => {
         return item.service?.image_url || null;
     };
 
-    return (
+    return createPortal(
         <AnimatePresence>
             {isOpen && (
                 <>
@@ -39,7 +52,7 @@ const CartDrawer: React.FC = () => {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setIsOpen(false)}
-                        className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm"
+                        className="fixed inset-0 z-[90] bg-slate-900/40 backdrop-blur-sm"
                     />
 
                     {/* Drawer */}
@@ -48,7 +61,7 @@ const CartDrawer: React.FC = () => {
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}
                         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                        className="fixed top-0 right-0 z-50 h-full w-full max-w-sm bg-white dark:bg-[#0D0F14] shadow-2xl flex flex-col"
+                        className="fixed inset-y-0 right-0 z-[100] h-screen min-h-screen w-full max-w-sm bg-white dark:bg-[#0D0F14] shadow-2xl flex flex-col"
                     >
                         {/* Header */}
                         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-white/5">
@@ -97,7 +110,7 @@ const CartDrawer: React.FC = () => {
                                             <div className="w-14 h-14 rounded-xl overflow-hidden bg-white dark:bg-black/20 flex items-center justify-center shrink-0 border border-slate-100 dark:border-white/5">
                                                 {imgUrl ? (
                                                     <img
-                                                        src={`${import.meta.env.VITE_SERVER_URL}${imgUrl}`}
+                                                        src={getMediaUrl(imgUrl)}
                                                         alt={name}
                                                         className="w-full h-full object-cover"
                                                     />
@@ -171,7 +184,8 @@ const CartDrawer: React.FC = () => {
                     </motion.div>
                 </>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
     );
 };
 

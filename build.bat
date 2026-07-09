@@ -14,10 +14,10 @@ if "%1"=="linux" (
     go build -o ../build/api ./cmd/api
     set GOOS=
     set GOARCH=
-    copy .env.production ..\build\.env
+    copy .env.production ..\build\
 ) else (
     go build -o ../build/api.exe ./cmd/api
-    copy .env.production ..\build\.env
+    copy .env.production ..\build\
 )
 if %errorlevel% neq 0 (
     echo Backend build failed!

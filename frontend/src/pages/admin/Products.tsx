@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Pagination from '@/components/Pagination';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/axios';
+import { getMediaUrl } from '@/lib/media';
 
 interface ProductImage {
     url: string;
@@ -207,7 +208,7 @@ const Products: React.FC = () => {
             description_en: product.description_en || '',
             description_bn: product.description_bn || ''
         });
-        setPreviewUrl(product.images?.[0]?.url ? `${import.meta.env.VITE_SERVER_URL}${product.images[0].url}` : null);
+        setPreviewUrl(product.images?.[0]?.url ? getMediaUrl(product.images[0].url) : null);
         setIsModalOpen(true);
     };
 
@@ -268,7 +269,7 @@ const Products: React.FC = () => {
                                         <div className="flex items-center gap-4">
                                             <div className="w-12 h-12 rounded-xl bg-[#F5A623]/10 flex items-center justify-center text-[#d48e1d] overflow-hidden border border-[#F5A623]/20">
                                                 {product.images?.length ? (
-                                                    <img src={`${import.meta.env.VITE_SERVER_URL}${product.images[0].url}`} alt="" className="w-full h-full object-cover" />
+                                                    <img src={getMediaUrl(product.images[0].url)} alt="" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <ImageIcon size={20} />
                                                 )}
