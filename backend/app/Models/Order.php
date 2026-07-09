@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * A customer order with its shipping, billing, and payment details.
+ */
 class Order extends Model
 {
     use SoftDeletes;
@@ -39,8 +42,27 @@ class Order extends Model
         'created_by'
     ];
 
+    /**
+     * Line items belonging to this order.
+     */
     public function items()
     {
         return $this->hasMany(OrderItem::class, 'order_id');
+    }
+
+    /**
+     * Status-change history entries for this order.
+     */
+    public function statusHistory()
+    {
+        return $this->hasMany(OrderStatusHistory::class, 'order_id');
+    }
+
+    /**
+     * The customer who placed this order, if any.
+     */
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
 }

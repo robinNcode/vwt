@@ -3,30 +3,35 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * A price quotation issued to a customer, with its line items.
+ */
 class Quotation extends Model
 {
-    use SoftDeletes;
-
     protected $fillable = [
         'quotation_number',
         'customer_id',
+        'session_token',
         'customer_name',
         'customer_email',
         'customer_phone',
-        'company_name',
-        'valid_until',
-        'subtotal',
-        'discount_amount',
-        'tax_amount',
-        'grand_total',
-        'status',
+        'customer_address',
         'notes',
-        'created_by'
+        'status',
+        'expires_at',
     ];
 
     protected $casts = [
-        'valid_until' => 'datetime',
+        'expires_at' => 'datetime',
     ];
+
+    /**
+     * Line items belonging to this quotation.
+     */
+    public function items(): HasMany
+    {
+        return $this->hasMany(QuotationItem::class, 'quotation_id');
+    }
 }

@@ -35,7 +35,9 @@ class Customer extends Authenticatable implements JWTSubject
 
     public function getJWTCustomClaims()
     {
-        return [];
+        return [
+            'type' => 'customer',
+        ];
     }
 
     public function addresses()
