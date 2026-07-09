@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
+    /**
+     * List all services, newest first.
+     */
     public function index(Request $request)
     {
         $services = Service::orderByDesc('id')->get();
@@ -15,6 +18,9 @@ class ServiceController extends Controller
         return ApiResponse::ok('Services fetched successfully', $services);
     }
 
+    /**
+     * Create a service.
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -34,6 +40,9 @@ class ServiceController extends Controller
         return ApiResponse::created('Service created successfully', $service);
     }
 
+    /**
+     * Update an existing service.
+     */
     public function update(Request $request, $id)
     {
         $service = Service::findOrFail($id);
@@ -45,6 +54,9 @@ class ServiceController extends Controller
         return ApiResponse::ok('Service updated successfully', $service);
     }
 
+    /**
+     * Delete a service.
+     */
     public function destroy($id)
     {
         $service = Service::findOrFail($id);

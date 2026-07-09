@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
+    /**
+     * Store a contact message submitted from the public contact form.
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -30,6 +33,9 @@ class ContactController extends Controller
         return ApiResponse::created('Message submitted successfully', $message);
     }
 
+    /**
+     * List contact messages, optionally filtered by a name/email/subject search.
+     */
     public function index(Request $request)
     {
         $search = trim((string) $request->query('search', ''));
@@ -47,6 +53,9 @@ class ContactController extends Controller
         return ApiResponse::ok('Messages fetched successfully', $query->get());
     }
 
+    /**
+     * Mark a contact message as read.
+     */
     public function markRead($id)
     {
         $message = ContactMessage::find($id);
@@ -59,6 +68,9 @@ class ContactController extends Controller
         return ApiResponse::ok('Message updated successfully', ['id' => (int) $id, 'is_read' => true]);
     }
 
+    /**
+     * Return the number of unread contact messages.
+     */
     public function unreadCount()
     {
         $count = ContactMessage::where('is_read', false)->count();

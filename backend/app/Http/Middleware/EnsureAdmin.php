@@ -13,6 +13,9 @@ use Illuminate\Http\Request;
  */
 class EnsureAdmin
 {
+    /**
+     * Allow the request through only for super admins or admin-typed tokens.
+     */
     public function handle(Request $request, Closure $next)
     {
         $guard = auth('api');

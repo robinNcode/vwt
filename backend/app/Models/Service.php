@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * A service offering shown on the storefront.
+ */
 class Service extends Model
 {
     use SoftDeletes;

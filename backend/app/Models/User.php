@@ -10,6 +10,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
+/**
+ * An admin/staff user, authenticated via JWT and assigned a role.
+ */
 class User extends Authenticatable implements JWTSubject
 {
     /** @use HasFactory<UserFactory> */
@@ -40,16 +43,25 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
+    /**
+     * The role assigned to this user.
+     */
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'role_id');
     }
 
+    /**
+     * The identifier stored in the JWT subject claim.
+     */
     public function getJWTIdentifier()
     {
         return $this->getKey();
     }
 
+    /**
+     * Custom claims embedded in the issued JWT.
+     */
     public function getJWTCustomClaims(): array
     {
         return [

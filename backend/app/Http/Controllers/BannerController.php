@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 
 class BannerController extends Controller
 {
+    /**
+     * Return active banners for the public storefront, ordered by sort order.
+     */
     public function listPublic()
     {
         $banners = Banner::where('is_active', true)->orderBy('sort_order')->get();
@@ -15,11 +18,17 @@ class BannerController extends Controller
         return ApiResponse::ok('Banners fetched successfully', $banners);
     }
 
+    /**
+     * List all banners for admin management, newest first.
+     */
     public function index()
     {
         return ApiResponse::ok('Banners fetched successfully', Banner::orderByDesc('id')->get());
     }
 
+    /**
+     * Create a banner.
+     */
     public function store(Request $request)
     {
         $data = $request->validate([

@@ -13,11 +13,17 @@ class AccountingController extends Controller
 {
     // ─── Sales ────────────────────────────────────────────────────────────
 
+    /**
+     * List all sales, most recent first.
+     */
     public function sales(Request $request)
     {
         return ApiResponse::ok('Sales fetched', AccountingSale::orderByDesc('date')->get());
     }
 
+    /**
+     * Create a sale record.
+     */
     public function storeSale(Request $request)
     {
         $data = $request->validate([
@@ -29,6 +35,9 @@ class AccountingController extends Controller
         return ApiResponse::created('Sale created', AccountingSale::create($data));
     }
 
+    /**
+     * Delete a sale record.
+     */
     public function destroySale($id)
     {
         return $this->destroyRecord(AccountingSale::find($id), 'Sale');
@@ -36,11 +45,17 @@ class AccountingController extends Controller
 
     // ─── Purchases ────────────────────────────────────────────────────────
 
+    /**
+     * List all purchases, most recent first.
+     */
     public function purchases(Request $request)
     {
         return ApiResponse::ok('Purchases fetched', AccountingPurchase::orderByDesc('date')->get());
     }
 
+    /**
+     * Create a purchase record.
+     */
     public function storePurchase(Request $request)
     {
         $data = $request->validate([
@@ -53,6 +68,9 @@ class AccountingController extends Controller
         return ApiResponse::created('Purchase created', AccountingPurchase::create($data));
     }
 
+    /**
+     * Delete a purchase record.
+     */
     public function destroyPurchase($id)
     {
         return $this->destroyRecord(AccountingPurchase::find($id), 'Purchase');
@@ -60,11 +78,17 @@ class AccountingController extends Controller
 
     // ─── Expenses ─────────────────────────────────────────────────────────
 
+    /**
+     * List all expenses, most recent first.
+     */
     public function expenses(Request $request)
     {
         return ApiResponse::ok('Expenses fetched', AccountingExpense::orderByDesc('date')->get());
     }
 
+    /**
+     * Create an expense record.
+     */
     public function storeExpense(Request $request)
     {
         $data = $request->validate([
@@ -77,6 +101,9 @@ class AccountingController extends Controller
         return ApiResponse::created('Expense created', AccountingExpense::create($data));
     }
 
+    /**
+     * Delete an expense record.
+     */
     public function destroyExpense($id)
     {
         return $this->destroyRecord(AccountingExpense::find($id), 'Expense');
@@ -84,11 +111,17 @@ class AccountingController extends Controller
 
     // ─── Service Revenues ─────────────────────────────────────────────────
 
+    /**
+     * List all service revenue records, most recent first.
+     */
     public function serviceRevenues(Request $request)
     {
         return ApiResponse::ok('Service revenues fetched', AccountingServiceRevenue::orderByDesc('date')->get());
     }
 
+    /**
+     * Create a service revenue record.
+     */
     public function storeServiceRevenue(Request $request)
     {
         $data = $request->validate([
@@ -101,11 +134,17 @@ class AccountingController extends Controller
         return ApiResponse::created('Service revenue created', AccountingServiceRevenue::create($data));
     }
 
+    /**
+     * Delete a service revenue record.
+     */
     public function destroyServiceRevenue($id)
     {
         return $this->destroyRecord(AccountingServiceRevenue::find($id), 'Service revenue');
     }
 
+    /**
+     * Delete the given record, or return a 404 when it does not exist.
+     */
     protected function destroyRecord($record, string $label)
     {
         if (! $record) {

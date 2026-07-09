@@ -9,11 +9,17 @@ use Illuminate\Support\Facades\DB;
 
 class QuotationController extends Controller
 {
+    /**
+     * List all quotations with their items, newest first.
+     */
     public function index(Request $request)
     {
         return ApiResponse::ok('Quotations fetched successfully', Quotation::with('items')->orderByDesc('id')->get());
     }
 
+    /**
+     * Return a single quotation with its items.
+     */
     public function show($id)
     {
         $quotation = Quotation::with('items')->find($id);
@@ -24,11 +30,17 @@ class QuotationController extends Controller
         return ApiResponse::ok('Quotation fetched successfully', $quotation);
     }
 
+    /**
+     * Return the next sequential quotation number (QTN-NNNN).
+     */
     public function nextNumber()
     {
         return ApiResponse::ok('Success', ['quotation_number' => $this->generateNextNumber()]);
     }
 
+    /**
+     * Create a quotation with its line items and computed line totals.
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -81,6 +93,9 @@ class QuotationController extends Controller
         return ApiResponse::created('Quotation created successfully', $quotation);
     }
 
+    /**
+     * Update a quotation's status.
+     */
     public function updateStatus(Request $request, $id)
     {
         $data = $request->validate(['status' => 'required|string']);
@@ -96,6 +111,9 @@ class QuotationController extends Controller
         return ApiResponse::ok('Quotation updated successfully', ['id' => (int) $id, 'status' => $status]);
     }
 
+    /**
+     * Compute the next quotation number by incrementing the latest QTN-NNNN.
+     */
     protected function generateNextNumber(): string
     {
         $last = Quotation::orderByDesc('id')->value('quotation_number');

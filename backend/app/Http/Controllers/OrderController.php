@@ -8,11 +8,15 @@ use App\Models\OrderStatusHistory;
 use App\Support\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
     // ─── Admin ────────────────────────────────────────────────────────────
 
+    /**
+     * List orders for admin, optionally filtered by status.
+     */
     public function index(Request $request)
     {
         $status = trim((string) $request->query('status', ''));
@@ -25,6 +29,9 @@ class OrderController extends Controller
         return ApiResponse::ok('Orders fetched successfully', $query->get());
     }
 
+    /**
+     * Change an order's status and record the transition in its history.
+     */
     public function updateStatus(Request $request, $id)
     {
         $data = $request->validate(['status' => 'required|string']);
@@ -32,7 +39,7 @@ class OrderController extends Controller
 
         $order = Order::find($id);
         if (! $order) {
-            return ApiResponse::fail('Failed to update order', 500);
+            return ApiResponse::fail('Order not found', 404);
         }
 
         DB::transaction(function () use ($order, $status) {
@@ -53,6 +60,9 @@ class OrderController extends Controller
 
     // ─── Public ───────────────────────────────────────────────────────────
 
+    /**
+     * Return a single order with its line items by id.
+     */
     public function getById($id)
     {
         $order = Order::with('items')->find($id);
@@ -63,6 +73,9 @@ class OrderController extends Controller
         return ApiResponse::ok('Order fetched successfully', $order);
     }
 
+    /**
+     * Look up an order with its line items by order number for public tracking.
+     */
     public function trackByNumber($number)
     {
         $order = Order::with('items')->where('order_number', trim($number))->first();
@@ -73,6 +86,9 @@ class OrderController extends Controller
         return ApiResponse::ok('Order fetched successfully', $order);
     }
 
+    /**
+     * Create an order with its items and an initial status-history entry.
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -101,7 +117,7 @@ class OrderController extends Controller
 
         $order = DB::transaction(function () use ($data) {
             $order = Order::create([
-                'order_number' => 'ORD-'.now()->format('Ymd-His'),
+                'order_number' => 'ORD-'.now()->format('Ymd-His').'-'.strtoupper(Str::random(4)),
                 'customer_name' => $data['customer_name'],
                 'customer_email' => $data['customer_email'],
                 'customer_phone' => $data['customer_phone'],

@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * A key/value application setting, grouped and optionally holding JSON.
+ */
 class Setting extends Model
 {
     protected $table = 'settings';

@@ -8,11 +8,17 @@ use Illuminate\Http\Request;
 
 class SettingController extends Controller
 {
+    /**
+     * List all settings.
+     */
     public function index()
     {
         return ApiResponse::ok('Settings fetched successfully', Setting::all());
     }
 
+    /**
+     * Create a setting, defaulting its group to "general".
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -37,6 +43,9 @@ class SettingController extends Controller
         return ApiResponse::created('Setting created successfully', $setting);
     }
 
+    /**
+     * Update a setting, applying only the provided (non-null) fields.
+     */
     public function update(Request $request, $id)
     {
         $setting = Setting::find($id);
@@ -67,6 +76,9 @@ class SettingController extends Controller
         return ApiResponse::ok('Setting updated successfully', $setting);
     }
 
+    /**
+     * Create or update multiple settings in one request.
+     */
     public function bulkUpdate(Request $request)
     {
         $items = $request->all();
@@ -105,6 +117,9 @@ class SettingController extends Controller
         return ApiResponse::ok('Settings updated successfully');
     }
 
+    /**
+     * Delete a setting.
+     */
     public function destroy($id)
     {
         $setting = Setting::find($id);

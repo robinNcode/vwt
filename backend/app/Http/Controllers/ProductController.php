@@ -14,16 +14,25 @@ class ProductController extends Controller
         protected ProductService $productService
     ) {}
 
+    /**
+     * List active products for the public storefront.
+     */
     public function listPublic(Request $request)
     {
         return ApiResponse::ok('Products fetched successfully', $this->productService->getPublicProducts());
     }
 
+    /**
+     * List all products for admin management.
+     */
     public function index(Request $request)
     {
         return ApiResponse::ok('Products fetched successfully', $this->productService->getAdminProducts());
     }
 
+    /**
+     * Create a product from the validated request payload.
+     */
     public function store(StoreProductRequest $request)
     {
         $dto = ProductDTO::fromRequest($request->validated());
@@ -32,6 +41,9 @@ class ProductController extends Controller
         return ApiResponse::created('Product created successfully', $product);
     }
 
+    /**
+     * Update an existing product from the validated request payload.
+     */
     public function update(StoreProductRequest $request, $id)
     {
         $dto = ProductDTO::fromRequest($request->validated());
@@ -40,6 +52,9 @@ class ProductController extends Controller
         return ApiResponse::ok('Product updated successfully', $product);
     }
 
+    /**
+     * Delete a product.
+     */
     public function destroy($id)
     {
         $this->productService->deleteProduct($id);

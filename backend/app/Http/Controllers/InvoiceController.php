@@ -8,11 +8,17 @@ use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
 {
+    /**
+     * List all invoices, newest first.
+     */
     public function index(Request $request)
     {
         return ApiResponse::ok('Invoices fetched successfully', Invoice::orderByDesc('id')->get());
     }
 
+    /**
+     * Return a single invoice with its related order.
+     */
     public function show($id)
     {
         $invoice = Invoice::with('order')->find($id);
@@ -32,6 +38,9 @@ class InvoiceController extends Controller
         return ApiResponse::ok('Success', ['invoice_number' => $this->generateNextNumber()]);
     }
 
+    /**
+     * Create an invoice, stamping the current time as the issue date.
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -54,6 +63,9 @@ class InvoiceController extends Controller
         return ApiResponse::created('Invoice created successfully', $invoice);
     }
 
+    /**
+     * Update an existing invoice.
+     */
     public function update(Request $request, $id)
     {
         $invoice = Invoice::find($id);
@@ -80,6 +92,9 @@ class InvoiceController extends Controller
         return ApiResponse::ok('Invoice updated successfully', $invoice);
     }
 
+    /**
+     * Delete an invoice.
+     */
     public function destroy($id)
     {
         $invoice = Invoice::find($id);

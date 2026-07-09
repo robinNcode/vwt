@@ -8,11 +8,17 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    /**
+     * List all users with their role.
+     */
     public function index()
     {
         return ApiResponse::ok('Users fetched successfully', User::with('role')->get());
     }
 
+    /**
+     * Return the authenticated user's profile with role and permissions.
+     */
     public function getProfile(Request $request)
     {
         $user = User::with('role.permissions')->find($request->user()->id);
@@ -20,6 +26,9 @@ class UserController extends Controller
         return ApiResponse::ok('Profile fetched successfully', $user);
     }
 
+    /**
+     * Update the authenticated user's own name, email, or password.
+     */
     public function updateProfile(Request $request)
     {
         $data = $request->validate([
@@ -43,6 +52,9 @@ class UserController extends Controller
         return ApiResponse::ok('Profile updated successfully', $user);
     }
 
+    /**
+     * Admin update of a user's name, email, role, active flag, or password.
+     */
     public function update(Request $request, $id)
     {
         $user = User::find($id);
@@ -78,6 +90,9 @@ class UserController extends Controller
         return ApiResponse::ok('User updated successfully', $user);
     }
 
+    /**
+     * Upload and set the authenticated user's avatar image.
+     */
     public function updateAvatar(Request $request)
     {
         $request->validate([

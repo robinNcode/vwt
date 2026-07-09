@@ -9,11 +9,17 @@ use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
+    /**
+     * List all roles with their assigned permissions.
+     */
     public function index()
     {
         return ApiResponse::ok('Roles fetched successfully', Role::with('permissions')->get());
     }
 
+    /**
+     * Create a role.
+     */
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -24,11 +30,17 @@ class RoleController extends Controller
         return ApiResponse::created('Role created successfully', Role::create($data));
     }
 
+    /**
+     * List all available permissions.
+     */
     public function listPermissions()
     {
         return ApiResponse::ok('Permissions fetched successfully', Permission::all());
     }
 
+    /**
+     * Sync the given permission ids onto a role.
+     */
     public function updatePermissions(Request $request, $id)
     {
         $data = $request->validate([

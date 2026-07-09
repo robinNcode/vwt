@@ -11,11 +11,17 @@ use Illuminate\Http\Request;
  */
 class WebSettingController extends Controller
 {
+    /**
+     * Absolute path of the JSON file backing the web settings.
+     */
     protected function filePath(): string
     {
         return storage_path('app/web_settings.json');
     }
 
+    /**
+     * Return the stored web settings, or defaults when none exist yet.
+     */
     public function show()
     {
         $path = $this->filePath();
@@ -28,6 +34,9 @@ class WebSettingController extends Controller
         return ApiResponse::ok('Web settings fetched successfully', $settings);
     }
 
+    /**
+     * Overwrite the web settings JSON file with the request payload.
+     */
     public function update(Request $request)
     {
         $settings = $request->all();
