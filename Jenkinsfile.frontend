@@ -1,0 +1,105 @@
+// =============================================================================
+//  VWT — FRONTEND PRODUCTION PIPELINE
+//  Publishes the latest committed frontend build to voltwavebd.com (main domain)
+// -----------------------------------------------------------------------------
+//  Flow: checkout latest commit → npm ci → npm run build (Vite) → tar dist/ →
+//        scp over SSH → extract into the main-domain docroot (public_html/).
+//
+//  Deploy is done over SSH (scp) — the Windows Jenkins agent has OpenSSH but
+//  NOT lftp, so FTP is not used.
+//
+//  ── ONE-TIME JENKINS SETUP ────────────────────────────────────────────────
+//  Create TWO credentials (Manage Jenkins → Credentials):
+//
+//    1) ID: github-https   Kind: Username with password
+//         User: robinNcode        Pass: <GitHub PAT from secrets/general.txt>
+//
+//    2) ID: vwt-ssh        Kind: SSH Username with private key
+//         Username:    <your cPanel SSH user>
+//         Private key: paste secrets/id_rsa
+//         Passphrase:  Volt_wave#123   (leave blank if the key has none)
+//
+//  FRONTEND_DIR is the docroot RELATIVE TO the SSH user's home dir.
+// =============================================================================
+
+pipeline {
+    agent any
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '10'))
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
+    // Auto-deploy the latest commit. Prefer a GitHub webhook; poll is a fallback.
+    triggers {
+        pollSCM('H/5 * * * *')
+    }
+
+    environment {
+        SSH_HOST     = 'voltwavebd.com'
+        // Main-domain (voltwavebd.com) docroot, RELATIVE to the SSH user's home
+        FRONTEND_DIR = 'public_html'
+    }
+
+    stages {
+
+        stage('Checkout Latest Commit') {
+            steps {
+                git branch: 'master',
+                    url: 'https://github.com/robinNcode/vwt.git',
+                    credentialsId: 'github-https'
+                bat 'git rev-parse --short HEAD'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                dir('frontend') {
+                    bat 'npm ci'
+                }
+            }
+        }
+
+        stage('Build (Vite / production)') {
+            steps {
+                // frontend/.env.production is picked up automatically by Vite,
+                // so the bundle targets https://api.voltwavebd.com/api/v1
+                dir('frontend') {
+                    bat 'npm run build'
+                }
+            }
+        }
+
+        stage('Package Build') {
+            steps {
+                // Tarball the built assets (no excludes needed inside dist/)
+                dir('frontend/dist') {
+                    bat 'tar -czf ../../frontend-deploy.tgz .'
+                }
+            }
+        }
+
+        stage('Upload & Deploy (SSH)') {
+            steps {
+                withCredentials([sshUserPrivateKey(
+                    credentialsId: 'vwt-ssh',
+                    keyFileVariable: 'SSH_KEY',
+                    usernameVariable: 'SSH_USER'
+                )]) {
+                    // 1) copy the tarball to the server home dir
+                    bat 'scp -i "%SSH_KEY%" -o StrictHostKeyChecking=no frontend-deploy.tgz %SSH_USER%@%SSH_HOST%:~/frontend-deploy.tgz'
+
+                    // 2) clear stale assets, then extract the new build into the docroot
+                    bat 'ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no %SSH_USER%@%SSH_HOST% "mkdir -p %FRONTEND_DIR%/assets && rm -rf %FRONTEND_DIR%/assets/* && tar -xzf ~/frontend-deploy.tgz -C %FRONTEND_DIR% && rm -f ~/frontend-deploy.tgz"'
+                }
+            }
+        }
+    }
+
+    post {
+        success { echo '✅ Frontend published — https://voltwavebd.com' }
+        failure { echo '❌ Frontend deploy failed — check the log above' }
+        always  { cleanWs() }
+    }
+}

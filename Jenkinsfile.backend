@@ -1,0 +1,96 @@
+// =============================================================================
+//  VWT — BACKEND PRODUCTION PIPELINE  (Laravel 12 / PHP 8.2)
+//  Publishes the latest committed backend to api.voltwavebd.com
+// -----------------------------------------------------------------------------
+//  Flow: checkout latest commit → git-archive the backend/ subtree (tracked
+//        files only) → scp the tarball over SSH → extract on the server →
+//        composer install + artisan migrate/cache.
+//
+//  Deploy is done over SSH (scp) — the Windows Jenkins agent has OpenSSH but
+//  NOT lftp, so FTP is not used. Composer + artisan run ON THE SERVER so the
+//  agent needs no PHP, and migrations run against the prod database.
+//
+//  Using `git archive HEAD:backend` means only git-tracked files ship:
+//  vendor/, node_modules/, .env and storage runtime files are gitignored and
+//  therefore never uploaded — so prod secrets/state on the server survive.
+//
+//  ── ONE-TIME JENKINS SETUP ────────────────────────────────────────────────
+//  Create TWO credentials (Manage Jenkins → Credentials):
+//
+//    1) ID: github-https   Kind: Username with password
+//         User: robinNcode        Pass: <GitHub PAT from secrets/general.txt>
+//
+//    2) ID: vwt-ssh        Kind: SSH Username with private key
+//         Username:    <your cPanel SSH user>
+//         Private key: paste secrets/id_rsa
+//         Passphrase:  Volt_wave#123   (leave blank if the key has none)
+//
+//  ── ADJUST BEFORE FIRST RUN ────────────────────────────────────────────────
+//  BACKEND_DIR is the app location RELATIVE TO the SSH user's home dir.
+//  The api subdomain document root must point at <BACKEND_DIR>/public.
+// =============================================================================
+
+pipeline {
+    agent any
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '20', artifactNumToKeepStr: '10'))
+        timestamps()
+        disableConcurrentBuilds()
+    }
+
+    // Auto-deploy the latest commit. Prefer a GitHub webhook; poll is a fallback.
+    triggers {
+        pollSCM('H/5 * * * *')
+    }
+
+    environment {
+        SSH_HOST    = 'voltwavebd.com'
+        // App dir on the server, RELATIVE to the SSH user's home (see secrets/general.txt)
+        BACKEND_DIR = 'api.voltwavebd.com/public_html/api'
+    }
+
+    stages {
+
+        stage('Checkout Latest Commit') {
+            steps {
+                git branch: 'master',
+                    url: 'https://github.com/robinNcode/vwt.git',
+                    credentialsId: 'github-https'
+                bat 'git rev-parse --short HEAD'
+            }
+        }
+
+        stage('Package Backend') {
+            steps {
+                // Archive only the backend/ subtree, tracked files only.
+                // gitignored paths (vendor/, node_modules/, .env, storage state)
+                // are excluded automatically.
+                bat 'git archive --format=tar.gz -o backend-deploy.tgz HEAD:backend'
+            }
+        }
+
+        stage('Upload & Deploy (SSH)') {
+            steps {
+                withCredentials([sshUserPrivateKey(
+                    credentialsId: 'vwt-ssh',
+                    keyFileVariable: 'SSH_KEY',
+                    usernameVariable: 'SSH_USER'
+                )]) {
+                    // 1) copy the tarball to the server home dir
+                    bat 'scp -i "%SSH_KEY%" -o StrictHostKeyChecking=no backend-deploy.tgz %SSH_USER%@%SSH_HOST%:~/backend-deploy.tgz'
+
+                    // 2) extract over the app dir, then install deps, migrate, cache.
+                    //    storage:link is idempotent; '|| true' keeps it non-fatal.
+                    bat 'ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no %SSH_USER%@%SSH_HOST% "mkdir -p %BACKEND_DIR% && tar -xzf ~/backend-deploy.tgz -C %BACKEND_DIR% && rm -f ~/backend-deploy.tgz && cd %BACKEND_DIR% && composer install --no-dev --optimize-autoloader --no-interaction && php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan view:cache && (php artisan storage:link || true)"'
+                }
+            }
+        }
+    }
+
+    post {
+        success { echo '✅ Backend published — https://api.voltwavebd.com' }
+        failure { echo '❌ Backend deploy failed — check the log above' }
+        always  { cleanWs() }
+    }
+}
