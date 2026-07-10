@@ -1,33 +1,68 @@
 // =============================================================================
 //  VWT — BACKEND PRODUCTION PIPELINE  (Laravel 12 / PHP 8.2)
-//  Publishes the latest committed backend to api.voltwavebd.com
+//  Publishes the latest committed backend using the cPanel "split-folder" layout.
 // -----------------------------------------------------------------------------
-//  Flow: checkout latest commit → git-archive the backend/ subtree (tracked
-//        files only) → scp the tarball over SSH → extract on the server →
-//        composer install + artisan migrate/cache.
+//  PRODUCTION LAYOUT (what this pipeline reproduces automatically)
+//  ---------------------------------------------------------------
+//  The Laravel app is split into two locations on the server so the web docroot
+//  only ever exposes public/ — everything else lives outside the docroot:
 //
-//  Deploy is done over SSH (scp) — the Windows Jenkins agent has OpenSSH but
-//  NOT lftp, so FTP is not used. Composer + artisan run ON THE SERVER so the
-//  agent needs no PHP, and migrations run against the prod database.
+//    <ftp-root>/
+//    ├── public_html/
+//    │   └── api/                       ← api.voltwavebd.com DOCROOT (public/ only)
+//    │         index.php, .htaccess, favicon.ico, robots.txt, uploads/, …
+//    └── api.voltwavebd.com/            ← APP FOLDER (everything except public/)
+//          app/ bootstrap/ config/ routes/ storage/ vendor/ .env, …
 //
-//  Using `git archive HEAD:backend` means only git-tracked files ship:
-//  vendor/, node_modules/, .env and storage runtime files are gitignored and
-//  therefore never uploaded — so prod secrets/state on the server survive.
+//  The subdomain api.voltwavebd.com points at public_html/api. From there the
+//  bootstrapper reaches the app folder via __DIR__.'/../../api.voltwavebd.com/…'
+//  (public_html/api → public_html → <ftp-root> → api.voltwavebd.com).
+//
+//  ── WHAT THE PIPELINE DOES ─────────────────────────────────────────────────
+//  1) Checkout the latest commit (shallow).
+//  2) Rewrite public/index.php ON THE AGENT to the production variant whose paths
+//     point at the sibling app folder (the repo copy stays the standard local one
+//     so `php artisan serve` / XAMPP dev is unaffected).
+//  3) FTP-upload backend/public/*            → public_html/api      (docroot)
+//  4) FTP-upload backend/* except public/    → api.voltwavebd.com   (app folder)
+//  5) FTP-upload the production .env (from a Jenkins Secret file credential)
+//                                            → api.voltwavebd.com/.env
+//
+//  ── WHAT STAYS MANUAL ON THE SERVER ────────────────────────────────────────
+//  The Jenkins agent has no PHP/Composer and a clean checkout has no vendor/
+//  (gitignored). Run these over SSH INSIDE the app folder (api.voltwavebd.com):
+//
+//    cd ~/api.voltwavebd.com
+//    composer install --no-dev --optimize-autoloader   (when composer.lock changes)
+//    php artisan migrate --force                        (when new migrations land)
+//    php artisan storage:link                           (first deploy, if needed)
+//    # optional caches (safe here — no Windows paths get baked in):
+//    php artisan config:cache && php artisan route:cache && php artisan view:cache
+//
+//  vendor/ and storage/ runtime state live on the server and are excluded from
+//  the upload (cleanRemote=false → the plugin only adds/overwrites, never deletes)
+//  so prod deps and state survive every deploy. NOTE: .env IS re-uploaded every
+//  build from the credential, so the credential is the single source of truth —
+//  do not hand-edit .env on the server, update the credential instead.
 //
 //  ── ONE-TIME JENKINS SETUP ────────────────────────────────────────────────
-//  Create TWO credentials (Manage Jenkins → Credentials):
+//  1) GitHub checkout credential (Manage Jenkins → Credentials):
+//        ID: github-https   Kind: Username with password
+//        User: robinNcode   Pass: <GitHub PAT from secrets/general.txt>
 //
-//    1) ID: github-https   Kind: Username with password
-//         User: robinNcode        Pass: <GitHub PAT from secrets/general.txt>
+//  2) Production .env credential (Manage Jenkins → Credentials):
+//        ID: vwt-backend-env    Kind: Secret file
+//        File: your local backend/.env.production (uploaded as .env on the server)
 //
-//    2) ID: vwt-ssh        Kind: SSH Username with private key
-//         Username:    <your cPanel SSH user>
-//         Private key: paste secrets/id_rsa
-//         Passphrase:  Volt_wave#123   (leave blank if the key has none)
-//
-//  ── ADJUST BEFORE FIRST RUN ────────────────────────────────────────────────
-//  BACKEND_DIR is the app location RELATIVE TO the SSH user's home dir.
-//  The api subdomain document root must point at <BACKEND_DIR>/public.
+//  3) FTP server config (Manage Jenkins → System → "Publish over FTP"):
+//        Name:        vwt-ftp          (this exact name goes in FTP_CONFIG below)
+//        Hostname:    voltwavebd.com
+//        Port:        21               (or 990 for FTPS — set in the plugin)
+//        Username:    deploy@voltwavebd.com     (cPanel FTP user)
+//        Password:    <cPanel FTP pass>
+//        Remote root: /                (the FTP user's home; the *_DIR values
+//                                       below are resolved relative to this)
+//     Use "Test Configuration" in that screen to confirm it connects.
 // =============================================================================
 
 pipeline {
@@ -45,9 +80,16 @@ pipeline {
     }
 
     environment {
-        SSH_HOST    = 'voltwavebd.com'
-        // App dir on the server, RELATIVE to the SSH user's home (see secrets/general.txt)
-        BACKEND_DIR = 'api.voltwavebd.com/public_html/api'
+        // Name of the "Publish over FTP" server config created in Jenkins → System.
+        FTP_CONFIG = 'vwt-ftp'
+        // Jenkins "Secret file" credential holding the production .env (uploaded as .env).
+        ENV_CRED   = 'vwt-backend-env'
+        // DOCROOT for api.voltwavebd.com — receives public/ contents only.
+        // RELATIVE to the FTP remote root (see secrets/general.txt).
+        PUBLIC_DIR = 'public_html/api'
+        // APP FOLDER — everything except public/. Sibling of public_html at the
+        // FTP remote root; MUST match the folder name in public/index.php below.
+        APP_DIR    = 'api.voltwavebd.com'
     }
 
     stages {
@@ -75,35 +117,154 @@ pipeline {
             }
         }
 
-        stage('Package Backend') {
+        stage('Prepare Production index.php') {
             steps {
-                // Archive only the backend/ subtree, tracked files only.
-                // gitignored paths (vendor/, node_modules/, .env, storage state)
-                // are excluded automatically.
-                bat 'git archive --format=tar.gz -o backend-deploy.tgz HEAD:backend'
+                // Overwrite the checked-out public/index.php with the production
+                // variant whose paths point at the sibling app folder (APP_DIR).
+                // Triple single-quotes => Groovy does NOT interpolate PHP's $vars.
+                // Keep the '../../api.voltwavebd.com/' segment in sync with APP_DIR.
+                writeFile file: 'backend/public/index.php', text: '''<?php
+
+use Illuminate\\Foundation\\Application;
+use Illuminate\\Http\\Request;
+
+define('LARAVEL_START', microtime(true));
+
+// Determine if the application is in maintenance mode...
+if (file_exists($maintenance = __DIR__.'/../../api.voltwavebd.com/storage/framework/maintenance.php')) {
+    require $maintenance;
+}
+
+// Register the Composer autoloader...
+require __DIR__.'/../../api.voltwavebd.com/vendor/autoload.php';
+
+// Bootstrap Laravel and handle the request...
+/** @var Application $app */
+$app = require_once __DIR__.'/../../api.voltwavebd.com/bootstrap/app.php';
+
+$app->handleRequest(Request::capture());
+'''
+                bat 'type backend\\public\\index.php'
             }
         }
 
-        stage('Upload & Deploy (SSH)') {
+        stage('Stage Production .env') {
             steps {
-                withCredentials([sshUserPrivateKey(
-                    credentialsId: 'vwt-ssh',
-                    keyFileVariable: 'SSH_KEY',
-                    usernameVariable: 'SSH_USER'
-                )]) {
-                    // 1) copy the tarball to the server home dir
-                    bat 'scp -i "%SSH_KEY%" -o StrictHostKeyChecking=no backend-deploy.tgz %SSH_USER%@%SSH_HOST%:~/backend-deploy.tgz'
-
-                    // 2) extract over the app dir, then install deps, migrate, cache.
-                    //    storage:link is idempotent; '|| true' keeps it non-fatal.
-                    bat 'ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no %SSH_USER%@%SSH_HOST% "mkdir -p %BACKEND_DIR% && tar -xzf ~/backend-deploy.tgz -C %BACKEND_DIR% && rm -f ~/backend-deploy.tgz && cd %BACKEND_DIR% && composer install --no-dev --optimize-autoloader --no-interaction && php artisan migrate --force && php artisan config:cache && php artisan route:cache && php artisan view:cache && (php artisan storage:link || true)"'
+                // Materialise the production .env from the Secret file credential
+                // into an isolated staging folder so it uploads as a plain ".env".
+                // OPTIONAL: if the credential is not configured, warn and skip the
+                // .env upload (the server's existing .env is left untouched) rather
+                // than failing the whole deploy. HAS_ENV gates the upload stage.
+                script {
+                    try {
+                        withCredentials([file(credentialsId: "${env.ENV_CRED}", variable: 'PROD_ENV')]) {
+                            bat 'if not exist deploy-env mkdir deploy-env'
+                            bat 'copy /Y "%PROD_ENV%" "deploy-env\\.env"'
+                        }
+                        env.HAS_ENV = 'true'
+                    } catch (err) {
+                        env.HAS_ENV = 'false'
+                        echo "⚠️  Credential '${env.ENV_CRED}' not found — skipping .env upload; the server's existing .env is left untouched."
+                    }
                 }
+            }
+        }
+
+        stage('Deploy public/ → docroot (FTP)') {
+            steps {
+                // Ship ONLY public/ contents into the subdomain docroot. The
+                // rewritten index.php goes up here; the rest of the app does not.
+                ftpPublisher(
+                    masterNodeName: '',
+                    paramPublish: null,
+                    failOnError: true,
+                    continueOnError: false,
+                    alwaysPublishFromMaster: true,
+                    publishers: [[
+                        configName: "${env.FTP_CONFIG}",
+                        transfers: [[
+                            sourceFiles:      'backend/public/**',
+                            removePrefix:     'backend/public',
+                            remoteDirectory:  "${env.PUBLIC_DIR}",
+                            patternSeparator: ',',
+                            cleanRemote:      false,
+                            flatten:          false,
+                            makeEmptyDirs:    true,
+                            asciiMode:        false,
+                            remoteDirectorySDF: false
+                        ]]
+                    ]]
+                )
+            }
+        }
+
+        stage('Deploy app/ → app folder (FTP)') {
+            steps {
+                // Ship the tracked app source (everything EXCEPT public/) into the
+                // sibling app folder. Excludes keep server-side vendor/, .env and
+                // storage runtime untouched; bootstrap/cache is excluded so stale
+                // compiled files never ship.
+                ftpPublisher(
+                    masterNodeName: '',
+                    paramPublish: null,
+                    failOnError: true,
+                    continueOnError: false,
+                    alwaysPublishFromMaster: true,
+                    publishers: [[
+                        configName: "${env.FTP_CONFIG}",
+                        transfers: [[
+                            sourceFiles:      'backend/**',
+                            removePrefix:     'backend',
+                            remoteDirectory:  "${env.APP_DIR}",
+                            excludes:         'backend/public/**,backend/vendor/**,backend/.env,backend/.env.*,backend/storage/**,backend/bootstrap/cache/**,backend/node_modules/**,backend/composer.phar',
+                            patternSeparator: ',',
+                            cleanRemote:      false,
+                            flatten:          false,
+                            makeEmptyDirs:    true,
+                            asciiMode:        false,
+                            remoteDirectorySDF: false
+                        ]]
+                    ]]
+                )
+            }
+        }
+
+        stage('Deploy .env → app folder (FTP)') {
+            // Only runs when the .env credential was found and staged above.
+            when { environment name: 'HAS_ENV', value: 'true' }
+            steps {
+                // Upload the staged production .env into the app folder root.
+                ftpPublisher(
+                    masterNodeName: '',
+                    paramPublish: null,
+                    failOnError: true,
+                    continueOnError: false,
+                    alwaysPublishFromMaster: true,
+                    publishers: [[
+                        configName: "${env.FTP_CONFIG}",
+                        transfers: [[
+                            sourceFiles:      'deploy-env/.env',
+                            removePrefix:     'deploy-env',
+                            remoteDirectory:  "${env.APP_DIR}",
+                            patternSeparator: ',',
+                            cleanRemote:      false,
+                            flatten:          false,
+                            makeEmptyDirs:    false,
+                            asciiMode:        true,
+                            remoteDirectorySDF: false
+                        ]]
+                    ]]
+                )
             }
         }
     }
 
     post {
-        success { echo '✅ Backend published — https://api.voltwavebd.com' }
+        success {
+            echo '✅ Backend published (split layout) — https://api.voltwavebd.com'
+            echo 'ℹ️  Manual on server if needed (inside ~/api.voltwavebd.com):'
+            echo '    composer install --no-dev --optimize-autoloader && php artisan migrate --force'
+        }
         failure { echo '❌ Backend deploy failed — check the log above' }
         always  { cleanWs() }
     }

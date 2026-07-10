@@ -1,25 +1,30 @@
 // =============================================================================
-//  VWT — FRONTEND PRODUCTION PIPELINE
-//  Publishes the latest committed frontend build to voltwavebd.com (main domain)
+//  VWT — FRONTEND PRODUCTION PIPELINE  (React + Vite)
+//  Publishes the production build to voltwavebd.com (main domain) over FTP.
 // -----------------------------------------------------------------------------
-//  Flow: checkout latest commit → npm ci → npm run build (Vite) → tar dist/ →
-//        scp over SSH → extract into the main-domain docroot (public_html/).
+//  Flow: checkout latest commit → npm ci → npm run build (Vite, production) →
+//        FTP-upload the built dist/ into the main-domain docroot (public_html/).
 //
-//  Deploy is done over SSH (scp) — the Windows Jenkins agent has OpenSSH but
-//  NOT lftp, so FTP is not used.
+//  Deploy is done over FTP using the "Publish Over FTP" Jenkins plugin — NO SSH.
+//  The build runs entirely on the agent in production mode; only static, already
+//  -built assets are shipped. The server does nothing but receive files.
 //
 //  ── ONE-TIME JENKINS SETUP ────────────────────────────────────────────────
-//  Create TWO credentials (Manage Jenkins → Credentials):
+//  1) Credential for GitHub checkout (Manage Jenkins → Credentials):
+//        ID: github-https   Kind: Username with password
+//        User: robinNcode   Pass: <GitHub PAT from secrets/general.txt>
 //
-//    1) ID: github-https   Kind: Username with password
-//         User: robinNcode        Pass: <GitHub PAT from secrets/general.txt>
+//  2) FTP server config (Manage Jenkins → System → "Publish over FTP"):
+//        Name:        vwt-ftp          (this exact name goes in FTP_CONFIG below)
+//        Hostname:    voltwavebd.com
+//        Port:        21               (or 990 for FTPS — set in the plugin)
+//        Username:    <cPanel FTP user>
+//        Password:    <cPanel FTP pass>
+//        Remote root: /                (the FTP user's home; remoteDirectory
+//                                       below is resolved relative to this)
+//     Use "Test Configuration" in that screen to confirm it connects.
 //
-//    2) ID: vwt-ssh        Kind: SSH Username with private key
-//         Username:    <your cPanel SSH user>
-//         Private key: paste secrets/id_rsa
-//         Passphrase:  Volt_wave#123   (leave blank if the key has none)
-//
-//  FRONTEND_DIR is the docroot RELATIVE TO the SSH user's home dir.
+//  FRONTEND_DIR is the docroot RELATIVE TO the FTP remote root above.
 // =============================================================================
 
 pipeline {
@@ -37,8 +42,9 @@ pipeline {
     }
 
     environment {
-        SSH_HOST     = 'voltwavebd.com'
-        // Main-domain (voltwavebd.com) docroot, RELATIVE to the SSH user's home
+        // Name of the "Publish over FTP" server config created in Jenkins → System.
+        FTP_CONFIG   = 'vwt-ftp'
+        // Main-domain (voltwavebd.com) docroot, RELATIVE to the FTP remote root.
         FRONTEND_DIR = 'public_html'
     }
 
@@ -85,28 +91,31 @@ pipeline {
             }
         }
 
-        stage('Package Build') {
+        stage('Deploy (FTP)') {
             steps {
-                // Tarball the built assets (no excludes needed inside dist/)
-                dir('frontend/dist') {
-                    bat 'tar -czf ../../frontend-deploy.tgz .'
-                }
-            }
-        }
-
-        stage('Upload & Deploy (SSH)') {
-            steps {
-                withCredentials([sshUserPrivateKey(
-                    credentialsId: 'vwt-ssh',
-                    keyFileVariable: 'SSH_KEY',
-                    usernameVariable: 'SSH_USER'
-                )]) {
-                    // 1) copy the tarball to the server home dir
-                    bat 'scp -i "%SSH_KEY%" -o StrictHostKeyChecking=no frontend-deploy.tgz %SSH_USER%@%SSH_HOST%:~/frontend-deploy.tgz'
-
-                    // 2) clear stale assets, then extract the new build into the docroot
-                    bat 'ssh -i "%SSH_KEY%" -o StrictHostKeyChecking=no %SSH_USER%@%SSH_HOST% "mkdir -p %FRONTEND_DIR%/assets && rm -rf %FRONTEND_DIR%/assets/* && tar -xzf ~/frontend-deploy.tgz -C %FRONTEND_DIR% && rm -f ~/frontend-deploy.tgz"'
-                }
+                // Upload the built assets into the docroot. Vite emits content-
+                // hashed filenames, so stale old assets are harmless; we leave
+                // cleanRemote=false to avoid wiping anything else in public_html.
+                ftpPublisher(
+                    masterNodeName: '',
+                    paramPublish: null,
+                    failOnError: true,
+                    continueOnError: false,
+                    alwaysPublishFromMaster: true,
+                    publishers: [[
+                        configName: "${env.FTP_CONFIG}",
+                        transfers: [[
+                            sourceFiles:      'frontend/dist/**',
+                            removePrefix:     'frontend/dist',
+                            remoteDirectory:  "${env.FRONTEND_DIR}",
+                            cleanRemote:      false,
+                            flatten:          false,
+                            makeEmptyDirs:    true,
+                            asciiMode:        false,
+                            remoteDirectorySDF: false
+                        ]]
+                    ]]
+                )
             }
         }
     }
