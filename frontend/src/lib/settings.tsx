@@ -60,24 +60,25 @@ export interface WebSettings {
     theme_default_mode: string;
     theme_border_radius: string;
     theme_sidebar_style: string;
-    [key: string]: any;
-}
 
-export interface DbSettingItem {
-    id: number;
-    group: string;
-    key: string;
-    value: string | null;
-    label_en: string | null;
-    label_bn: string | null;
+    machinery_import_tax: string;
+    default_shipment_method: string;
+    currency_code: string;
+    currency_symbol: string;
+
+    enable_mfa: string;
+    session_timeout: string;
+    email_on_new_order: string;
+    sms_on_critical_alert: string;
+
+    [key: string]: any;
 }
 
 interface SiteSettingsContextType {
     settings: WebSettings | null;
-    dbSettings: Record<string, string>;
     loading: boolean;
     refreshSettings: () => Promise<void>;
-    getDbSetting: (key: string, defaultValue?: string) => string;
+    getSetting: (key: string, defaultValue?: string) => string;
 }
 
 const DEFAULT_SETTINGS: WebSettings = {
@@ -98,7 +99,7 @@ const DEFAULT_SETTINGS: WebSettings = {
     },
     email: 'info@voltwave.tech',
     phone: '+880 1700-000000',
-    phone2: '+880 1234-567890',
+    phone2: '',
     address: 'Kazi Nazrul Islam Ave, Dhaka, Bangladesh',
     map_url: '',
     meta_title: 'Volt Wave Tech | Industrial Electrical & Automation',
@@ -135,75 +136,60 @@ const DEFAULT_SETTINGS: WebSettings = {
     theme_default_mode: 'system',
     theme_border_radius: 'rounded',
     theme_sidebar_style: 'default',
+    machinery_import_tax: '15.5',
+    default_shipment_method: 'Freight',
+    currency_code: 'BDT',
+    currency_symbol: '৳',
+    enable_mfa: 'false',
+    session_timeout: '60',
+    email_on_new_order: 'true',
+    sms_on_critical_alert: 'true',
 };
 
 const SiteSettingsContext = createContext<SiteSettingsContextType>({
     settings: DEFAULT_SETTINGS,
-    dbSettings: {},
     loading: false,
     refreshSettings: async () => {},
-    getDbSetting: () => '',
+    getSetting: () => '',
 });
 
 export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [settings, setSettings] = useState<WebSettings>(DEFAULT_SETTINGS);
-    const [dbSettings, setDbSettings] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState<boolean>(true);
 
     const refreshSettings = useCallback(async () => {
         try {
-            const [webRes, dbRes] = await Promise.allSettled([
-                api.get('/web-settings'),
-                api.get('/settings'), // Public/cached or available endpoint
-            ]);
+            // Read all settings directly from database-backed endpoint
+            const res = await api.get('/web-settings');
 
-            let merged = { ...DEFAULT_SETTINGS };
-            const dbMap: Record<string, string> = {};
+            if (res.data?.success && res.data.data) {
+                const fetched = res.data.data;
+                const merged: WebSettings = {
+                    ...DEFAULT_SETTINGS,
+                    ...fetched,
+                    social_links: {
+                        ...DEFAULT_SETTINGS.social_links,
+                        ...(fetched.social_links || {}),
+                    },
+                };
 
-            if (dbRes.status === 'fulfilled' && dbRes.value.data?.success && Array.isArray(dbRes.value.data.data)) {
-                dbRes.value.data.data.forEach((item: DbSettingItem) => {
-                    if (item.key && item.value !== null && item.value !== undefined) {
-                        dbMap[item.key] = item.value;
+                setSettings(merged);
+
+                // Update document title dynamically
+                if (merged.site_name && document.title) {
+                    if (!document.title.includes(merged.site_name)) {
+                        document.title = merged.site_name;
                     }
-                });
-                setDbSettings(dbMap);
-            }
-
-            if (webRes.status === 'fulfilled' && webRes.value.data?.success && webRes.value.data.data) {
-                merged = { ...merged, ...webRes.value.data.data };
-                if (webRes.value.data.data.social_links) {
-                    merged.social_links = {
-                        ...merged.social_links,
-                        ...webRes.value.data.data.social_links,
-                    };
                 }
-            }
 
-            // Fallback DB fields into web settings if web settings is blank
-            if (dbMap['site_name'] && !merged.site_name) merged.site_name = dbMap['site_name'];
-            if (dbMap['site_email'] && !merged.email) merged.email = dbMap['site_email'];
-            if (dbMap['site_phone'] && !merged.phone) merged.phone = dbMap['site_phone'];
-            if (dbMap['site_address'] && !merged.address) merged.address = dbMap['site_address'];
-            if (dbMap['footer_text'] && !merged.footer_text) merged.footer_text = dbMap['footer_text'];
-            if (dbMap['facebook_url'] && !merged.social_links.facebook) merged.social_links.facebook = dbMap['facebook_url'];
-            if (dbMap['linkedin_url'] && !merged.social_links.linkedin) merged.social_links.linkedin = dbMap['linkedin_url'];
-
-            setSettings(merged);
-
-            // Update document title dynamically
-            if (merged.site_name && document.title) {
-                if (!document.title.includes(merged.site_name)) {
-                    document.title = merged.site_name;
+                // Update Favicon dynamically if provided
+                if (merged.favicon_url) {
+                    const link = (document.querySelector("link[rel*='icon']") as HTMLLinkElement) || document.createElement('link');
+                    link.type = 'image/x-icon';
+                    link.rel = 'shortcut icon';
+                    link.href = merged.favicon_url;
+                    document.getElementsByTagName('head')[0].appendChild(link);
                 }
-            }
-
-            // Update Favicon dynamically if provided
-            if (merged.favicon_url) {
-                const link = document.querySelector("link[rel*='icon']") as HTMLLinkElement || document.createElement('link');
-                link.type = 'image/x-icon';
-                link.rel = 'shortcut icon';
-                link.href = merged.favicon_url;
-                document.getElementsByTagName('head')[0].appendChild(link);
             }
         } catch (error) {
             console.warn('SiteSettingsProvider: using fallback defaults', error);
@@ -216,12 +202,12 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
         refreshSettings();
     }, [refreshSettings]);
 
-    const getDbSetting = (key: string, defaultValue = ''): string => {
-        return dbSettings[key] ?? defaultValue;
+    const getSetting = (key: string, defaultValue = ''): string => {
+        return settings?.[key] !== undefined && settings?.[key] !== null ? String(settings[key]) : defaultValue;
     };
 
     return (
-        <SiteSettingsContext.Provider value={{ settings, dbSettings, loading, refreshSettings, getDbSetting }}>
+        <SiteSettingsContext.Provider value={{ settings, loading, refreshSettings, getSetting }}>
             {children}
         </SiteSettingsContext.Provider>
     );
@@ -229,4 +215,3 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
 export const useSiteSettings = () => useContext(SiteSettingsContext);
 export default SiteSettingsContext;
-

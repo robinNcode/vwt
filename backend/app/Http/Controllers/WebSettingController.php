@@ -2,179 +2,257 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use App\Support\ApiResponse;
 use Illuminate\Http\Request;
 
 /**
- * Web settings are stored as a single JSON document on disk, mirroring the Go
- * file-backed WebSettingService (storage/app/web_settings.json).
+ * Controller providing site-wide configuration dictionary backed entirely
+ * by the `settings` database table (replacing the former JSON file storage).
  */
 class WebSettingController extends Controller
 {
     /**
-     * Comprehensive default values for every web-setting field.
-     * Organised to match the frontend WebSettings interface.
+     * Default schema providing fallbacks for all frontend settings.
      */
     protected const DEFAULTS = [
-        // ── General ─────────────────────────────────────────────────
+        // General & Contact
         'site_name'        => 'Volt Wave Tech',
-        'site_tagline'     => '',
-        'site_description' => '',
+        'site_tagline'     => 'Empowering Next-Gen Electrical & Automation Solutions',
+        'site_description' => 'Premier provider of high-grade industrial electrical equipment, automation systems, and engineering services.',
         'logo_url'         => '',
         'favicon_url'      => '',
-        'footer_text'      => '',
+        'footer_text'      => '© 2026 Volt Wave Tech. All rights reserved.',
         'social_links'     => [
-            'facebook'  => '',
+            'facebook'  => 'https://facebook.com/voltwavetech',
             'twitter'   => '',
             'instagram' => '',
-            'linkedin'  => '',
+            'linkedin'  => 'https://linkedin.com/company/voltwave',
             'youtube'   => '',
-            'whatsapp'  => '',
+            'whatsapp'  => '+880170000000',
             'tiktok'    => '',
         ],
-        'email'            => '',
-        'phone'            => '',
+        'email'            => 'info@voltwave.tech',
+        'phone'            => '+880 1700-000000',
         'phone2'           => '',
-        'address'          => '',
+        'address'          => 'Kazi Nazrul Islam Ave, Dhaka, Bangladesh',
         'map_url'          => '',
 
-        // ── SEO ─────────────────────────────────────────────────────
-        'meta_title'        => '',
-        'meta_description'  => '',
-        'meta_keywords'     => '',
+        // SEO
+        'meta_title'        => 'Volt Wave Tech | Industrial Electrical & Automation',
+        'meta_description'  => 'Industrial automation, electrical engineering, and machinery supplies in Bangladesh.',
+        'meta_keywords'     => 'electrical, machinery, engineering, automation, volt wave tech',
         'og_image'          => '',
         'google_analytics'  => '',
-        'canonical_url'     => '',
+        'canonical_url'     => 'https://voltwavebd.com',
 
-        // ── Invoice / Company ───────────────────────────────────────
-        'company_name'          => '',
-        'company_subtitle'      => '',
+        // Invoice / Quotation / Company
+        'company_name'          => 'Volt Wave Tech',
+        'company_subtitle'      => 'Engineering & Industrial Solutions',
         'company_logo_url'      => '',
         'signature_image_url'   => '',
-        'proprietor_name'       => '',
-        'proprietor_title'      => '',
-        'business_address'      => '',
-        'business_email'        => '',
-        'business_phone'        => '',
+        'proprietor_name'       => 'Md. Nazmul Huda',
+        'proprietor_title'      => 'Managing Director',
+        'business_address'      => 'Kazi Nazrul Islam Ave, Dhaka, Bangladesh',
+        'business_email'        => 'info@voltwave.tech',
+        'business_phone'        => '+880 1700-000000',
         'business_phone2'       => '',
-        'bank_name'             => '',
-        'bank_account_name'     => '',
-        'bank_account_number'   => '',
-        'bank_routing_number'   => '',
-        'invoice_footer_note'   => '',
+        'bank_name'             => 'City Bank PLC',
+        'bank_account_name'     => 'Volt Wave Tech',
+        'bank_account_number'   => '1234567890123',
+        'bank_routing_number'   => '225272645',
+        'invoice_footer_note'   => 'Thank you for your business. For any query, contact accounts@voltwave.tech',
 
-        // ── Email / SMTP ────────────────────────────────────────────
-        'smtp_host'        => '',
-        'smtp_port'        => '',
+        // Email / SMTP
+        'smtp_host'        => 'smtp.gmail.com',
+        'smtp_port'        => '587',
         'smtp_user'        => '',
         'smtp_password'    => '',
-        'smtp_from_name'   => '',
-        'smtp_from_email'  => '',
-        'smtp_encryption'  => '',
+        'smtp_from_name'   => 'Volt Wave Tech',
+        'smtp_from_email'  => 'noreply@voltwave.tech',
+        'smtp_encryption'  => 'tls',
 
-        // ── Theme ───────────────────────────────────────────────────
-        'theme_primary_color'  => '',
-        'theme_accent_color'   => '',
-        'theme_font_family'    => '',
-        'theme_heading_font'   => '',
-        'theme_default_mode'   => '',
-        'theme_border_radius'  => '',
-        'theme_sidebar_style'  => '',
+        // Theme
+        'theme_primary_color'  => '#F5A623',
+        'theme_accent_color'   => '#2B3A55',
+        'theme_font_family'    => 'Inter',
+        'theme_heading_font'   => 'Sora',
+        'theme_default_mode'   => 'system',
+        'theme_border_radius'  => 'rounded',
+        'theme_sidebar_style'  => 'default',
+
+        // Logistics & Operations
+        'machinery_import_tax'    => '15.5',
+        'default_shipment_method' => 'Freight',
+        'currency_code'           => 'BDT',
+        'currency_symbol'         => '৳',
+
+        // Security & Alerts
+        'enable_mfa'              => 'false',
+        'session_timeout'         => '60',
+        'email_on_new_order'      => 'true',
+        'sms_on_critical_alert'   => 'true',
     ];
 
     /**
-     * Mapping of group names to the setting keys they contain.
+     * Map setting keys to their canonical category group in the database table.
      */
-    protected const GROUPS = [
-        'general' => [
-            'site_name', 'site_tagline', 'site_description', 'logo_url',
-            'favicon_url', 'footer_text', 'social_links',
-            'email', 'phone', 'phone2', 'address', 'map_url',
-        ],
-        'seo' => [
-            'meta_title', 'meta_description', 'meta_keywords',
-            'og_image', 'google_analytics', 'canonical_url',
-        ],
-        'invoice' => [
-            'company_name', 'company_subtitle', 'company_logo_url',
-            'signature_image_url', 'proprietor_name', 'proprietor_title',
-            'business_address', 'business_email', 'business_phone', 'business_phone2',
-            'bank_name', 'bank_account_name', 'bank_account_number',
-            'bank_routing_number', 'invoice_footer_note',
-        ],
-        'email' => [
-            'smtp_host', 'smtp_port', 'smtp_user', 'smtp_password',
-            'smtp_from_name', 'smtp_from_email', 'smtp_encryption',
-        ],
-        'theme' => [
-            'theme_primary_color', 'theme_accent_color', 'theme_font_family',
-            'theme_heading_font', 'theme_default_mode', 'theme_border_radius',
-            'theme_sidebar_style',
-        ],
+    protected const KEY_TO_GROUP = [
+        // General
+        'site_name'        => 'general',
+        'site_tagline'     => 'general',
+        'site_description' => 'general',
+        'logo_url'         => 'general',
+        'favicon_url'      => 'general',
+        'footer_text'      => 'general',
+        'email'            => 'general',
+        'site_email'       => 'general',
+        'phone'            => 'general',
+        'site_phone'       => 'general',
+        'phone2'           => 'general',
+        'address'          => 'general',
+        'site_address'     => 'general',
+        'map_url'          => 'general',
+
+        // Social
+        'social_links'     => 'social',
+        'facebook_url'     => 'social',
+        'linkedin_url'     => 'social',
+
+        // SEO
+        'meta_title'       => 'seo',
+        'meta_description' => 'seo',
+        'meta_keywords'    => 'seo',
+        'og_image'         => 'seo',
+        'google_analytics' => 'seo',
+        'canonical_url'    => 'seo',
+
+        // Invoice
+        'company_name'          => 'invoice',
+        'company_subtitle'      => 'invoice',
+        'company_logo_url'      => 'invoice',
+        'signature_image_url'   => 'invoice',
+        'proprietor_name'       => 'invoice',
+        'proprietor_title'      => 'invoice',
+        'business_address'      => 'invoice',
+        'business_email'        => 'invoice',
+        'business_phone'        => 'invoice',
+        'business_phone2'       => 'invoice',
+        'bank_name'             => 'invoice',
+        'bank_account_name'     => 'invoice',
+        'bank_account_number'   => 'invoice',
+        'bank_routing_number'   => 'invoice',
+        'invoice_footer_note'   => 'invoice',
+
+        // Email
+        'smtp_host'        => 'email',
+        'smtp_port'        => 'email',
+        'smtp_user'        => 'email',
+        'smtp_password'    => 'email',
+        'smtp_from_name'   => 'email',
+        'smtp_from_email'  => 'email',
+        'smtp_encryption'  => 'email',
+
+        // Theme
+        'theme_primary_color'  => 'theme',
+        'theme_accent_color'   => 'theme',
+        'theme_font_family'    => 'theme',
+        'theme_heading_font'   => 'theme',
+        'theme_default_mode'   => 'theme',
+        'theme_border_radius'  => 'theme',
+        'theme_sidebar_style'  => 'theme',
+
+        // Logistics
+        'machinery_import_tax'    => 'logistics',
+        'default_shipment_method' => 'logistics',
+        'currency_code'           => 'logistics',
+        'currency_symbol'         => 'logistics',
+
+        // Security & Notifications
+        'enable_mfa'            => 'security',
+        'session_timeout'       => 'security',
+        'email_on_new_order'    => 'notifications',
+        'sms_on_critical_alert' => 'notifications',
     ];
 
     /**
-     * Absolute path of the JSON file backing the web settings.
+     * Build the merged settings dictionary from the database settings table.
      */
-    protected function filePath(): string
+    protected function loadSettingsFromDatabase(): array
     {
-        return storage_path('app/web_settings.json');
-    }
+        $rows = Setting::all();
+        $dbData = [];
 
-    /**
-     * Read stored settings and merge them with defaults so every key is present.
-     */
-    protected function resolvedSettings(): array
-    {
-        $path = $this->filePath();
-
-        $stored = [];
-        if (is_file($path)) {
-            $stored = json_decode(file_get_contents($path), true) ?: [];
+        foreach ($rows as $row) {
+            if ($row->value_json !== null && $row->value_json !== '') {
+                $decoded = is_string($row->value_json) ? json_decode($row->value_json, true) : $row->value_json;
+                $dbData[$row->key] = $decoded;
+            } elseif ($row->value !== null) {
+                $dbData[$row->key] = $row->value;
+            }
         }
 
-        // Deep-merge social_links separately so individual sub-keys get defaults.
-        $settings = array_merge(self::DEFAULTS, $stored);
-        $settings['social_links'] = array_merge(
-            self::DEFAULTS['social_links'],
-            is_array($settings['social_links'] ?? null) ? $settings['social_links'] : []
-        );
+        // Bridge legacy/alternate key names
+        if (isset($dbData['site_email']) && !isset($dbData['email'])) {
+            $dbData['email'] = $dbData['site_email'];
+        }
+        if (isset($dbData['site_phone']) && !isset($dbData['phone'])) {
+            $dbData['phone'] = $dbData['site_phone'];
+        }
+        if (isset($dbData['site_address']) && !isset($dbData['address'])) {
+            $dbData['address'] = $dbData['site_address'];
+        }
 
-        return $settings;
+        // Build social links
+        $social = self::DEFAULTS['social_links'];
+        if (isset($dbData['social_links']) && is_array($dbData['social_links'])) {
+            $social = array_merge($social, $dbData['social_links']);
+        }
+        if (isset($dbData['facebook_url']) && !empty($dbData['facebook_url'])) {
+            $social['facebook'] = $dbData['facebook_url'];
+        }
+        if (isset($dbData['linkedin_url']) && !empty($dbData['linkedin_url'])) {
+            $social['linkedin'] = $dbData['linkedin_url'];
+        }
+
+        $merged = array_merge(self::DEFAULTS, $dbData);
+        $merged['social_links'] = $social;
+
+        return $merged;
     }
 
     /**
-     * Return the stored web settings, merged with defaults.
+     * Return all site settings merged with defaults.
      */
     public function show()
     {
-        return ApiResponse::ok('Web settings fetched successfully', $this->resolvedSettings());
+        return ApiResponse::ok('Web settings fetched successfully from database', $this->loadSettingsFromDatabase());
     }
 
     /**
-     * Return settings filtered by a named group (general, seo, invoice, email, theme).
+     * Return settings filtered by group name.
      */
     public function showGroup(string $group)
     {
         $groupKey = strtolower($group);
+        $all = $this->loadSettingsFromDatabase();
+        $filtered = [];
 
-        if (! isset(self::GROUPS[$groupKey])) {
-            return ApiResponse::fail("Unknown settings group: {$group}", 404);
+        foreach (self::KEY_TO_GROUP as $key => $grp) {
+            if ($grp === $groupKey && array_key_exists($key, $all)) {
+                $filtered[$key] = $all[$key];
+            }
         }
 
-        $all  = $this->resolvedSettings();
-        $keys = self::GROUPS[$groupKey];
-        $data = [];
-
-        foreach ($keys as $key) {
-            $data[$key] = $all[$key] ?? self::DEFAULTS[$key] ?? null;
+        if (empty($filtered)) {
+            return ApiResponse::fail("Unknown or empty settings group: {$group}", 404);
         }
 
-        return ApiResponse::ok("Web settings ({$groupKey}) fetched successfully", $data);
+        return ApiResponse::ok("Web settings ({$groupKey}) fetched successfully", $filtered);
     }
 
     /**
-     * Validate and overwrite the web settings JSON file.
+     * Update settings into the database `settings` table.
      */
     public function update(Request $request)
     {
@@ -186,14 +264,14 @@ class WebSettingController extends Controller
             'logo_url'         => 'nullable|string|max:500',
             'favicon_url'      => 'nullable|string|max:500',
             'footer_text'      => 'nullable|string|max:1000',
-            'social_links'              => 'nullable|array',
-            'social_links.facebook'     => 'nullable|string|max:500',
-            'social_links.twitter'      => 'nullable|string|max:500',
-            'social_links.instagram'    => 'nullable|string|max:500',
-            'social_links.linkedin'     => 'nullable|string|max:500',
-            'social_links.youtube'      => 'nullable|string|max:500',
-            'social_links.whatsapp'     => 'nullable|string|max:500',
-            'social_links.tiktok'       => 'nullable|string|max:500',
+            'social_links'           => 'nullable|array',
+            'social_links.facebook'  => 'nullable|string|max:500',
+            'social_links.twitter'   => 'nullable|string|max:500',
+            'social_links.instagram' => 'nullable|string|max:500',
+            'social_links.linkedin'  => 'nullable|string|max:500',
+            'social_links.youtube'   => 'nullable|string|max:500',
+            'social_links.whatsapp'  => 'nullable|string|max:500',
+            'social_links.tiktok'    => 'nullable|string|max:500',
             'email'            => 'nullable|string|max:255',
             'phone'            => 'nullable|string|max:50',
             'phone2'           => 'nullable|string|max:50',
@@ -242,29 +320,69 @@ class WebSettingController extends Controller
             'theme_default_mode'   => 'nullable|string|max:20',
             'theme_border_radius'  => 'nullable|string|max:20',
             'theme_sidebar_style'  => 'nullable|string|max:30',
+
+            // Logistics & Ops
+            'machinery_import_tax'    => 'nullable|string|max:20',
+            'default_shipment_method' => 'nullable|string|max:50',
+            'currency_code'           => 'nullable|string|max:10',
+            'currency_symbol'         => 'nullable|string|max:10',
+
+            // Security & Notifications
+            'enable_mfa'            => 'nullable|string|max:10',
+            'session_timeout'       => 'nullable|string|max:10',
+            'email_on_new_order'    => 'nullable|string|max:10',
+            'sms_on_critical_alert' => 'nullable|string|max:10',
         ]);
 
-        // Merge incoming data over the current resolved settings so we never lose keys.
-        $settings = array_merge($this->resolvedSettings(), $data);
+        $userId = auth('api')->id();
 
-        // Deep-merge social_links
-        if (isset($data['social_links']) && is_array($data['social_links'])) {
-            $settings['social_links'] = array_merge(
-                self::DEFAULTS['social_links'],
-                $this->resolvedSettings()['social_links'] ?? [],
-                $data['social_links']
+        foreach ($data as $key => $value) {
+            $group = self::KEY_TO_GROUP[$key] ?? 'general';
+            $isJson = is_array($value) || is_object($value);
+
+            Setting::updateOrCreate(
+                ['group' => $group, 'key' => $key],
+                [
+                    'value'       => $isJson ? null : ($value !== null ? (string) $value : null),
+                    'value_json'  => $isJson ? json_encode($value) : null,
+                    'label_en'    => ucwords(str_replace('_', ' ', $key)),
+                    'label_bn'    => null,
+                    'updated_by'  => $userId,
+                ]
             );
+
+            // Sync mirrored keys
+            if ($key === 'email') {
+                Setting::updateOrCreate(
+                    ['group' => 'general', 'key' => 'site_email'],
+                    ['value' => $value, 'label_en' => 'Site Support Email', 'updated_by' => $userId]
+                );
+            } elseif ($key === 'phone') {
+                Setting::updateOrCreate(
+                    ['group' => 'general', 'key' => 'site_phone'],
+                    ['value' => $value, 'label_en' => 'Site Phone', 'updated_by' => $userId]
+                );
+            } elseif ($key === 'address') {
+                Setting::updateOrCreate(
+                    ['group' => 'general', 'key' => 'site_address'],
+                    ['value' => $value, 'label_en' => 'Site Address', 'updated_by' => $userId]
+                );
+            } elseif ($key === 'social_links' && is_array($value)) {
+                if (!empty($value['facebook'])) {
+                    Setting::updateOrCreate(
+                        ['group' => 'social', 'key' => 'facebook_url'],
+                        ['value' => $value['facebook'], 'label_en' => 'Facebook URL', 'updated_by' => $userId]
+                    );
+                }
+                if (!empty($value['linkedin'])) {
+                    Setting::updateOrCreate(
+                        ['group' => 'social', 'key' => 'linkedin_url'],
+                        ['value' => $value['linkedin'], 'label_en' => 'LinkedIn URL', 'updated_by' => $userId]
+                    );
+                }
+            }
         }
 
-        $dir = dirname($this->filePath());
-        if (! is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
-        file_put_contents(
-            $this->filePath(),
-            json_encode($settings, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
-        );
-
-        return ApiResponse::ok('Web settings updated successfully', $settings);
+        return ApiResponse::ok('Site configuration saved to database successfully', $this->loadSettingsFromDatabase());
     }
 }
