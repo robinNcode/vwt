@@ -17,6 +17,20 @@ class SettingController extends Controller
     }
 
     /**
+     * Return settings filtered by group name.
+     */
+    public function showByGroup(string $group)
+    {
+        $settings = Setting::where('group', $group)->get();
+
+        if ($settings->isEmpty()) {
+            return ApiResponse::fail("No settings found for group: {$group}", 404);
+        }
+
+        return ApiResponse::ok("Settings ({$group}) fetched successfully", $settings);
+    }
+
+    /**
      * Create a setting, defaulting its group to "general".
      */
     public function store(Request $request)
@@ -50,7 +64,7 @@ class SettingController extends Controller
     {
         $setting = Setting::find($id);
         if (! $setting) {
-            return ApiResponse::fail('Failed to update setting', 500);
+            return ApiResponse::fail('Setting not found', 404);
         }
 
         $data = $request->validate([
@@ -124,7 +138,7 @@ class SettingController extends Controller
     {
         $setting = Setting::find($id);
         if (! $setting) {
-            return ApiResponse::fail('Failed to delete setting', 500);
+            return ApiResponse::fail('Setting not found', 404);
         }
         $setting->delete();
 

@@ -94,12 +94,15 @@ Route::prefix('v1/admin')->middleware(['auth:api', 'admin'])->group(function () 
 
     // Settings
     Route::get('/settings', [SettingController::class, 'index']);
+    Route::get('/settings/group/{group}', [SettingController::class, 'showByGroup']);
     Route::post('/settings', [SettingController::class, 'store']);
     Route::patch('/settings/bulk', [SettingController::class, 'bulkUpdate']);
     Route::put('/settings/{id}', [SettingController::class, 'update']);
     Route::delete('/settings/{id}', [SettingController::class, 'destroy']);
 
     // Web settings (single JSON document)
+    Route::get('/web-settings', [WebSettingController::class, 'show']);
+    Route::get('/web-settings/group/{group}', [WebSettingController::class, 'showGroup']);
     Route::put('/web-settings', [WebSettingController::class, 'update']);
 
     // Contact messages
