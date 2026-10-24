@@ -29,6 +29,7 @@ Route::prefix('v1')->group(function () {
     Route::get('/products', [ProductController::class, 'listPublic']);
     Route::get('/services', [ServiceController::class, 'index']);
     Route::get('/web-settings', [WebSettingController::class, 'show']);
+    Route::get('/settings', [SettingController::class, 'index']);
     Route::get('/banners', [BannerController::class, 'listPublic']);
     Route::get('/blog', [BlogController::class, 'listPublic']);
     Route::get('/blog/{slug}', [BlogController::class, 'showPublic']);

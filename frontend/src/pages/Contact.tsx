@@ -4,9 +4,11 @@ import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, Send, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import axios from 'axios'
+import { useSiteSettings } from '@/lib/settings'
 
 const Contact = () => {
     const { t } = useTranslation()
+    const { settings } = useSiteSettings()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [formData, setFormData] = useState({
         name: '',
@@ -15,6 +17,11 @@ const Contact = () => {
         subject: '',
         message: ''
     })
+
+    const address = settings?.address || t('contact_page.info.address')
+    const email = settings?.email || 'support@voltwavetech.com'
+    const phone = settings?.phone || '+880 1700-000000'
+    const phone2 = settings?.phone2
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -63,7 +70,7 @@ const Contact = () => {
                         transition={{ delay: 0.1 }}
                         className="text-xl text-slate-600 dark:text-slate-400"
                     >
-                        {t('contact_page.subtitle')}
+                        {settings?.site_tagline || t('contact_page.subtitle')}
                     </motion.p>
                 </div>
 
@@ -84,7 +91,7 @@ const Contact = () => {
                                     <div>
                                         <h4 className="font-bold text-slate-900 dark:text-white mb-1">{t('contact_page.info.address_title')}</h4>
                                         <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-                                            {t('contact_page.info.address')}
+                                            {address}
                                         </p>
                                     </div>
                                 </div>
@@ -95,7 +102,9 @@ const Contact = () => {
                                     </div>
                                     <div>
                                         <h4 className="font-bold text-slate-900 dark:text-white mb-1">{t('contact_page.info.email_title')}</h4>
-                                        <p className="text-slate-500 dark:text-slate-400 text-sm">support@voltwavetech.com</p>
+                                        <a href={`mailto:${email}`} className="text-slate-500 dark:text-slate-400 text-sm hover:text-emerald-600 transition-colors">
+                                            {email}
+                                        </a>
                                     </div>
                                 </div>
 
@@ -105,7 +114,14 @@ const Contact = () => {
                                     </div>
                                     <div>
                                         <h4 className="font-bold text-slate-900 dark:text-white mb-1">{t('contact_page.info.phone_title')}</h4>
-                                        <p className="text-slate-500 dark:text-slate-400 text-sm">+880 1234 567890</p>
+                                        <a href={`tel:${phone.replace(/\s+/g, '')}`} className="text-slate-500 dark:text-slate-400 text-sm hover:text-yellow-600 transition-colors block">
+                                            {phone}
+                                        </a>
+                                        {phone2 && (
+                                            <a href={`tel:${phone2.replace(/\s+/g, '')}`} className="text-slate-500 dark:text-slate-400 text-sm hover:text-yellow-600 transition-colors block mt-1">
+                                                {phone2}
+                                            </a>
+                                        )}
                                     </div>
                                 </div>
                             </div>

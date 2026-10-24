@@ -6,18 +6,23 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { authService } from '@/lib/auth'
 import { useCartStore } from '@/lib/cart'
+import { useSiteSettings } from '@/lib/settings'
 import ThemeToggle from '../ThemeToggle'
 import CartDrawer from './CartDrawer'
 import finalLogo from '@/assets/images/final_logo.png'
 
 const Navbar = () => {
     const { t, i18n } = useTranslation()
+    const { settings } = useSiteSettings()
     const navigate = useNavigate()
     const [isOpen, setIsOpen] = useState(false)
     const [scrolled, setScrolled] = useState(false)
     const [user, setUser] = useState(authService.getUser())
     const { items, setIsOpen: setCartOpen, fetchCart } = useCartStore()
     const cartCount = items.reduce((sum, item) => sum + item.quantity, 0)
+
+    const siteName = settings?.site_name || 'Volt Wave Tech'
+    const logoSrc = settings?.logo_url || finalLogo
 
     useEffect(() => {
         const checkUser = () => {
@@ -70,7 +75,7 @@ const Navbar = () => {
             <div className="container-custom flex items-center justify-between">
                 {/* Logo */}
                 <Link to="/" className="flex items-center gap-2 group">
-                    <img src={finalLogo} alt="Volt Wave Tech" className="h-8 md:h-10 object-contain dark:brightness-0 dark:invert" />
+                    <img src={logoSrc} alt={siteName} className="h-8 md:h-10 object-contain dark:brightness-0 dark:invert" />
                 </Link>
 
                 {/* Desktop Nav */}
