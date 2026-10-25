@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Search, Package, Truck, CheckCircle2, Clock, XCircle, MapPin, Phone, Loader2, AlertCircle, PackageCheck, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import api from '@/lib/axios';
+import { useSiteSettings } from '@/lib/settings';
 
 interface OrderItem {
     id: number;
@@ -27,10 +29,10 @@ interface Order {
 }
 
 const statusSteps = [
-    { key: 'pending', label: 'Order Placed', icon: ShoppingBag, bg: 'bg-blue-500' },
-    { key: 'processing', label: 'Processing', icon: Package, bg: 'bg-amber-500' },
-    { key: 'shipped', label: 'Shipped', icon: Truck, bg: 'bg-purple-500' },
-    { key: 'delivered', label: 'Delivered', icon: PackageCheck, bg: 'bg-emerald-500' },
+    { key: 'pending', icon: ShoppingBag, bg: 'bg-blue-500' },
+    { key: 'processing', icon: Package, bg: 'bg-amber-500' },
+    { key: 'shipped', icon: Truck, bg: 'bg-purple-500' },
+    { key: 'delivered', icon: PackageCheck, bg: 'bg-emerald-500' },
 ];
 
 const stepColors: Record<string, string> = {
@@ -46,6 +48,12 @@ const getStepIndex = (status: string) => {
 };
 
 const TrackOrder: React.FC = () => {
+    const { t, i18n } = useTranslation();
+    const { settings } = useSiteSettings();
+    const isBn = i18n.language === 'bn';
+    const phoneDisplay = (isBn && settings?.phone_bn ? settings.phone_bn : settings?.phone) || '+880 1822-108496';
+    const phoneRaw = settings?.phone || '+880 1822-108496';
+
     const [orderId, setOrderId] = useState('');
     const [order, setOrder] = useState<Order | null>(null);
     const [loading, setLoading] = useState(false);
@@ -98,7 +106,7 @@ const TrackOrder: React.FC = () => {
                         className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-[#F5A623] text-xs font-bold uppercase tracking-wider backdrop-blur-sm mb-6"
                     >
                         <Truck size={14} />
-                        Real-time Order Tracking
+                        {t('track_order.badge')}
                     </motion.div>
                     <motion.h1
                         initial={{ opacity: 0, y: 20 }}
@@ -106,7 +114,7 @@ const TrackOrder: React.FC = () => {
                         transition={{ delay: 0.05 }}
                         className="text-4xl md:text-6xl font-extrabold text-white mb-4 font-sora"
                     >
-                        Track Your Order
+                        {t('track_order.title')}
                     </motion.h1>
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
@@ -114,7 +122,7 @@ const TrackOrder: React.FC = () => {
                         transition={{ delay: 0.1 }}
                         className="text-slate-300 max-w-xl mx-auto text-base md:text-lg leading-relaxed"
                     >
-                        Enter your order number or order ID to get real-time tracking updates on your package.
+                        {t('track_order.subtitle')}
                     </motion.p>
                 </div>
             </section>
@@ -131,7 +139,7 @@ const TrackOrder: React.FC = () => {
                     className="bg-white dark:bg-[#1A1E29] rounded-2xl border border-slate-200 dark:border-white/5 p-6 shadow-xl shadow-slate-200/50 dark:shadow-black/20 mb-8"
                 >
                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
-                        Order Number / Order ID
+                        {t('track_order.input_label')}
                     </label>
                     <div className="flex gap-3">
                         <div className="relative flex-1">
@@ -141,7 +149,7 @@ const TrackOrder: React.FC = () => {
                                 type="text"
                                 value={orderId}
                                 onChange={e => setOrderId(e.target.value)}
-                                placeholder="e.g. VWT-20241025-0001 or order ID"
+                                placeholder={t('track_order.placeholder')}
                                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-[#F5A623]/50 text-sm transition-all"
                             />
                         </div>
@@ -151,11 +159,11 @@ const TrackOrder: React.FC = () => {
                             className="flex items-center gap-2 bg-blue-600 dark:bg-[#F5A623] hover:bg-blue-700 dark:hover:bg-[#D48E1D] text-white dark:text-[#0D0F14] font-bold px-6 py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/20 dark:shadow-[#F5A623]/20 text-sm"
                         >
                             {loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
-                            Track
+                            {loading ? t('track_order.tracking_btn') : t('track_order.track_btn')}
                         </button>
                     </div>
                     <p className="text-xs text-slate-400 dark:text-slate-600 mt-3">
-                        You can find your order number in the confirmation email or SMS sent after purchase.
+                        {t('track_order.hint')}
                     </p>
                 </motion.form>
 
@@ -168,7 +176,7 @@ const TrackOrder: React.FC = () => {
                             className="flex items-center gap-3 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-2xl p-4 mb-6"
                         >
                             <AlertCircle size={18} className="text-red-500 shrink-0" />
-                            <p className="text-sm text-red-600 dark:text-red-400 font-medium">{error}</p>
+                            <p className="text-sm text-red-600 dark:text-red-400 font-medium">{t('track_order.not_found')}</p>
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -183,7 +191,7 @@ const TrackOrder: React.FC = () => {
                             <div className="bg-white dark:bg-[#1A1E29] rounded-2xl border border-slate-200 dark:border-white/5 p-6 shadow-xl shadow-slate-200/50 dark:shadow-black/20">
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                                     <div>
-                                        <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">Order Number</p>
+                                        <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">{t('track_order.order_details')}</p>
                                         <h2 className="text-2xl font-extrabold text-blue-600 dark:text-[#F5A623] font-mono">{order.order_number}</h2>
                                     </div>
                                     <div className="text-right">
@@ -195,23 +203,23 @@ const TrackOrder: React.FC = () => {
                                                     : 'bg-amber-100 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20'
                                         }`}>
                                             {isCancelled ? <XCircle size={12} /> : order.status === 'delivered' ? <CheckCircle2 size={12} /> : <Clock size={12} />}
-                                            {order.status.toUpperCase()}
+                                            {t(`track_order.steps.${order.status}`, { defaultValue: order.status.toUpperCase() })}
                                         </span>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                                     <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-3">
-                                        <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">Customer</p>
+                                        <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">{isBn ? 'গ্রাহক' : 'Customer'}</p>
                                         <p className="font-semibold text-slate-800 dark:text-white">{order.customer_name}</p>
                                     </div>
                                     <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-3">
-                                        <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">Order Total</p>
+                                        <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">{t('track_order.grand_total')}</p>
                                         <p className="font-bold text-slate-800 dark:text-white">৳{order.grand_total?.toLocaleString()}</p>
                                     </div>
                                     <div className="bg-slate-50 dark:bg-white/5 rounded-xl p-3">
-                                        <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">Payment</p>
+                                        <p className="text-xs text-slate-400 dark:text-slate-500 mb-1">{t('track_order.payment')}</p>
                                         <p className={`font-bold ${order.payment_status === 'paid' ? 'text-emerald-500' : 'text-amber-500'}`}>
-                                            {order.payment_status?.toUpperCase()}
+                                            {order.payment_status === 'paid' ? (isBn ? 'পরিশোধিত (PAID)' : 'PAID') : (isBn ? 'অপরিশোধিত (UNPAID)' : 'UNPAID')}
                                         </p>
                                     </div>
                                 </div>
@@ -219,7 +227,7 @@ const TrackOrder: React.FC = () => {
                                     <div className="mt-4 flex items-start gap-2.5 bg-slate-50 dark:bg-white/5 rounded-xl p-3">
                                         <MapPin size={14} className="text-blue-500 dark:text-[#F5A623] mt-0.5 shrink-0" />
                                         <div>
-                                            <p className="text-xs text-slate-400 dark:text-slate-500 mb-0.5">Delivery Address</p>
+                                            <p className="text-xs text-slate-400 dark:text-slate-500 mb-0.5">{t('track_order.shipping_to')}</p>
                                             <p className="text-sm text-slate-700 dark:text-slate-300">{order.shipping_address}</p>
                                         </div>
                                     </div>
@@ -228,7 +236,7 @@ const TrackOrder: React.FC = () => {
 
                             {!isCancelled ? (
                                 <div className="bg-white dark:bg-[#1A1E29] rounded-2xl border border-slate-200 dark:border-white/5 p-6 shadow-xl shadow-slate-200/50 dark:shadow-black/20">
-                                    <h3 className="font-bold text-slate-900 dark:text-white mb-8 text-sm uppercase tracking-wider">Delivery Progress</h3>
+                                    <h3 className="font-bold text-slate-900 dark:text-white mb-8 text-sm uppercase tracking-wider">{isBn ? 'ডেলিভারি অগ্রগতি' : 'Delivery Progress'}</h3>
                                     <div className="relative">
                                         <div className="absolute top-5 left-[10%] right-[10%] h-0.5 bg-slate-200 dark:bg-white/10 hidden sm:block" />
                                         <div
@@ -256,10 +264,10 @@ const TrackOrder: React.FC = () => {
                                                         </div>
                                                         <div>
                                                             <p className={`text-xs font-bold ${isCompleted ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-600'}`}>
-                                                                {step.label}
+                                                                {t(`track_order.steps.${step.key}`)}
                                                             </p>
-                                                            {isCurrent && <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Current</p>}
-                                                            {isCompleted && !isCurrent && <p className="text-[10px] text-emerald-500 mt-0.5 font-semibold">✓ Done</p>}
+                                                            {isCurrent && <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{isBn ? 'বর্তমান' : 'Current'}</p>}
+                                                            {isCompleted && !isCurrent && <p className="text-[10px] text-emerald-500 mt-0.5 font-semibold">✓ {isBn ? 'সম্পন্ন' : 'Done'}</p>}
                                                         </div>
                                                     </div>
                                                 );
@@ -268,7 +276,7 @@ const TrackOrder: React.FC = () => {
                                     </div>
                                     <div className="mt-8 p-4 rounded-xl bg-blue-50 dark:bg-blue-500/5 border border-blue-100 dark:border-blue-500/10">
                                         <p className="text-xs text-blue-600 dark:text-blue-400 font-semibold">
-                                            📦 Estimated Delivery: <span className="font-bold">1–3 days within Dhaka, 3–7 days nationwide (via courier partners).</span>
+                                            📦 {isBn ? 'সম্ভাব্য ডেলিভারিঃ ঢাকার মধ্যে ১-৩ দিন, ঢাকার বাইরে ৩-৭ দিন (কুরিয়ারের মাধ্যমে)।' : 'Estimated Delivery: 1–3 days within Dhaka, 3–7 days nationwide (via courier partners).'}
                                         </p>
                                     </div>
                                 </div>
@@ -279,8 +287,8 @@ const TrackOrder: React.FC = () => {
                                             <XCircle size={24} className="text-red-500" />
                                         </div>
                                         <div>
-                                            <h3 className="font-bold text-red-600 dark:text-red-400">Order Cancelled</h3>
-                                            <p className="text-sm text-slate-500 dark:text-slate-400">This order has been cancelled. Contact support for refund queries.</p>
+                                            <h3 className="font-bold text-red-600 dark:text-red-400">{isBn ? 'অর্ডার বাতিল করা হয়েছে' : 'Order Cancelled'}</h3>
+                                            <p className="text-sm text-slate-500 dark:text-slate-400">{isBn ? 'এই অর্ডারটি বাতিল হয়েছে। রিফান্ডের জন্য যোগাযোগ করুন।' : 'This order has been cancelled. Contact support for refund queries.'}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -288,7 +296,7 @@ const TrackOrder: React.FC = () => {
 
                             {order.items && order.items.length > 0 && (
                                 <div className="bg-white dark:bg-[#1A1E29] rounded-2xl border border-slate-200 dark:border-white/5 p-6 shadow-xl shadow-slate-200/50 dark:shadow-black/20">
-                                    <h3 className="font-bold text-slate-900 dark:text-white mb-4 text-sm uppercase tracking-wider">Order Items</h3>
+                                    <h3 className="font-bold text-slate-900 dark:text-white mb-4 text-sm uppercase tracking-wider">{t('track_order.items')}</h3>
                                     <div className="space-y-3">
                                         {order.items.map(item => (
                                             <div key={item.id} className="flex items-center justify-between py-3 border-b border-slate-100 dark:border-white/5 last:border-0">
@@ -310,15 +318,15 @@ const TrackOrder: React.FC = () => {
 
                             <div className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-[#F5A623] dark:to-[#D48E1D] rounded-2xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                                 <div>
-                                    <h4 className="font-bold text-white dark:text-[#0D0F14] text-lg">Need help with your order?</h4>
-                                    <p className="text-sm text-blue-100 dark:text-[#0D0F14]/70 mt-1">Our support team is available 9 AM – 9 PM, 7 days a week.</p>
+                                    <h4 className="font-bold text-white dark:text-[#0D0F14] text-lg">{isBn ? 'অর্ডার নিয়ে কোনো সাহায্য দরকার?' : 'Need help with your order?'}</h4>
+                                    <p className="text-sm text-blue-100 dark:text-[#0D0F14]/70 mt-1">{isBn ? 'আমাদের সাপোর্ট টিম সকাল ৯টা – রাত ৯টা পর্যন্ত প্রস্তুত।' : 'Our support team is available 9 AM – 9 PM, 7 days a week.'}</p>
                                 </div>
                                 <a
-                                    href="tel:+8801822108496"
+                                    href={`tel:${phoneRaw.replace(/\s+/g, '')}`}
                                     className="inline-flex items-center gap-2 bg-white dark:bg-[#0D0F14] text-blue-600 dark:text-[#F5A623] font-bold px-5 py-2.5 rounded-xl text-sm hover:shadow-lg transition-all shrink-0"
                                 >
                                     <Phone size={14} />
-                                    Call Support
+                                    {isBn ? 'কল করুন' : 'Call Support'} ({phoneDisplay})
                                 </a>
                             </div>
                         </motion.div>
@@ -333,9 +341,9 @@ const TrackOrder: React.FC = () => {
                         className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-2"
                     >
                         {[
-                            { icon: ShoppingBag, title: 'Place Order', desc: 'Complete your purchase online or by calling us.' },
-                            { icon: Truck, title: 'Fast Shipping', desc: 'Delivered via trusted couriers across Bangladesh.' },
-                            { icon: CheckCircle2, title: 'Track & Receive', desc: 'Monitor progress and receive at your doorstep.' },
+                            { icon: ShoppingBag, title: t('track_order.info_cards.card1_title'), desc: t('track_order.info_cards.card1_desc') },
+                            { icon: Truck, title: t('track_order.info_cards.card2_title'), desc: t('track_order.info_cards.card2_desc') },
+                            { icon: CheckCircle2, title: t('track_order.info_cards.card3_title'), desc: t('track_order.info_cards.card3_desc') },
                         ].map((card, i) => (
                             <div key={i} className="bg-white dark:bg-[#1A1E29] rounded-2xl border border-slate-100 dark:border-white/5 p-5 text-center shadow-md">
                                 <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-[#F5A623]/10 flex items-center justify-center mx-auto mb-3">

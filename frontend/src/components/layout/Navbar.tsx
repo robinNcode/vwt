@@ -59,11 +59,11 @@ const Navbar = () => {
     }
 
     const navLinks = [
-        { name: t('nav.home'), icon: <Home />, href: '/' },
-        { name: t('nav.products'), icon: <Box />, href: '/products' },
-        { name: t('nav.services'), icon: <Wrench />, href: '/services' },
-        { name: t('nav.contact'), icon: <Mail />, href: '/contact' },
-        { name: t('nav.track-orders'), icon: <Truck />, href: '/track-order' }
+        { name: t('nav.home'), icon: <Home size={15} />, href: '/' },
+        { name: t('nav.products'), icon: <Box size={15} />, href: '/products' },
+        { name: t('nav.services'), icon: <Wrench size={15} />, href: '/services' },
+        { name: t('nav.contact'), icon: <Mail size={15} />, href: '/contact' },
+        { name: t('nav.track-orders'), icon: <Truck size={15} />, href: '/track-order' }
     ]
 
     return (
@@ -114,7 +114,7 @@ const Navbar = () => {
                             ? "text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623]"
                             : "text-white/90 hover:text-white"
                     )}>
-                        <Search size={20} />
+                        <Search size={16} />
                     </button>
                     <button
                         onClick={() => setCartOpen(true)}
@@ -125,7 +125,7 @@ const Navbar = () => {
                                 : "text-white/90 hover:text-white"
                         )}
                     >
-                        <ShoppingCart size={20} />
+                        <ShoppingCart size={16} />
                         <span className="absolute top-1 right-1 w-4 h-4 bg-blue-600 dark:bg-[#F5A623] text-[10px] font-bold text-white flex items-center justify-center rounded-full">
                             {cartCount}
                         </span>
@@ -198,7 +198,7 @@ const Navbar = () => {
                 </div>
 
                 {/* Mobile menu button */}
-                <div className="md:hidden flex items-center gap-3">
+                <div className="md:hidden flex items-center gap-2">
                     <button
                         onClick={() => setCartOpen(true)}
                         className={cn(
@@ -206,7 +206,7 @@ const Navbar = () => {
                             scrolled ? "text-slate-600 dark:text-slate-400" : "text-white/90"
                         )}
                     >
-                        <ShoppingCart size={20} />
+                        <ShoppingCart size={17} />
                         {cartCount > 0 && (
                             <span className="absolute top-1 right-1 min-w-4 h-4 px-1 bg-blue-600 dark:bg-[#F5A623] text-[10px] font-bold text-white flex items-center justify-center rounded-full">
                                 {cartCount}
@@ -220,7 +220,7 @@ const Navbar = () => {
                             scrolled ? "text-slate-600 dark:text-slate-400" : "text-white/90"
                         )}
                     >
-                        <Globe size={20} />
+                        <Globe size={17} />
                     </button>
                     <button
                         className={cn(
@@ -229,7 +229,7 @@ const Navbar = () => {
                         )}
                         onClick={() => setIsOpen(!isOpen)}
                     >
-                        {isOpen ? <X size={24} /> : <Menu size={24} />}
+                        {isOpen ? <X size={20} /> : <Menu size={20} />}
                     </button>
                     <ThemeToggle />
                 </div>
