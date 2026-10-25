@@ -20,7 +20,7 @@ const Contact = () => {
 
     const address = settings?.address || t('contact_page.info.address')
     const email = settings?.email || 'support@voltwavetech.com'
-    const phone = settings?.phone || '+880 1700-000000'
+    const phone = settings?.phone || '+880 1822-108496'
     const phone2 = settings?.phone2
 
     const handleSubmit = async (e: React.FormEvent) => {

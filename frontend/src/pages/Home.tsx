@@ -8,7 +8,7 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import voltWaveTech from '@/assets/images/visiting_card_volt_wave_tech_back.png';
 import visitingCard from '@/assets/images/visiting_card_volt_wave_tech.png';
-import signWithSeal from '@/assets/images/Sign_with_seal.jpg';
+import lifeChartStatistics from '@/assets/images/3d-casual-life-chart-and-statistics-2.png';
 import sign from '@/assets/images/sign.jpg';
 import voltwaveLightBg from '@/assets/images/voltwave_light_clean.png';
 import voltwaveDarkBg from '@/assets/images/voltwave_dark_clean.png';
@@ -277,11 +277,10 @@ const Home = () => {
                             viewport={{ once: true }}
                             className="flex-1 relative w-full max-w-md lg:max-w-none"
                         >
-                            <div className="absolute inset-0 bg-blue-600/8 dark:bg-[#F5A623]/5 rounded-3xl -rotate-3" />
                             <img
-                                src={signWithSeal}
+                                src={lifeChartStatistics}
                                 alt="Certification"
-                                className="relative z-10 w-full rounded-3xl shadow-2xl border-8 border-white dark:border-[#1A1E29]"
+                                className="relative z-10 w-full"
                             />
                         </motion.div>
 
@@ -332,10 +331,6 @@ const Home = () => {
                                     </li>
                                 ))}
                             </motion.ul>
-                            <div className="mt-10 pt-8 border-t border-slate-200 dark:border-white/8">
-                                <img src={sign} alt="Signature" className="h-12 opacity-80 dark:brightness-0 dark:invert" />
-                                <p className="mt-2 text-sm font-bold text-slate-900 dark:text-white">{t('trust.signatory')}</p>
-                            </div>
                         </div>
                     </div>
                 </div>

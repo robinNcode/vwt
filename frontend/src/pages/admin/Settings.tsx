@@ -431,16 +431,16 @@ const Settings: React.FC = () => {
             <SectionDivider title="Contact Information" />
 
             <Field label="Primary Support Email">
-                <TextInput value={config.email} onChange={v => updateField('email', v)} placeholder="info@voltwave.tech" type="email" icon={<Mail size={14} />} />
+                <TextInput value={config.email} onChange={v => updateField('email', v)} placeholder="admin@voltwavebd.com" type="email" icon={<Mail size={14} />} />
             </Field>
             <Field label="Primary Telephone">
-                <TextInput value={config.phone} onChange={v => updateField('phone', v)} placeholder="+880 1700-000000" icon={<Phone size={14} />} />
+                <TextInput value={config.phone} onChange={v => updateField('phone', v)} placeholder="+880 1822-108496" icon={<Phone size={14} />} />
             </Field>
             <Field label="Secondary / Hot-Line Telephone">
                 <TextInput value={config.phone2} onChange={v => updateField('phone2', v)} placeholder="+880 1234-567890" icon={<Phone size={14} />} />
             </Field>
             <Field label="Physical Address" fullWidth>
-                <TextInput value={config.address} onChange={v => updateField('address', v)} placeholder="Kazi Nazrul Islam Ave, Dhaka, Bangladesh" />
+                <TextInput value={config.address} onChange={v => updateField('address', v)} placeholder="Kamarpara Nurani Madrasa, Uttara, Dhaka" />
             </Field>
             <Field label="Google Maps Embed / Location URL" fullWidth hint="Paste share link or embed URL">
                 <TextInput value={config.map_url} onChange={v => updateField('map_url', v)} placeholder="https://maps.app.goo.gl/..." icon={<ExternalLink size={14} />} />
@@ -507,7 +507,7 @@ const Settings: React.FC = () => {
                 <TextInput value={config.proprietor_title} onChange={v => updateField('proprietor_title', v)} placeholder="Managing Director" />
             </Field>
             <Field label="Business Print Address" fullWidth>
-                <TextInput value={config.business_address} onChange={v => updateField('business_address', v)} placeholder="Kazi Nazrul Islam Ave, Dhaka, Bangladesh" />
+                <TextInput value={config.business_address} onChange={v => updateField('business_address', v)} placeholder="Kamarpara Nurani Madrasa, Uttara, Dhaka" />
             </Field>
             <Field label="Billing Email">
                 <TextInput value={config.business_email} onChange={v => updateField('business_email', v)} type="email" icon={<Mail size={14} />} />
