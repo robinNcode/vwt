@@ -249,10 +249,11 @@ const Navbar = () => {
                                 <Link
                                     key={link.name}
                                     to={link.href}
-                                    className="text-lg font-medium text-slate-700 dark:text-slate-300 active:text-blue-600 dark:active:text-[#F5A623]"
+                                    className="text-lg font-medium text-slate-700 dark:text-slate-300 active:text-blue-600 dark:active:text-[#F5A623] flex items-center gap-2"
                                     onClick={() => setIsOpen(false)}
                                 >
-                                    {link.name}
+                                    <span className="text-lg">{link.icon}</span>
+                                    <span>{link.name}</span>
                                 </Link>
                             ))}
                             <div className="pt-4 border-t border-slate-100 dark:border-white/5 flex flex-col gap-3">

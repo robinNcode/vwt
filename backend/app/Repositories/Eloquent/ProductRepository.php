@@ -4,18 +4,29 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\Product;
 use App\Repositories\Contracts\ProductRepositoryInterface;
+use Illuminate\Support\Facades\Cache;
 
 class ProductRepository implements ProductRepositoryInterface
 {
+    /** Cache TTL in seconds (30 minutes) */
+    private const CACHE_TTL = 1800;
+
     public function getAllPaginated(int $perPage = 15)
     {
-        // Returns a full collection (Go parity: the API returns arrays, not paginators).
-        return Product::with('images')->orderByDesc('id')->get();
+        // Admin view is not cached (always fresh)
+        return Product::with(['images' => fn ($q) => $q->orderBy('sort_order')->orderBy('id')])
+            ->orderByDesc('id')
+            ->get();
     }
 
     public function getActivePaginated(int $perPage = 15)
     {
-        return Product::where('is_active', true)->with('images')->orderByDesc('id')->get();
+        return Cache::remember('products.public', self::CACHE_TTL, function () {
+            return Product::where('is_active', true)
+                ->with(['images' => fn ($q) => $q->orderBy('sort_order')->orderBy('id')])
+                ->orderByDesc('id')
+                ->get();
+        });
     }
 
     public function findById(int $id)
@@ -25,19 +36,23 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function create(array $data)
     {
-        return Product::create($data);
+        $product = Product::create($data);
+        Cache::forget('products.public');
+        return $product;
     }
 
     public function update(int $id, array $data)
     {
         $product = $this->findById($id);
         $product->update($data);
+        Cache::forget('products.public');
         return $product;
     }
 
     public function delete(int $id)
     {
         $product = $this->findById($id);
+        Cache::forget('products.public');
         return $product->delete();
     }
 }

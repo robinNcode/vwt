@@ -5,13 +5,15 @@ import Skeleton from '../components/ui/Skeleton';
 import { ShoppingCart, Heart, Eye, Search, SlidersHorizontal, X, Package, LayoutGrid } from 'lucide-react';
 import api from '../lib/axios';
 import { useCartStore } from '../lib/cart';
-import { getMediaUrl } from '../lib/media';
+import { getMediaUrl, getThumbnailUrl } from '../lib/media';
 import ProductModal from '../components/products/ProductModal';
 import { useSearchParams } from 'react-router-dom';
 
 export interface ProductImage {
     id?: number;
     url: string;
+    thumbnail_url?: string;
+    thumb?: string;
     is_primary: boolean;
     sort_order?: number;
 }
@@ -405,8 +407,10 @@ const Products: React.FC = () => {
                                         <div className="relative h-64 overflow-hidden bg-slate-50 dark:bg-black/20">
                                             {primaryImage ? (
                                                 <img
-                                                    src={getMediaUrl(primaryImage.url)}
+                                                    src={getThumbnailUrl(primaryImage)}
                                                     alt={name}
+                                                    loading="lazy"
+                                                    decoding="async"
                                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                                 />
                                             ) : (

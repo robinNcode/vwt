@@ -5,7 +5,7 @@ import Skeleton from '../components/ui/Skeleton';
 import { Zap, Shield, Clock, Wrench, ShoppingCart, CheckCircle2, ArrowRight, Layers } from 'lucide-react';
 import api from '../lib/axios';
 import { useCartStore } from '../lib/cart';
-import { getMediaUrl } from '../lib/media';
+import { getMediaUrl, getThumbnailUrl } from '../lib/media';
 import ServiceModal from '../components/services/ServiceModal';
 
 export interface Service {
@@ -16,6 +16,8 @@ export interface Service {
     description_bn?: string;
     price: number | null;
     image_url?: string;
+    thumbnail_url?: string;
+    thumb?: string;
     slug: string;
     is_active: boolean;
     sort_order: number;
@@ -197,10 +199,12 @@ const Services: React.FC = () => {
 
                                         {/* Icon */}
                                         <div className="w-16 h-16 rounded-2xl overflow-hidden bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-[#F5A623] flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300 border border-blue-100 dark:border-blue-500/20">
-                                            {service.image_url ? (
+                                            {(service.thumbnail_url || service.thumb || service.image_url) ? (
                                                 <img
-                                                    src={getMediaUrl(service.image_url)}
+                                                    src={getThumbnailUrl(service)}
                                                     alt={name}
+                                                    loading="lazy"
+                                                    decoding="async"
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
