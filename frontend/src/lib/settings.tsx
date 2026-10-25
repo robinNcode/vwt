@@ -3,11 +3,15 @@ import api from './axios';
 
 export interface WebSettings {
     site_name: string;
+    site_name_bn?: string;
     site_tagline: string;
+    site_tagline_bn?: string;
     site_description: string;
+    site_description_bn?: string;
     logo_url: string;
     favicon_url: string;
     footer_text: string;
+    footer_text_bn?: string;
     social_links: {
         facebook: string;
         twitter: string;
@@ -19,8 +23,11 @@ export interface WebSettings {
     };
     email: string;
     phone: string;
+    phone_bn?: string;
     phone2: string;
+    phone2_bn?: string;
     address: string;
+    address_bn?: string;
     map_url: string;
 
     meta_title: string;

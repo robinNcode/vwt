@@ -5,15 +5,18 @@ import { useSiteSettings } from '@/lib/settings'
 import finalLogo from '@/assets/images/final_logo.png'
 
 const Footer = () => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const { settings } = useSiteSettings()
+    const isBn = i18n.language === 'bn'
 
-    const siteName = settings?.site_name || 'Volt Wave Tech'
+    const siteName = (isBn && settings?.site_name_bn ? settings.site_name_bn : settings?.site_name) || 'Volt Wave Tech'
     const logoSrc = settings?.logo_url || finalLogo
-    const address = settings?.address || t('contact_page.info.address')
-    const phone = settings?.phone || '+880 1822-108496'
+    const address = (isBn && settings?.address_bn ? settings.address_bn : settings?.address) || t('contact_page.info.address')
+    const phone = (isBn && settings?.phone_bn ? settings.phone_bn : settings?.phone) || '+880 1822-108496'
+    const phoneRaw = settings?.phone || '+880 1822-108496'
     const email = settings?.email || 'support@voltwavetech.com'
-    const footerText = settings?.footer_text || `© ${new Date().getFullYear()} ${siteName}. All rights reserved.`
+    const footerText = (isBn && settings?.footer_text_bn ? settings.footer_text_bn : settings?.footer_text) || `© ${new Date().getFullYear()} ${siteName}. All rights reserved.`
+    const siteDescription = (isBn && settings?.site_description_bn ? settings.site_description_bn : settings?.site_description) || t('footer.desc')
     const socialLinks = settings?.social_links || { facebook: '', twitter: '', instagram: '', linkedin: '', youtube: '', whatsapp: '', tiktok: '' }
 
     return (
@@ -26,14 +29,14 @@ const Footer = () => {
                             <Zap size={20} className="text-white dark:text-[#0D0F14]" />
                         </div>
                         <p className="text-white font-bold text-lg">
-                            Need a custom electronics solution?
+                            {t('footer.strip_title')}
                         </p>
                     </div>
                     <Link
                         to="/contact"
                         className="inline-flex items-center gap-2 rounded-xl bg-blue-600 dark:bg-[#F5A623] px-6 py-3 text-sm font-bold text-white dark:text-[#0D0F14] hover:bg-blue-500 dark:hover:bg-[#D48E1D] transition-all active:scale-95 shrink-0"
                     >
-                        Get in Touch →
+                        {t('footer.strip_btn')}
                     </Link>
                 </div>
             </div>
@@ -47,7 +50,7 @@ const Footer = () => {
                             <img src={logoSrc} alt={siteName} className="h-8 object-contain brightness-0 invert" />
                         </Link>
                         <p className="text-slate-400 text-sm leading-relaxed">
-                            {settings?.site_description || t('footer.desc')}
+                            {siteDescription}
                         </p>
                         <div className="flex flex-wrap gap-2.5">
                             {socialLinks.facebook && (
@@ -137,7 +140,7 @@ const Footer = () => {
                                 <div className="w-8 h-8 rounded-lg bg-emerald-600/15 flex items-center justify-center shrink-0">
                                     <Phone className="text-emerald-400" size={15} />
                                 </div>
-                                <a href={`tel:${phone.replace(/\s+/g, '')}`} className="text-slate-400 text-sm hover:text-white transition-colors">
+                                <a href={`tel:${phoneRaw.replace(/\s+/g, '')}`} className="text-slate-400 text-sm hover:text-white transition-colors">
                                     {phone}
                                 </a>
                             </li>

@@ -5,6 +5,7 @@
         "services": "Services",
         "about": "About",
         "contact": "Contact",
+        "track-orders": "Track Orders",
         "login": "Login",
         "logout": "Logout"
     },
@@ -90,6 +91,8 @@
         }
     },
     "footer": {
+        "strip_title": "Need a custom electronics solution?",
+        "strip_btn": "Get in Touch →",
         "desc": "Your destination for premium electronics and professional electrical services. We bring power to your life with quality and trust.",
         "quick_links": "Quick Links",
         "support": "Support",

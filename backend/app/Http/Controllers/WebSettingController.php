@@ -18,11 +18,15 @@ class WebSettingController extends Controller
     protected const DEFAULTS = [
         // General & Contact
         'site_name'        => 'Volt Wave Tech',
+        'site_name_bn'     => 'ভোল্ট ওয়েভ টেক',
         'site_tagline'     => 'Empowering Next-Gen Electrical & Automation Solutions',
+        'site_tagline_bn'  => 'নেক্সট-জেন ইলেকট্রিক্যাল এবং অটোমেশন সমাধান',
         'site_description' => 'Premier provider of high-grade industrial electrical equipment, automation systems, and engineering services.',
+        'site_description_bn' => 'প্রিমিয়াম শিল্প বৈদ্যুতিক সরঞ্জাম, অটোমেশন সিস্টেম এবং প্রকৌশল পরিষেবার শীর্ষস্থানীয় সরবরাহকারী।',
         'logo_url'         => '',
         'favicon_url'      => '',
         'footer_text'      => '© 2026 Volt Wave Tech. All rights reserved.',
+        'footer_text_bn'   => '© ২০২৬ ভোল্ট ওয়েভ টেক। সর্বস্বত্ব সংরক্ষিত।',
         'social_links'     => [
             'facebook'  => 'https://facebook.com/voltwavetech',
             'twitter'   => '',
@@ -34,8 +38,11 @@ class WebSettingController extends Controller
         ],
         'email'            => 'admin@voltwavebd.com',
         'phone'            => '+880 1822-108496',
+        'phone_bn'         => '+৮৮০ ১৮২২-১০৮৪৯৬',
         'phone2'           => '',
+        'phone2_bn'        => '',
         'address'          => 'Kamarpara Nurani Madrasa, Uttara, Dhaka',
+        'address_bn'       => 'কামারপাড়া নূরানী মাদ্রাসা, উত্তরা, ঢাকা',
         'map_url'          => '',
 
         // SEO
@@ -100,17 +107,24 @@ class WebSettingController extends Controller
     protected const KEY_TO_GROUP = [
         // General
         'site_name'        => 'general',
+        'site_name_bn'     => 'general',
         'site_tagline'     => 'general',
+        'site_tagline_bn'  => 'general',
         'site_description' => 'general',
+        'site_description_bn' => 'general',
         'logo_url'         => 'general',
         'favicon_url'      => 'general',
         'footer_text'      => 'general',
+        'footer_text_bn'   => 'general',
         'email'            => 'general',
         'site_email'       => 'general',
         'phone'            => 'general',
+        'phone_bn'         => 'general',
         'site_phone'       => 'general',
         'phone2'           => 'general',
+        'phone2_bn'        => 'general',
         'address'          => 'general',
+        'address_bn'       => 'general',
         'site_address'     => 'general',
         'map_url'          => 'general',
 
@@ -259,11 +273,15 @@ class WebSettingController extends Controller
         $data = $request->validate([
             // General
             'site_name'        => 'nullable|string|max:255',
+            'site_name_bn'     => 'nullable|string|max:255',
             'site_tagline'     => 'nullable|string|max:255',
+            'site_tagline_bn'  => 'nullable|string|max:255',
             'site_description' => 'nullable|string|max:1000',
+            'site_description_bn' => 'nullable|string|max:1000',
             'logo_url'         => 'nullable|string|max:500',
             'favicon_url'      => 'nullable|string|max:500',
             'footer_text'      => 'nullable|string|max:1000',
+            'footer_text_bn'   => 'nullable|string|max:1000',
             'social_links'           => 'nullable|array',
             'social_links.facebook'  => 'nullable|string|max:500',
             'social_links.twitter'   => 'nullable|string|max:500',
@@ -274,8 +292,11 @@ class WebSettingController extends Controller
             'social_links.tiktok'    => 'nullable|string|max:500',
             'email'            => 'nullable|string|max:255',
             'phone'            => 'nullable|string|max:50',
+            'phone_bn'         => 'nullable|string|max:50',
             'phone2'           => 'nullable|string|max:50',
+            'phone2_bn'        => 'nullable|string|max:50',
             'address'          => 'nullable|string|max:500',
+            'address_bn'       => 'nullable|string|max:500',
             'map_url'          => 'nullable|string|max:1000',
 
             // SEO

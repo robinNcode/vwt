@@ -44,16 +44,23 @@ export interface SocialLinks {
 export interface SiteConfiguration {
     // General
     site_name: string;
+    site_name_bn: string;
     site_tagline: string;
+    site_tagline_bn: string;
     site_description: string;
+    site_description_bn: string;
     logo_url: string;
     favicon_url: string;
     footer_text: string;
+    footer_text_bn: string;
     social_links: SocialLinks;
     email: string;
     phone: string;
+    phone_bn: string;
     phone2: string;
+    phone2_bn: string;
     address: string;
+    address_bn: string;
     map_url: string;
 
     // SEO
@@ -116,11 +123,15 @@ export interface SiteConfiguration {
 
 const DEFAULT_CONFIG: SiteConfiguration = {
     site_name: 'Volt Wave Tech',
+    site_name_bn: 'ভোল্ট ওয়েভ টেক',
     site_tagline: '',
+    site_tagline_bn: '',
     site_description: '',
+    site_description_bn: '',
     logo_url: '',
     favicon_url: '',
     footer_text: '',
+    footer_text_bn: '',
     social_links: {
         facebook: '',
         twitter: '',
@@ -132,8 +143,11 @@ const DEFAULT_CONFIG: SiteConfiguration = {
     },
     email: '',
     phone: '',
+    phone_bn: '',
     phone2: '',
+    phone2_bn: '',
     address: '',
+    address_bn: '',
     map_url: '',
     meta_title: '',
     meta_description: '',
@@ -409,38 +423,63 @@ const Settings: React.FC = () => {
 
     const renderGeneral = () => (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Field label="Website / Brand Name">
+            <Field label="Website / Brand Name (English)">
                 <TextInput value={config.site_name} onChange={v => updateField('site_name', v)} placeholder="Volt Wave Tech" />
             </Field>
-            <Field label="Tagline / Slogan">
+            <Field label="Website / Brand Name (Bengali - বাংলা)">
+                <TextInput value={config.site_name_bn} onChange={v => updateField('site_name_bn', v)} placeholder="ভোল্ট ওয়েভ টেক" />
+            </Field>
+
+            <Field label="Tagline / Slogan (English)">
                 <TextInput value={config.site_tagline} onChange={v => updateField('site_tagline', v)} placeholder="Empowering Next-Gen Electrical Solutions" />
             </Field>
-            <Field label="Site Description" fullWidth hint="Appears in search snippets, social shares, and footer">
-                <TextArea value={config.site_description} onChange={v => updateField('site_description', v)} placeholder="Premier provider of industrial equipment..." rows={3} />
+            <Field label="Tagline / Slogan (Bengali - বাংলা)">
+                <TextInput value={config.site_tagline_bn} onChange={v => updateField('site_tagline_bn', v)} placeholder="নেক্সট-জেন ইলেকট্রিক্যাল সমাধান" />
             </Field>
+
+            <Field label="Site Description (English)" fullWidth hint="Appears in search snippets, social shares, and footer">
+                <TextArea value={config.site_description} onChange={v => updateField('site_description', v)} placeholder="Premier provider of industrial equipment..." rows={2} />
+            </Field>
+            <Field label="Site Description (Bengali - বাংলা)" fullWidth hint="বাংলায় সংক্ষিপ্ত বর্ণনা যা ফুটারে প্রদর্শিত হবে">
+                <TextArea value={config.site_description_bn} onChange={v => updateField('site_description_bn', v)} placeholder="প্রিমিয়াম শিল্প বৈদ্যুতিক সরঞ্জাম..." rows={2} />
+            </Field>
+
             <Field label="Logo URL" hint="Direct image link (SVG/PNG with transparent background recommended)">
                 <TextInput value={config.logo_url} onChange={v => updateField('logo_url', v)} placeholder="https://..." icon={<ExternalLink size={14} />} />
             </Field>
             <Field label="Favicon URL" hint="Direct link to browser tab icon (16×16 or 32×32 ICO/PNG)">
                 <TextInput value={config.favicon_url} onChange={v => updateField('favicon_url', v)} placeholder="https://..." icon={<ExternalLink size={14} />} />
             </Field>
-            <Field label="Footer Copyright Notice" fullWidth>
+
+            <Field label="Footer Copyright Notice (English)">
                 <TextInput value={config.footer_text} onChange={v => updateField('footer_text', v)} placeholder="© 2026 Volt Wave Tech. All rights reserved." />
+            </Field>
+            <Field label="Footer Copyright Notice (Bengali - বাংলা)">
+                <TextInput value={config.footer_text_bn} onChange={v => updateField('footer_text_bn', v)} placeholder="© ২০২৬ ভোল্ট ওয়েভ টেক। সর্বস্বত্ব সংরক্ষিত।" />
             </Field>
 
             <SectionDivider title="Contact Information" />
 
-            <Field label="Primary Support Email">
+            <Field label="Primary Support Email" fullWidth>
                 <TextInput value={config.email} onChange={v => updateField('email', v)} placeholder="admin@voltwavebd.com" type="email" icon={<Mail size={14} />} />
             </Field>
-            <Field label="Primary Telephone">
+            <Field label="Primary Telephone (English)">
                 <TextInput value={config.phone} onChange={v => updateField('phone', v)} placeholder="+880 1822-108496" icon={<Phone size={14} />} />
             </Field>
-            <Field label="Secondary / Hot-Line Telephone">
+            <Field label="Primary Telephone (Bengali - বাংলা)">
+                <TextInput value={config.phone_bn} onChange={v => updateField('phone_bn', v)} placeholder="+৮৮০ ১৮২২-১০৮৪৯৬" icon={<Phone size={14} />} />
+            </Field>
+            <Field label="Secondary Telephone (English)">
                 <TextInput value={config.phone2} onChange={v => updateField('phone2', v)} placeholder="+880 1234-567890" icon={<Phone size={14} />} />
             </Field>
-            <Field label="Physical Address" fullWidth>
+            <Field label="Secondary Telephone (Bengali - বাংলা)">
+                <TextInput value={config.phone2_bn} onChange={v => updateField('phone2_bn', v)} placeholder="+৮৮০ ১২৩৪-৫৬৭৮৯০" icon={<Phone size={14} />} />
+            </Field>
+            <Field label="Physical Address (English)" fullWidth>
                 <TextInput value={config.address} onChange={v => updateField('address', v)} placeholder="Kamarpara Nurani Madrasa, Uttara, Dhaka" />
+            </Field>
+            <Field label="Physical Address (Bengali - বাংলা)" fullWidth>
+                <TextInput value={config.address_bn} onChange={v => updateField('address_bn', v)} placeholder="কামারপাড়া নূরানী মাদ্রাসা, উত্তরা, ঢাকা" />
             </Field>
             <Field label="Google Maps Embed / Location URL" fullWidth hint="Paste share link or embed URL">
                 <TextInput value={config.map_url} onChange={v => updateField('map_url', v)} placeholder="https://maps.app.goo.gl/..." icon={<ExternalLink size={14} />} />

@@ -5,7 +5,9 @@ import {
     Package,
     TrendingUp,
     ArrowUpRight,
-    Loader2
+    Loader2,
+    Search,
+    X
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -20,6 +22,9 @@ const Dashboard: React.FC = () => {
     const [expenses, setExpenses] = React.useState<any[]>([]);
     const [serviceRevs, setServiceRevs] = React.useState<any[]>([]);
     const [loading, setLoading] = React.useState(true);
+    const [orderSearch, setOrderSearch] = React.useState('');
+    const [orderSearchResult, setOrderSearchResult] = React.useState<any>(null);
+    const [orderSearching, setOrderSearching] = React.useState(false);
 
     React.useEffect(() => {
         const fetchAll = async () => {
@@ -44,6 +49,25 @@ const Dashboard: React.FC = () => {
         };
         fetchAll();
     }, []);
+
+    const handleOrderSearch = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!orderSearch.trim()) return;
+        setOrderSearching(true);
+        setOrderSearchResult(null);
+        try {
+            const res = await api.get(`/orders/track/${orderSearch.trim()}`);
+            if (res.data.success && res.data.data) {
+                setOrderSearchResult({ found: true, ...res.data.data });
+            } else {
+                setOrderSearchResult({ found: false });
+            }
+        } catch {
+            setOrderSearchResult({ found: false });
+        } finally {
+            setOrderSearching(false);
+        }
+    };
 
     const totalIncome = sales.reduce((a, b) => a + b.amount, 0) + serviceRevs.reduce((a, b) => a + b.amount, 0);
     const totalExpense = purchases.reduce((a, b) => a + b.amount, 0) + expenses.reduce((a, b) => a + b.amount, 0);
@@ -181,7 +205,70 @@ const Dashboard: React.FC = () => {
                         </button>
                     </div>
 
-                    <div className="mt-8 p-5 bg-gradient-to-br from-[#F5A623] to-[#D48E1D] rounded-2xl relative overflow-hidden group cursor-pointer shadow-lg shadow-[#F5A623]/20">
+                    {/* Quick Order Search */}
+                    <div className="mt-5 p-4 rounded-2xl bg-[#F8F3E6] dark:bg-white/5 border border-[#E8DCC4] dark:border-white/10">
+                        <p className="text-xs font-bold text-[#5C4D3C] dark:text-white mb-3 flex items-center gap-2">
+                            <Search size={12} className="text-[#d48e1d] dark:text-[#F5A623]" />
+                            Quick Order Lookup
+                        </p>
+                        <form onSubmit={handleOrderSearch} className="flex gap-2">
+                            <div className="relative flex-1">
+                                <input
+                                    id="dashboard-order-search"
+                                    type="text"
+                                    value={orderSearch}
+                                    onChange={e => { setOrderSearch(e.target.value); setOrderSearchResult(null); }}
+                                    placeholder="Order ID..."
+                                    className="w-full pl-3 pr-3 py-2 rounded-lg border border-[#E8DCC4] dark:border-white/10 bg-white dark:bg-[#13161E] text-[#5C4D3C] dark:text-white placeholder-[#8B7355] dark:placeholder-[#4D526A] focus:outline-none focus:border-[#F5A623]/50 text-xs transition-all"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={orderSearching || !orderSearch.trim()}
+                                className="bg-[#F5A623] hover:bg-[#D48E1D] text-[#0D0F14] font-bold px-3 py-2 rounded-lg text-xs transition-all disabled:opacity-50 shadow-md shadow-[#F5A623]/20"
+                            >
+                                {orderSearching ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
+                            </button>
+                        </form>
+                        {orderSearchResult && (
+                            <div className={cn(
+                                "mt-3 p-3 rounded-xl text-xs",
+                                orderSearchResult.found
+                                    ? "bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20"
+                                    : "bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20"
+                            )}>
+                                {orderSearchResult.found ? (
+                                    <div>
+                                        <p className="font-bold text-[#d48e1d] dark:text-[#F5A623] font-mono">{orderSearchResult.order_number}</p>
+                                        <p className="text-[#5C4D3C] dark:text-slate-300 mt-0.5">{orderSearchResult.customer_name}</p>
+                                        <div className="flex items-center justify-between mt-1.5">
+                                            <span className={cn(
+                                                "px-2 py-0.5 rounded text-[10px] font-bold uppercase",
+                                                orderSearchResult.status === 'delivered' ? 'text-emerald-500' :
+                                                orderSearchResult.status === 'shipped' ? 'text-purple-400' :
+                                                orderSearchResult.status === 'cancelled' ? 'text-red-400' : 'text-amber-400'
+                                            )}>
+                                                {orderSearchResult.status}
+                                            </span>
+                                            <span className="font-mono font-bold text-[#5C4D3C] dark:text-white">৳{orderSearchResult.grand_total?.toLocaleString()}</span>
+                                        </div>
+                                        <Link
+                                            to="/admin/orders"
+                                            className="block text-center mt-2 text-[10px] text-[#d48e1d] dark:text-[#F5A623] font-bold hover:underline"
+                                        >
+                                            View in Orders →
+                                        </Link>
+                                    </div>
+                                ) : (
+                                    <p className="text-red-600 dark:text-red-400 flex items-center gap-1.5">
+                                        <X size={10} /> Order not found
+                                    </p>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="mt-4 p-5 bg-gradient-to-br from-[#F5A623] to-[#D48E1D] rounded-2xl relative overflow-hidden group cursor-pointer shadow-lg shadow-[#F5A623]/20">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-white/20 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
                         <h4 className="text-[#0D0F14] font-sora font-extrabold text-lg relative z-10 leading-tight">{t('dashboard.need_support')}</h4>
                         <p className="text-[#0D0F14]/70 text-xs font-bold mt-2 relative z-10 transition-transform group-hover:translate-x-1">{t('dashboard.visit_docs')} →</p>

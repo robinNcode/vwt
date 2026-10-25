@@ -77,24 +77,51 @@ const TrackOrder: React.FC = () => {
     const isCancelled = order?.status === 'cancelled';
 
     return (
-        <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] py-20 px-4">
-            <div className="max-w-3xl mx-auto">
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center mb-12"
-                >
-                    <div className="inline-flex items-center gap-2 bg-blue-50 dark:bg-[#F5A623]/10 border border-blue-100 dark:border-[#F5A623]/20 rounded-full px-4 py-1.5 mb-6">
-                        <Truck size={14} className="text-blue-600 dark:text-[#F5A623]" />
-                        <span className="text-xs font-bold text-blue-600 dark:text-[#F5A623] uppercase tracking-wider">Real-time Tracking</span>
-                    </div>
-                    <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white mb-3 font-sora">
+        <div className="bg-white dark:bg-[#0D0F14] transition-colors duration-300">
+            {/* ── Page Hero ── */}
+            <section className="relative pt-32 pb-20 bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-900 overflow-hidden">
+                <div
+                    className="absolute inset-0 opacity-5 pointer-events-none"
+                    style={{
+                        backgroundImage:
+                            'linear-gradient(rgba(255,255,255,0.15) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.15) 1px,transparent 1px)',
+                        backgroundSize: '48px 48px',
+                    }}
+                />
+                <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-blue-600/20 blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-20 -left-20 w-[400px] h-[400px] rounded-full bg-indigo-700/20 blur-3xl pointer-events-none" />
+
+                <div className="container-custom relative z-10 text-center">
+                    <motion.div
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-[#F5A623] text-xs font-bold uppercase tracking-wider backdrop-blur-sm mb-6"
+                    >
+                        <Truck size={14} />
+                        Real-time Order Tracking
+                    </motion.div>
+                    <motion.h1
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.05 }}
+                        className="text-4xl md:text-6xl font-extrabold text-white mb-4 font-sora"
+                    >
                         Track Your Order
-                    </h1>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm max-w-md mx-auto">
-                        Enter your order number to get the latest status update on your delivery.
-                    </p>
-                </motion.div>
+                    </motion.h1>
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                        className="text-slate-300 max-w-xl mx-auto text-base md:text-lg leading-relaxed"
+                    >
+                        Enter your order number or order ID to get real-time tracking updates on your package.
+                    </motion.p>
+                </div>
+            </section>
+
+            {/* ── Main Content ── */}
+            <div className="container-custom py-16">
+                <div className="max-w-3xl mx-auto">
 
                 <motion.form
                     initial={{ opacity: 0, y: 20 }}
@@ -320,6 +347,7 @@ const TrackOrder: React.FC = () => {
                         ))}
                     </motion.div>
                 )}
+                </div>
             </div>
         </div>
     );

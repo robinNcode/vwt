@@ -7,7 +7,7 @@ import axios from 'axios'
 import { useSiteSettings } from '@/lib/settings'
 
 const Contact = () => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const { settings } = useSiteSettings()
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [formData, setFormData] = useState({
@@ -18,10 +18,12 @@ const Contact = () => {
         message: ''
     })
 
-    const address = settings?.address || t('contact_page.info.address')
+    const isBn = i18n.language === 'bn'
+    const address = (isBn && settings?.address_bn ? settings.address_bn : settings?.address) || t('contact_page.info.address')
     const email = settings?.email || 'support@voltwavetech.com'
-    const phone = settings?.phone || '+880 1822-108496'
-    const phone2 = settings?.phone2
+    const phone = (isBn && settings?.phone_bn ? settings.phone_bn : settings?.phone) || '+880 1822-108496'
+    const phoneRaw = settings?.phone || '+880 1822-108496'
+    const phone2 = (isBn && settings?.phone2_bn ? settings.phone2_bn : settings?.phone2)
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -192,14 +194,14 @@ const Contact = () => {
                                         {t('contact_page.info.phone_title')}
                                     </h4>
                                     <a
-                                        href={`tel:${phone.replace(/\s+/g, '')}`}
+                                        href={`tel:${phoneRaw.replace(/\s+/g, '')}`}
                                         className="text-slate-500 dark:text-slate-400 text-sm hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors block"
                                     >
                                         {phone}
                                     </a>
                                     {phone2 && (
                                         <a
-                                            href={`tel:${phone2.replace(/\s+/g, '')}`}
+                                            href={`tel:${(settings?.phone2 || phone2).replace(/\s+/g, '')}`}
                                             className="text-slate-500 dark:text-slate-400 text-sm hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors block mt-1"
                                         >
                                             {phone2}

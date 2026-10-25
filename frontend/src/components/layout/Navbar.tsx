@@ -11,6 +11,9 @@ import ThemeToggle from '../ThemeToggle'
 import CartDrawer from './CartDrawer'
 import finalLogo from '@/assets/images/final_logo.png'
 
+// Icons
+import { Home, Box, Wrench, Info, Mail, Truck } from 'lucide-react'
+
 const Navbar = () => {
     const { t, i18n } = useTranslation()
     const { settings } = useSiteSettings()
@@ -56,11 +59,11 @@ const Navbar = () => {
     }
 
     const navLinks = [
-        { name: t('nav.home'), href: '/' },
-        { name: t('nav.products'), href: '/products' },
-        { name: t('nav.services'), href: '/services' },
-        { name: t('nav.about'), href: '/about' },
-        { name: t('nav.contact'), href: '/contact' },
+        { name: t('nav.home'), icon: <Home />, href: '/' },
+        { name: t('nav.products'), icon: <Box />, href: '/products' },
+        { name: t('nav.services'), icon: <Wrench />, href: '/services' },
+        { name: t('nav.contact'), icon: <Mail />, href: '/contact' },
+        { name: t('nav.track-orders'), icon: <Truck />, href: '/track-order' }
     ]
 
     return (
@@ -79,10 +82,7 @@ const Navbar = () => {
                         src={logoSrc}
                         alt={siteName}
                         className={cn(
-                            "h-8 md:h-10 object-contain transition-all duration-300",
-                            scrolled
-                                ? "dark:brightness-0 dark:invert"
-                                : "brightness-0 invert dark:brightness-0 dark:invert"
+                            "h-8 md:h-10 object-contain transition-all duration-300"
                         )}
                     />
                 </Link>
@@ -94,12 +94,13 @@ const Navbar = () => {
                             key={link.name}
                             to={link.href}
                             className={cn(
-                                "text-sm font-semibold transition-colors",
+                                "text-sm font-semibold transition-colors flex items-center gap-2",
                                 scrolled
                                     ? "text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-[#F5A623]"
                                     : "text-white/90 hover:text-white drop-shadow"
                             )}
                         >
+                            {link.icon}
                             {link.name}
                         </Link>
                     ))}
