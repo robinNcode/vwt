@@ -43,35 +43,35 @@ function App() {
                         </div>
                     } />
                     <Route path="/products" element={
-                        <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] font-sans text-slate-900 transition-colors duration-300">
+                        <div className="min-h-screen bg-white dark:bg-[#0D0F14] font-sans text-slate-900 dark:text-white transition-colors duration-300">
                             <Navbar />
                             <main><Products /></main>
                             <Footer />
                         </div>
                     } />
                     <Route path="/services" element={
-                        <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] font-sans text-slate-900 transition-colors duration-300">
+                        <div className="min-h-screen bg-white dark:bg-[#0D0F14] font-sans text-slate-900 dark:text-white transition-colors duration-300">
                             <Navbar />
                             <main><Services /></main>
                             <Footer />
                         </div>
                     } />
                     <Route path="/about" element={
-                        <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] font-sans text-slate-900 transition-colors duration-300">
+                        <div className="min-h-screen bg-white dark:bg-[#0D0F14] font-sans text-slate-900 dark:text-white transition-colors duration-300">
                             <Navbar />
                             <main><About /></main>
                             <Footer />
                         </div>
                     } />
                     <Route path="/contact" element={
-                        <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] font-sans text-slate-900 transition-colors duration-300">
+                        <div className="min-h-screen bg-white dark:bg-[#0D0F14] font-sans text-slate-900 dark:text-white transition-colors duration-300">
                             <Navbar />
                             <main><Contact /></main>
                             <Footer />
                         </div>
                     } />
                     <Route path="/checkout" element={
-                        <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] font-sans text-slate-900 transition-colors duration-300">
+                        <div className="min-h-screen bg-white dark:bg-[#0D0F14] font-sans text-slate-900 dark:text-white transition-colors duration-300">
                             <Navbar />
                             <main><Checkout /></main>
                             <Footer />
