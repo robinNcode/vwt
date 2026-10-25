@@ -16,6 +16,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\BannerController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ImageUploadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -150,4 +151,13 @@ Route::prefix('v1/admin')->middleware(['auth:api', 'admin'])->group(function () 
     // Blog
     Route::get('/blog', [BlogController::class, 'index']);
     Route::post('/blog', [BlogController::class, 'store']);
+
+    // Image Upload (products, services, banners, general)
+    Route::post('/upload', [ImageUploadController::class, 'upload']);
+
+    // Cache management
+    Route::post('/cache/clear', function () {
+        \Illuminate\Support\Facades\Cache::flush();
+        return \App\Support\ApiResponse::ok('Cache cleared successfully');
+    });
 });

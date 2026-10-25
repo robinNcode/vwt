@@ -10,6 +10,10 @@ import Contact from './pages/Contact'
 import About from './pages/About'
 import Login from './pages/Login'
 import Checkout from './pages/Checkout'
+import TrackOrder from './pages/TrackOrder'
+import FAQ from './pages/FAQ'
+import ShippingPolicy from './pages/ShippingPolicy'
+import ReturnPolicy from './pages/ReturnPolicy'
 
 import AdminLayout from './components/layout/AdminLayout'
 import AdminDashboard from './pages/admin/Dashboard'
@@ -43,35 +47,35 @@ function App() {
                         </div>
                     } />
                     <Route path="/products" element={
-                        <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] font-sans text-slate-900 transition-colors duration-300">
+                        <div className="min-h-screen bg-white dark:bg-[#0D0F14] font-sans text-slate-900 dark:text-white transition-colors duration-300">
                             <Navbar />
                             <main><Products /></main>
                             <Footer />
                         </div>
                     } />
                     <Route path="/services" element={
-                        <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] font-sans text-slate-900 transition-colors duration-300">
+                        <div className="min-h-screen bg-white dark:bg-[#0D0F14] font-sans text-slate-900 dark:text-white transition-colors duration-300">
                             <Navbar />
                             <main><Services /></main>
                             <Footer />
                         </div>
                     } />
                     <Route path="/about" element={
-                        <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] font-sans text-slate-900 transition-colors duration-300">
+                        <div className="min-h-screen bg-white dark:bg-[#0D0F14] font-sans text-slate-900 dark:text-white transition-colors duration-300">
                             <Navbar />
                             <main><About /></main>
                             <Footer />
                         </div>
                     } />
                     <Route path="/contact" element={
-                        <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] font-sans text-slate-900 transition-colors duration-300">
+                        <div className="min-h-screen bg-white dark:bg-[#0D0F14] font-sans text-slate-900 dark:text-white transition-colors duration-300">
                             <Navbar />
                             <main><Contact /></main>
                             <Footer />
                         </div>
                     } />
                     <Route path="/checkout" element={
-                        <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] font-sans text-slate-900 transition-colors duration-300">
+                        <div className="min-h-screen bg-white dark:bg-[#0D0F14] font-sans text-slate-900 dark:text-white transition-colors duration-300">
                             <Navbar />
                             <main><Checkout /></main>
                             <Footer />
@@ -80,6 +84,34 @@ function App() {
                     <Route path="/login" element={
                         <div className="min-h-screen bg-slate-50 dark:bg-[#0D0F14] font-sans text-slate-900 transition-colors duration-300">
                             <main><Login /></main>
+                        </div>
+                    } />
+                    <Route path="/track-order" element={
+                        <div className="min-h-screen bg-white dark:bg-[#0D0F14] font-sans text-slate-900 dark:text-white transition-colors duration-300">
+                            <Navbar />
+                            <main><TrackOrder /></main>
+                            <Footer />
+                        </div>
+                    } />
+                    <Route path="/faq" element={
+                        <div className="min-h-screen bg-white dark:bg-[#0D0F14] font-sans text-slate-900 dark:text-white transition-colors duration-300">
+                            <Navbar />
+                            <main><FAQ /></main>
+                            <Footer />
+                        </div>
+                    } />
+                    <Route path="/shipping" element={
+                        <div className="min-h-screen bg-white dark:bg-[#0D0F14] font-sans text-slate-900 dark:text-white transition-colors duration-300">
+                            <Navbar />
+                            <main><ShippingPolicy /></main>
+                            <Footer />
+                        </div>
+                    } />
+                    <Route path="/returns" element={
+                        <div className="min-h-screen bg-white dark:bg-[#0D0F14] font-sans text-slate-900 dark:text-white transition-colors duration-300">
+                            <Navbar />
+                            <main><ReturnPolicy /></main>
+                            <Footer />
                         </div>
                     } />
 

@@ -305,7 +305,7 @@ func seedPages(db *gorm.DB) {
 func seedSettings(db *gorm.DB) {
 	settings := []models.Setting{
 		{Group: "general", Key: "site_name", Value: strPtr("Volt Wave Tech"), LabelEN: strPtr("Site Name")},
-		{Group: "general", Key: "site_email", Value: strPtr("info@voltwave.tech"), LabelEN: strPtr("Site Email")},
+		{Group: "general", Key: "site_email", Value: strPtr("admin@voltwavebd.com"), LabelEN: strPtr("Site Email")},
 		{Group: "general", Key: "site_phone", Value: strPtr("+8801XXXXXXXXX"), LabelEN: strPtr("Site Phone")},
 		{Group: "general", Key: "site_address", Value: strPtr("Dhaka, Bangladesh"), LabelEN: strPtr("Site Address")},
 		{Group: "general", Key: "default_currency", Value: strPtr("BDT"), LabelEN: strPtr("Default Currency")},

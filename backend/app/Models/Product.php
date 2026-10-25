@@ -11,6 +11,9 @@ class Product extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'name',
+        'stock_quantity',
+        'description',
         'category_id',
         'product_type',
         'sku_prefix',
@@ -36,6 +39,22 @@ class Product extends Model
         'created_by',
         'updated_by',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function ($product) {
+            // Keep legacy / non-nullable columns synchronized
+            if (empty($product->name)) {
+                $product->name = $product->name_en ?? $product->name_bn ?? '';
+            }
+            if (!isset($product->stock_quantity)) {
+                $product->stock_quantity = (int) ($product->stock ?? 0);
+            }
+            if (empty($product->description)) {
+                $product->description = $product->short_desc_en ?? $product->description_en ?? '';
+            }
+        });
+    }
 
     public function category()
     {

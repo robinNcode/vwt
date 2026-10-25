@@ -1015,9 +1015,9 @@ CREATE TABLE `settings` (
 
 insert  into `settings`(`id`,`group`,`key`,`value`,`value_json`,`label_bn`,`label_en`,`updated_by`,`updated_at`) values 
 (1,'general','site_name','Volt Wave Tech',NULL,'সাইটের নাম','Site Name',NULL,'2026-06-01 13:00:36.593'),
-(2,'general','site_address','Kazi Nazrul Islam Ave, Dhaka, Bangladesh',NULL,'সাইটের ঠিকানা','Site Address',NULL,'2026-06-01 13:00:36.595'),
-(3,'general','site_email','info@voltwave.tech',NULL,'সাইট সাপোর্ট ইমেল','Site Support Email',NULL,'2026-06-01 13:00:36.598'),
-(4,'general','site_phone','+880 1700-000000',NULL,'সাইট ফোন','Site Phone',NULL,'2026-06-01 13:00:36.600'),
+(2,'general','site_address','Kamarpara Nurani Madrasa, Uttara, Dhaka',NULL,'সাইটের ঠিকানা','Site Address',NULL,'2026-06-01 13:00:36.595'),
+(3,'general','site_email','admin@voltwavebd.com',NULL,'সাইট সাপোর্ট ইমেল','Site Support Email',NULL,'2026-06-01 13:00:36.598'),
+(4,'general','site_phone','+880 1822-108496',NULL,'সাইট ফোন','Site Phone',NULL,'2026-06-01 13:00:36.600'),
 (5,'general','footer_text','© 2024 Volt Wave Tech. All Rights Reserved.',NULL,'ফুটার টেক্সট','Footer Text',NULL,'2026-06-01 13:00:36.602'),
 (6,'social','facebook_url','https://facebook.com/voltwavetech',NULL,'ফেসবুক ইউআরএল','Facebook URL',NULL,'2026-06-01 13:00:36.605'),
 (7,'social','linkedin_url','https://linkedin.com/company/voltwave',NULL,'লিঙ্কডইন ইউআরএল','LinkedIn URL',NULL,'2026-06-01 13:00:36.608'),

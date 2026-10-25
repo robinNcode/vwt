@@ -20,6 +20,7 @@ class Service extends Model
         'description_en',
         'price',
         'image_url',
+        'thumbnail_url',
         'is_active',
         'sort_order',
         'created_by',
@@ -27,6 +28,16 @@ class Service extends Model
 
     protected $casts = [
         'is_active' => 'boolean',
-        'price' => 'decimal:2',
+        'price'     => 'decimal:2',
     ];
+
+    protected $appends = ['thumb'];
+
+    /**
+     * Return the thumbnail URL if stored, else fall back to image_url.
+     */
+    public function getThumbAttribute(): string
+    {
+        return $this->attributes['thumbnail_url'] ?? $this->attributes['image_url'] ?? '';
+    }
 }

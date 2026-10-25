@@ -3,11 +3,15 @@ import api from './axios';
 
 export interface WebSettings {
     site_name: string;
+    site_name_bn?: string;
     site_tagline: string;
+    site_tagline_bn?: string;
     site_description: string;
+    site_description_bn?: string;
     logo_url: string;
     favicon_url: string;
     footer_text: string;
+    footer_text_bn?: string;
     social_links: {
         facebook: string;
         twitter: string;
@@ -19,8 +23,11 @@ export interface WebSettings {
     };
     email: string;
     phone: string;
+    phone_bn?: string;
     phone2: string;
+    phone2_bn?: string;
     address: string;
+    address_bn?: string;
     map_url: string;
 
     meta_title: string;
@@ -97,10 +104,10 @@ const DEFAULT_SETTINGS: WebSettings = {
         whatsapp: '+880170000000',
         tiktok: '',
     },
-    email: 'info@voltwave.tech',
-    phone: '+880 1700-000000',
+    email: 'admin@voltwavebd.com',
+    phone: '+880 1822-108496',
     phone2: '',
-    address: 'Kazi Nazrul Islam Ave, Dhaka, Bangladesh',
+    address: 'Kamarpara Nurani Madrasa, Uttara, Dhaka',
     map_url: '',
     meta_title: 'Volt Wave Tech | Industrial Electrical & Automation',
     meta_description: 'Industrial automation, electrical engineering, and machinery supplies in Bangladesh.',
@@ -114,9 +121,9 @@ const DEFAULT_SETTINGS: WebSettings = {
     signature_image_url: '',
     proprietor_name: 'Md. Nazmul Huda',
     proprietor_title: 'Managing Director',
-    business_address: 'Kazi Nazrul Islam Ave, Dhaka, Bangladesh',
-    business_email: 'info@voltwave.tech',
-    business_phone: '+880 1700-000000',
+    business_address: 'Kamarpara Nurani Madrasa, Uttara, Dhaka',
+    business_email: 'admin@voltwavebd.com',
+    business_phone: '+880 1822-108496',
     business_phone2: '',
     bank_name: 'City Bank PLC',
     bank_account_name: 'Volt Wave Tech',
@@ -149,7 +156,7 @@ const DEFAULT_SETTINGS: WebSettings = {
 const SiteSettingsContext = createContext<SiteSettingsContextType>({
     settings: DEFAULT_SETTINGS,
     loading: false,
-    refreshSettings: async () => {},
+    refreshSettings: async () => { },
     getSetting: () => '',
 });
 

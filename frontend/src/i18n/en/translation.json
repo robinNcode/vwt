@@ -5,6 +5,7 @@
         "services": "Services",
         "about": "About",
         "contact": "Contact",
+        "track-orders": "Track Orders",
         "login": "Login",
         "logout": "Logout"
     },
@@ -90,6 +91,8 @@
         }
     },
     "footer": {
+        "strip_title": "Need a custom electronics solution?",
+        "strip_btn": "Get in Touch →",
         "desc": "Your destination for premium electronics and professional electrical services. We bring power to your life with quality and trust.",
         "quick_links": "Quick Links",
         "support": "Support",
@@ -100,6 +103,78 @@
         "track": "Track Order",
         "terms": "Terms of Service",
         "privacy": "Privacy Policy"
+    },
+    "track_order": {
+        "badge": "Real-time Order Tracking",
+        "title": "Track Your Order",
+        "subtitle": "Enter your order number or order ID to get real-time tracking updates on your package.",
+        "input_label": "Order Number / Order ID",
+        "placeholder": "e.g. VWT-20241025-0001 or order ID",
+        "track_btn": "Track",
+        "tracking_btn": "Tracking...",
+        "hint": "You can find your order number in the confirmation email or SMS sent after purchase.",
+        "not_found": "No order found with this ID. Please check and try again.",
+        "steps": {
+            "pending": "Order Placed",
+            "processing": "Processing",
+            "shipped": "Shipped",
+            "delivered": "Delivered"
+        },
+        "order_details": "Order Details",
+        "placed_on": "Placed on",
+        "payment": "Payment",
+        "shipping_to": "Shipping Address",
+        "items": "Ordered Items",
+        "grand_total": "Grand Total",
+        "status": "Status",
+        "info_cards": {
+            "card1_title": "Place Order",
+            "card1_desc": "Complete your purchase online or by calling us.",
+            "card2_title": "Fast Shipping",
+            "card2_desc": "Delivered via trusted couriers across Bangladesh.",
+            "card3_title": "Track & Receive",
+            "card3_desc": "Monitor progress and receive at your doorstep."
+        }
+    },
+    "faq_page": {
+        "badge": "Help Center & FAQs",
+        "title": "Frequently Asked Questions",
+        "subtitle": "Find answers to common questions about ordering, shipping, returns, and our products and services.",
+        "categories_title": "Categories",
+        "questions_count": "questions",
+        "still_have_questions": "Still have questions?",
+        "still_have_questions_desc": "Our support team is ready to help you with any queries not covered here.",
+        "contact_support": "Contact Support",
+        "cats": {
+            "ordering": "Ordering & Payment",
+            "shipping": "Shipping & Delivery",
+            "returns": "Returns & Refunds",
+            "products": "Products & Warranty",
+            "security": "Account & Security",
+            "services": "Services & Repairs",
+            "payment-security": "Payment Security"
+        }
+    },
+    "shipping_page": {
+        "badge": "Shipping Information",
+        "title": "Shipping Policy",
+        "subtitle": "We deliver across Bangladesh through trusted courier partners. Read our complete shipping terms below.",
+        "contents": "Contents",
+        "track_btn": "Track My Order",
+        "returns_btn": "Return Policy →",
+        "phone_label": "Phone / WhatsApp",
+        "email_label": "Email Support",
+        "avail_hours": "Available 9 AM – 9 PM, 7 days",
+        "response_time": "Response within 24 hours"
+    },
+    "returns_page": {
+        "badge": "Customer Protection",
+        "title": "Return & Refund Policy",
+        "subtitle": "Your satisfaction is our priority. Please read our return and refund terms carefully before initiating a return request.",
+        "contents": "Contents",
+        "at_a_glance": "At a Glance",
+        "request_return_btn": "Request a Return",
+        "shipping_policy_btn": "Shipping Policy →"
     },
     "admin_nav": {
         "dashboard": "Dashboard",
