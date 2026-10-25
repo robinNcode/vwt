@@ -60,7 +60,7 @@ class ProductController extends Controller
 
     private function handleUploadedImage(Request $request, $product): void
     {
-        if ($request->hasFile('image')) {
+        if ($request->hasFile('image') && $request->file('image')->getSize() > 0) {
             $file = $request->file('image');
             $ext = strtolower($file->getClientOriginalExtension());
             $filename = \Illuminate\Support\Str::uuid() . '.' . $ext;

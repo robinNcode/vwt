@@ -38,6 +38,14 @@ class ServiceController extends Controller
      */
     public function store(Request $request)
     {
+        if ($request->has('is_active')) {
+            $request->merge([
+                'is_active' => filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true,
+            ]);
+        }
+
+        $hasRealImage = $request->hasFile('image') && $request->file('image')->getSize() > 0;
+
         $data = $request->validate([
             'name_en'       => 'required|string',
             'name_bn'       => 'required|string',
@@ -47,12 +55,12 @@ class ServiceController extends Controller
             'price'         => 'nullable|numeric',
             'image_url'     => 'nullable|string',
             'thumbnail_url' => 'nullable|string',
-            'image'         => 'nullable|file|mimes:jpeg,jpg,png,webp,gif|max:8192',
+            'image'         => $hasRealImage ? 'required|file|mimes:jpeg,jpg,png,webp,gif|max:8192' : 'nullable',
             'is_active'     => 'nullable|boolean',
             'sort_order'    => 'nullable|integer',
         ]);
 
-        if ($request->hasFile('image')) {
+        if ($hasRealImage) {
             $imgData = $this->handleImageUpload($request->file('image'));
             $data['image_url'] = $imgData['image_url'];
             $data['thumbnail_url'] = $imgData['thumbnail_url'];
@@ -70,12 +78,19 @@ class ServiceController extends Controller
     public function update(Request $request, $id)
     {
         $service = Service::findOrFail($id);
+
+        if ($request->has('is_active')) {
+            $request->merge([
+                'is_active' => filter_var($request->input('is_active'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? true,
+            ]);
+        }
+
         $fields = $request->only([
             'name_en', 'name_bn', 'slug', 'description_bn', 'description_en',
             'price', 'image_url', 'thumbnail_url', 'is_active', 'sort_order',
         ]);
 
-        if ($request->hasFile('image')) {
+        if ($request->hasFile('image') && $request->file('image')->getSize() > 0) {
             $imgData = $this->handleImageUpload($request->file('image'));
             $fields['image_url'] = $imgData['image_url'];
             $fields['thumbnail_url'] = $imgData['thumbnail_url'];
