@@ -28,7 +28,9 @@ Route::prefix('v1')->group(function () {
     Route::post('/auth/customers/register', [AuthController::class, 'customerRegister']);
 
     Route::get('/products', [ProductController::class, 'listPublic']);
+    Route::get('/products/{slug}', [ProductController::class, 'showPublic']);
     Route::get('/services', [ServiceController::class, 'index']);
+    Route::get('/services/{slug}', [ServiceController::class, 'showPublic']);
     Route::get('/web-settings', [WebSettingController::class, 'show']);
     Route::get('/settings', [SettingController::class, 'index']);
     Route::get('/banners', [BannerController::class, 'listPublic']);

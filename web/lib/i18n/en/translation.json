@@ -1,0 +1,292 @@
+{
+    "nav": {
+        "home": "Home",
+        "products": "Products",
+        "services": "Services",
+        "about": "About",
+        "contact": "Contact",
+        "track-orders": "Track Orders",
+        "login": "Login",
+        "logout": "Logout"
+    },
+    "hero": {
+        "new_arrival": "New Arrival: Next-Gen Power Modules",
+        "title": "Welcome to Volt Wave Tech",
+        "subtitle": "Your destination for electronics and power solutions. We ensure quality products and services.",
+        "cta_products": "View Products",
+        "cta_services": "Book Services"
+    },
+    "features": {
+        "fast_delivery": {
+            "title": "Fast Delivery",
+            "desc": "Quick delivery across the country within 24-48 hours."
+        },
+        "original_products": {
+            "title": "Original Products",
+            "desc": "We guarantee 100% authentic and genuine electronics."
+        },
+        "support": {
+            "title": "24/7 Support",
+            "desc": "Our dedicated support team is always ready to help you."
+        }
+    },
+    "trust": {
+        "title": "Certified Quality & Professional Excellence",
+        "desc": "At Volt Wave Tech, we don't just sell electronics; we deliver excellence. Our products and services are backed by industry certifications and a commitment to the highest standards of safety and performance.",
+        "points": {
+            "licensed": "Licensed Electrical Professionals",
+            "warranty": "Genuine Manufacturer Warranty",
+            "verified": "Quality Verified and Tested",
+            "eco": "Eco-friendly Power Solutions"
+        },
+        "signatory": "Authorized Signatory"
+    },
+    "cta": {
+        "title": "Ready to upgrade your workspace?",
+        "desc": "Explore our wide range of professional tools and expert components designed for engineers and hobbyists alike.",
+        "button": "Shop Collection",
+        "ics": "Smart ICs",
+        "iot": "IoT Modules"
+    },
+    "brand": {
+        "title": "Our Brand Identity",
+        "desc": "Volt Wave Tech stands for quality and reliability in the electronics industry."
+    },
+    "about_page": {
+        "title": "About Volt Wave Tech",
+        "subtitle": "Leading the way in electronics and power solutions.",
+        "mission_title": "Our Mission",
+        "mission_desc": "To provide high-quality electronic components and professional services that empower innovation and efficiency for our clients.",
+        "vision_title": "Our Vision",
+        "vision_desc": "To be the most trusted partner in the electronics industry, known for reliability, expertise, and excellence.",
+        "values": {
+            "title": "Our Values",
+            "quality": "Quality First",
+            "quality_desc": "We never compromise on the authenticity and performance of our products.",
+            "integrity": "Integrity",
+            "integrity_desc": "We build lasting relationships through honesty and transparency.",
+            "innovation": "Innovation",
+            "innovation_desc": "We continuously evolve to bring you the latest technologies."
+        }
+    },
+    "contact_page": {
+        "title": "Contact Us",
+        "subtitle": "Have questions? We're here to help.",
+        "form": {
+            "name": "Your Name",
+            "email": "Email Address",
+            "phone": "Phone Number",
+            "subject": "Subject",
+            "message": "Your Message",
+            "submit": "Send Message",
+            "sending": "Sending...",
+            "success": "Your message has been sent successfully!",
+            "error": "Failed to send message. Please try again."
+        },
+        "info": {
+            "address_title": "Our Office",
+            "address": "Hosna Plaza, Mirpur-10, Dhaka-1216, Bangladesh",
+            "email_title": "Email Us",
+            "phone_title": "Call Us"
+        }
+    },
+    "footer": {
+        "strip_title": "Need a custom electronics solution?",
+        "strip_btn": "Get in Touch →",
+        "desc": "Your destination for premium electronics and professional electrical services. We bring power to your life with quality and trust.",
+        "quick_links": "Quick Links",
+        "support": "Support",
+        "contact_us": "Contact Us",
+        "faqs": "FAQs",
+        "shipping": "Shipping Policy",
+        "returns": "Return Policy",
+        "track": "Track Order",
+        "terms": "Terms of Service",
+        "privacy": "Privacy Policy"
+    },
+    "track_order": {
+        "badge": "Real-time Order Tracking",
+        "title": "Track Your Order",
+        "subtitle": "Enter your order number or order ID to get real-time tracking updates on your package.",
+        "input_label": "Order Number / Order ID",
+        "placeholder": "e.g. VWT-20241025-0001 or order ID",
+        "track_btn": "Track",
+        "tracking_btn": "Tracking...",
+        "hint": "You can find your order number in the confirmation email or SMS sent after purchase.",
+        "not_found": "No order found with this ID. Please check and try again.",
+        "steps": {
+            "pending": "Order Placed",
+            "processing": "Processing",
+            "shipped": "Shipped",
+            "delivered": "Delivered"
+        },
+        "order_details": "Order Details",
+        "placed_on": "Placed on",
+        "payment": "Payment",
+        "shipping_to": "Shipping Address",
+        "items": "Ordered Items",
+        "grand_total": "Grand Total",
+        "status": "Status",
+        "info_cards": {
+            "card1_title": "Place Order",
+            "card1_desc": "Complete your purchase online or by calling us.",
+            "card2_title": "Fast Shipping",
+            "card2_desc": "Delivered via trusted couriers across Bangladesh.",
+            "card3_title": "Track & Receive",
+            "card3_desc": "Monitor progress and receive at your doorstep."
+        }
+    },
+    "faq_page": {
+        "badge": "Help Center & FAQs",
+        "title": "Frequently Asked Questions",
+        "subtitle": "Find answers to common questions about ordering, shipping, returns, and our products and services.",
+        "categories_title": "Categories",
+        "questions_count": "questions",
+        "still_have_questions": "Still have questions?",
+        "still_have_questions_desc": "Our support team is ready to help you with any queries not covered here.",
+        "contact_support": "Contact Support",
+        "cats": {
+            "ordering": "Ordering & Payment",
+            "shipping": "Shipping & Delivery",
+            "returns": "Returns & Refunds",
+            "products": "Products & Warranty",
+            "security": "Account & Security",
+            "services": "Services & Repairs",
+            "payment-security": "Payment Security"
+        }
+    },
+    "shipping_page": {
+        "badge": "Shipping Information",
+        "title": "Shipping Policy",
+        "subtitle": "We deliver across Bangladesh through trusted courier partners. Read our complete shipping terms below.",
+        "contents": "Contents",
+        "track_btn": "Track My Order",
+        "returns_btn": "Return Policy →",
+        "phone_label": "Phone / WhatsApp",
+        "email_label": "Email Support",
+        "avail_hours": "Available 9 AM – 9 PM, 7 days",
+        "response_time": "Response within 24 hours"
+    },
+    "returns_page": {
+        "badge": "Customer Protection",
+        "title": "Return & Refund Policy",
+        "subtitle": "Your satisfaction is our priority. Please read our return and refund terms carefully before initiating a return request.",
+        "contents": "Contents",
+        "at_a_glance": "At a Glance",
+        "request_return_btn": "Request a Return",
+        "shipping_policy_btn": "Shipping Policy →"
+    },
+    "admin_nav": {
+        "dashboard": "Dashboard",
+        "products": "Products",
+        "services": "Services",
+        "orders": "Orders",
+        "quotations": "Quotations",
+        "invoices": "Invoices",
+        "accounting": "Accounting",
+        "accounting_sales": "Sales",
+        "accounting_purchases": "Purchases",
+        "accounting_expenses": "Expenses",
+        "accounting_revenue": "Service Revenues",
+        "settings": "Settings",
+        "users": "Users & Permissions",
+        "profile": "My Profile",
+        "messages": "Messages",
+        "logout": "Logout",
+        "search_placeholder": "Search..."
+    },
+    "messages": {
+        "title": "Customer Messages",
+        "subtitle": "Manage and respond to customer inquiries and feedback.",
+        "sender": "Sender",
+        "subject": "Subject",
+        "date": "Date",
+        "status": "Status",
+        "read": "Read",
+        "unread": "Unread",
+        "actions": "Actions",
+        "no_found": "No messages found.",
+        "mark_read": "Mark as Read",
+        "error_fetch": "Failed to fetch messages. Please check your connection.",
+        "mark_read_success": "Message marked as read successfully.",
+        "mark_read_error": "Failed to update message status.",
+        "loading": "Loading messages..."
+    },
+    "settings": {
+        "title": "System Settings",
+        "subtitle": "Configure global application variables and preferences.",
+        "save_success": "Settings updated successfully!",
+        "save_error": "Failed to update settings. Please try again.",
+        "groups": {
+            "general": "General Configuration",
+            "seo": "SEO Configuration",
+            "templates": "Invoice/Quotation Templates",
+            "order": "Order Configuration",
+            "security": "Security Settings",
+            "notifications": "Notification Preferences",
+            "logistics": "Machinery & Logistics",
+            "social": "Social Media Presence"
+        }
+    },
+    "dashboard": {
+        "overview": "System Overview",
+        "subtitle": "Check how your business is performing today.",
+        "export": "Export Report",
+        "revenue": "Revenue",
+        "orders": "Orders",
+        "products": "Products",
+        "customers": "Customers",
+        "recent_orders": "Recent Orders",
+        "view_all": "View All",
+        "quick_actions": "Quick Actions",
+        "add_product": "Add New Product",
+        "add_product_desc": "Stock inventory updates",
+        "create_order": "Create New Order",
+        "create_order_desc": "Manual order entry",
+        "customer_query": "Customer Query",
+        "customer_query_desc": "Recent contact messages",
+        "need_support": "Need Support?",
+        "visit_docs": "Visit documentation"
+    },
+    "accounting": {
+        "sales": "Sales Revenue",
+        "purchases": "Vendor Purchases",
+        "expenses": "Operational Expenses",
+        "service_revenues": "Service Revenue",
+        "overview": "Accounting Overview",
+        "full_report": "Full Report",
+        "total_income": "Total Income",
+        "total_expenses": "Total Expenses",
+        "net_margin": "Net Margin"
+    },
+    "invoices": {
+        "title": "Finance & Invoices",
+        "subtitle": "Review transaction documents and billing history.",
+        "create_manual": "Create Manual Invoice",
+        "invoice_no": "Invoice No.",
+        "client_orders": "Order ID / Client",
+        "issued_date": "Issued Date",
+        "actions": "Actions",
+        "no_found": "No invoices found.",
+        "modal_title": "Create Manual Invoice",
+        "modal_desc": "Manually generate an invoice for offline orders.",
+        "client_name": "Client Name",
+        "items_title": "Invoice Items",
+        "add_item": "+ Add Item",
+        "desc": "Description",
+        "qty": "Qty",
+        "price": "Price",
+        "save": "Save Invoice"
+    },
+    "quotations": {
+        "title": "Quotations & Proposals",
+        "subtitle": "Manage and generate professional quotes for potential clients.",
+        "create_new": "New Quote",
+        "quote_no": "Quote No.",
+        "client": "Client",
+        "valid_until": "Valid Until",
+        "status": "Status",
+        "actions": "Actions",
+        "no_found": "No quotations found."
+    }
+}

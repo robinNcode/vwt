@@ -34,6 +34,25 @@ class ServiceController extends Controller
     }
 
     /**
+     * Return a single active service by slug for the public storefront.
+     */
+    public function showPublic(string $slug)
+    {
+        $service = Service::where('slug', $slug)
+            ->where('is_active', true)
+            ->first();
+
+        if (! $service) {
+            return ApiResponse::fail('Service not found', 404);
+        }
+
+        $service->image_url = $this->absoluteMediaUrl($service->image_url);
+        $service->thumbnail_url = $this->absoluteMediaUrl($service->thumbnail_url);
+
+        return ApiResponse::ok('Service fetched successfully', $service);
+    }
+
+    /**
      * Create a service.
      */
     public function store(Request $request)
@@ -100,6 +119,22 @@ class ServiceController extends Controller
         Cache::forget(self::CACHE_KEY);
 
         return ApiResponse::ok('Service updated successfully', $service);
+    }
+
+    /**
+     * Convert stored media paths into absolute URLs for API consumers.
+     */
+    private function absoluteMediaUrl(?string $path): ?string
+    {
+        if (! $path) {
+            return null;
+        }
+
+        if (preg_match('#^https?://#i', $path)) {
+            return $path;
+        }
+
+        return url($path);
     }
 
     private function handleImageUpload($file): array

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\DTOs\ProductDTO;
 use App\Http\Requests\StoreProductRequest;
+use App\Models\Product;
 use App\Services\ProductService;
 use App\Support\ApiResponse;
 use Illuminate\Http\Request;
@@ -20,6 +21,31 @@ class ProductController extends Controller
     public function listPublic(Request $request)
     {
         return ApiResponse::ok('Products fetched successfully', $this->productService->getPublicProducts());
+    }
+
+    /**
+     * Return a single active product by slug for the public storefront.
+     */
+    public function showPublic(string $slug)
+    {
+        $product = Product::where('slug', $slug)
+            ->where('is_active', true)
+            ->with([
+                'images' => fn ($query) => $query->orderBy('sort_order')->orderBy('id'),
+                'category',
+            ])
+            ->first();
+
+        if (! $product) {
+            return ApiResponse::fail('Product not found', 404);
+        }
+
+        $product->images->each(function ($image) {
+            $image->url = $this->absoluteMediaUrl($image->url);
+            $image->thumbnail_url = $this->absoluteMediaUrl($image->thumbnail_url);
+        });
+
+        return ApiResponse::ok('Product fetched successfully', $product);
     }
 
     /**
@@ -56,6 +82,22 @@ class ProductController extends Controller
         $this->handleUploadedImage($request, $product);
 
         return ApiResponse::ok('Product updated successfully', $product->load('images'));
+    }
+
+    /**
+     * Convert stored media paths into absolute URLs for API consumers.
+     */
+    private function absoluteMediaUrl(?string $path): ?string
+    {
+        if (! $path) {
+            return null;
+        }
+
+        if (preg_match('#^https?://#i', $path)) {
+            return $path;
+        }
+
+        return url($path);
     }
 
     private function handleUploadedImage(Request $request, $product): void
