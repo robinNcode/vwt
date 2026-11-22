@@ -44,6 +44,15 @@ export const metadata: Metadata = {
         description:
             'Professional electrical engineering, automation, installation, and maintenance services.',
         url: '/services',
+        type: 'website',
+        images: ['/images/final_logo.png'],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Services | Volt Wave Tech',
+        description:
+            'Professional electrical engineering, automation, installation, and maintenance services.',
+        images: ['/images/final_logo.png'],
     },
 };
 

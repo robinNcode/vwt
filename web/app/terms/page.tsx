@@ -7,6 +7,21 @@ export const metadata: Metadata = {
     alternates: {
         canonical: '/terms',
     },
+    openGraph: {
+        title: 'Terms & Conditions | Volt Wave Tech',
+        description:
+            'Terms and conditions for purchasing products and booking services from Volt Wave Tech.',
+        url: '/terms',
+        type: 'website',
+        images: ['/images/final_logo.png'],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Terms & Conditions | Volt Wave Tech',
+        description:
+            'Terms and conditions for purchasing products and booking services from Volt Wave Tech.',
+        images: ['/images/final_logo.png'],
+    },
 };
 
 const sections = [

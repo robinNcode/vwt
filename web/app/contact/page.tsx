@@ -9,6 +9,21 @@ export const metadata: Metadata = {
     alternates: {
         canonical: '/contact',
     },
+    openGraph: {
+        title: 'Contact Us | Volt Wave Tech',
+        description:
+            'Contact Volt Wave Tech for product enquiries, quotations, service bookings, and technical support.',
+        url: '/contact',
+        type: 'website',
+        images: ['/images/final_logo.png'],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Contact Us | Volt Wave Tech',
+        description:
+            'Contact Volt Wave Tech for product enquiries, quotations, service bookings, and technical support.',
+        images: ['/images/final_logo.png'],
+    },
 };
 
 export default function Page() {

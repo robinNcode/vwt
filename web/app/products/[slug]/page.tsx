@@ -12,6 +12,16 @@ import { ApiError, apiFetch } from '@/lib/api';
 
 export const revalidate = 120;
 
+export async function generateStaticParams() {
+    try {
+        const payload = await apiFetch<ApiEnvelope<ProductDetail[]>>('/products');
+        const items = Array.isArray(payload.data) ? payload.data : [];
+        return items.filter((p) => Boolean(p.slug)).map((p) => ({ slug: p.slug }));
+    } catch {
+        return [];
+    }
+}
+
 const siteUrl = process.env.SITE_URL || 'http://localhost:3000';
 const apiOrigin = (() => {
     try {

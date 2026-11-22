@@ -44,6 +44,15 @@ export const metadata: Metadata = {
         description:
             'Browse industrial electrical products, AirTAC pneumatics, boiler spares, and equipment.',
         url: '/products',
+        type: 'website',
+        images: ['/images/final_logo.png'],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Products | Volt Wave Tech',
+        description:
+            'Browse industrial electrical products, AirTAC pneumatics, boiler spares, and equipment.',
+        images: ['/images/final_logo.png'],
     },
 };
 

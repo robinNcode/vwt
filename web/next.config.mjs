@@ -2,6 +2,24 @@ import path from 'node:path';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: 'api.voltwavebd.com',
+            },
+            {
+                protocol: 'http',
+                hostname: 'localhost',
+                port: '8083',
+            },
+            {
+                protocol: 'http',
+                hostname: '127.0.0.1',
+                port: '8000',
+            },
+        ],
+    },
     webpack(config) {
         config.resolve.alias['react-router-dom'] = path.resolve(
             process.cwd(),

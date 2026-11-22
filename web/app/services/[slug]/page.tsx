@@ -11,6 +11,23 @@ import { ApiError, apiFetch } from '@/lib/api';
 
 export const revalidate = 120;
 
+export async function generateStaticParams() {
+    try {
+        const payload = await apiFetch<{
+            data?: ServiceDetail[] | { items?: ServiceDetail[] } | null;
+        }>('/services');
+        const data = payload.data;
+        const items = Array.isArray(data)
+            ? data
+            : data && Array.isArray(data.items)
+              ? data.items
+              : [];
+        return items.filter((s) => Boolean(s.slug)).map((s) => ({ slug: s.slug }));
+    } catch {
+        return [];
+    }
+}
+
 const siteUrl = process.env.SITE_URL || 'http://localhost:3000';
 const apiOrigin = (() => {
     try {

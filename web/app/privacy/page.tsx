@@ -7,6 +7,21 @@ export const metadata: Metadata = {
     alternates: {
         canonical: '/privacy',
     },
+    openGraph: {
+        title: 'Privacy Policy | Volt Wave Tech',
+        description:
+            'How Volt Wave Tech collects, uses, and protects your personal information.',
+        url: '/privacy',
+        type: 'website',
+        images: ['/images/final_logo.png'],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'Privacy Policy | Volt Wave Tech',
+        description:
+            'How Volt Wave Tech collects, uses, and protects your personal information.',
+        images: ['/images/final_logo.png'],
+    },
 };
 
 const sections = [

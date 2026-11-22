@@ -1,4 +1,4 @@
-type ApiFetchOptions = Omit<RequestInit, 'cache' | 'next'> & {
+export type ApiFetchOptions = Omit<RequestInit, 'next'> & {
     revalidate?: number | false;
 };
 
@@ -27,18 +27,25 @@ function buildApiUrl(path: string): string {
 }
 
 export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): Promise<T> {
-    const { revalidate = 120, headers, ...requestInit } = options;
+    const { revalidate = 120, cache, headers, ...requestInit } = options;
     const requestHeaders = new Headers(headers);
 
     if (!requestHeaders.has('Accept')) {
         requestHeaders.set('Accept', 'application/json');
     }
 
-    const response = await fetch(buildApiUrl(path), {
+    const init: RequestInit = {
         ...requestInit,
         headers: requestHeaders,
-        next: { revalidate },
-    });
+    };
+
+    if (cache === 'no-store') {
+        init.cache = 'no-store';
+    } else if (typeof revalidate === 'number' || revalidate === false) {
+        init.next = { revalidate };
+    }
+
+    const response = await fetch(buildApiUrl(path), init);
 
     if (!response.ok) {
         const body = await response.text().catch(() => '');
@@ -49,4 +56,18 @@ export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): 
     }
 
     return response.json() as Promise<T>;
+}
+
+/** Fetch public catalog data with ISR/revalidation */
+export async function fetchCatalog<T>(path: string, revalidate: number | false = 120): Promise<T> {
+    return apiFetch<T>(path, { revalidate });
+}
+
+/** Fetch user-specific or sensitive data with no-store */
+export async function fetchUserSpecific<T>(path: string, token?: string): Promise<T> {
+    const headers: Record<string, string> = {};
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+    return apiFetch<T>(path, { cache: 'no-store', headers });
 }
