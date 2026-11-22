@@ -22,17 +22,4 @@ if (!i18n.isInitialized) {
     });
 }
 
-if (typeof window !== 'undefined') {
-    const stored = window.localStorage.getItem('vwt_language');
-
-    if (stored === 'bn' || stored === 'en') {
-        void i18n.changeLanguage(stored);
-    }
-
-    i18n.on('languageChanged', (language) => {
-        window.localStorage.setItem('vwt_language', language);
-        document.documentElement.lang = language;
-    });
-}
-
 export default i18n;

@@ -422,17 +422,30 @@ const Products: React.FC<{ initialProducts?: Product[] }> = ({ initialProducts }
                                                 <img
                                                     src={getThumbnailUrl(primaryImage)}
                                                     alt={name}
+                                                    width={800}
+                                                    height={600}
                                                     loading="lazy"
                                                     decoding="async"
+                                                    onError={(event) => {
+                                                        event.currentTarget.onerror = null;
+                                                        event.currentTarget.src = '/images/product-placeholder.svg';
+                                                    }}
                                                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                                 />
                                             ) : (
-                                                <div className="w-full h-full flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-white/5 dark:to-white/[0.02]">
-                                                    <div className="w-20 h-20 rounded-2xl bg-white dark:bg-white/10 shadow-sm flex items-center justify-center border border-slate-100 dark:border-white/10">
-                                                        <Package size={36} strokeWidth={1.2} className="text-slate-300 dark:text-slate-600" />
-                                                    </div>
-                                                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-600">No Image</span>
-                                                </div>
+                                                <img
+                                                    src="/images/product-placeholder.svg"
+                                                    alt={`${name} placeholder`}
+                                                    width={800}
+                                                    height={600}
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    onError={(event) => {
+                                                        event.currentTarget.onerror = null;
+                                                        event.currentTarget.src = '/images/product-placeholder.svg';
+                                                    }}
+                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                />
                                             )}
                                             <div className="absolute top-4 right-4 flex flex-col gap-2 translate-x-12 group-hover:translate-x-0 transition-transform duration-300">
                                                 <ShareButton

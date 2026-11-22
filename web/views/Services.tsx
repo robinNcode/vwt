@@ -219,12 +219,30 @@ const Services: React.FC<{ initialServices?: Service[] }> = ({ initialServices }
                                                 <img
                                                     src={getThumbnailUrl(service)}
                                                     alt={name}
+                                                    width={800}
+                                                    height={600}
                                                     loading="lazy"
                                                     decoding="async"
+                                                    onError={(event) => {
+                                                        event.currentTarget.onerror = null;
+                                                        event.currentTarget.src = '/images/service-placeholder.svg';
+                                                    }}
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
-                                                <Wrench size={30} />
+                                                <img
+                                                    src="/images/service-placeholder.svg"
+                                                    alt={`${name} placeholder`}
+                                                    width={800}
+                                                    height={600}
+                                                    loading="lazy"
+                                                    decoding="async"
+                                                    onError={(event) => {
+                                                        event.currentTarget.onerror = null;
+                                                        event.currentTarget.src = '/images/service-placeholder.svg';
+                                                    }}
+                                                    className="w-full h-full object-cover"
+                                                />
                                             )}
                                         </div>
 

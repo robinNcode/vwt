@@ -30,6 +30,11 @@ class ServiceController extends Controller
             });
         }
 
+        foreach ($services as $service) {
+            $service->image_url = $this->absoluteMediaUrl($service->image_url);
+            $service->thumbnail_url = $this->absoluteMediaUrl($service->thumbnail_url);
+        }
+
         return ApiResponse::ok('Services fetched successfully', $services);
     }
 

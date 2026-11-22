@@ -20,7 +20,16 @@ class ProductController extends Controller
      */
     public function listPublic(Request $request)
     {
-        return ApiResponse::ok('Products fetched successfully', $this->productService->getPublicProducts());
+        $products = $this->productService->getPublicProducts();
+
+        foreach ($products as $product) {
+            foreach ($product->images as $image) {
+                $image->url = $this->absoluteMediaUrl($image->url);
+                $image->thumbnail_url = $this->absoluteMediaUrl($image->thumbnail_url);
+            }
+        }
+
+        return ApiResponse::ok('Products fetched successfully', $products);
     }
 
     /**
