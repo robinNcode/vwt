@@ -83,38 +83,38 @@ const Footer = () => {
                     {/* Brand */}
                     <div className="flex flex-col gap-6 lg:col-span-1">
                         <Link to="/" className="flex items-center gap-2">
-                            <img src={logoSrc} alt={siteName} className="h-8 object-contain brightness-0 invert" />
+                            <img src={logoSrc} alt={siteName} width={509} height={73} className="h-8 w-auto object-contain brightness-0 invert" />
                         </Link>
                         <p className="text-slate-400 text-sm leading-relaxed">
                             {siteDescription}
                         </p>
                         <div className="flex flex-wrap gap-2.5">
                             {socialLinks.facebook && (
-                                <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer"
+                                <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" aria-label="Volt Wave Tech on Facebook"
                                     className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all">
                                     <Facebook size={16} />
                                 </a>
                             )}
                             {socialLinks.instagram && (
-                                <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer"
+                                <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Volt Wave Tech on Instagram"
                                     className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-pink-600 hover:text-white hover:border-pink-600 transition-all">
                                     <Instagram size={16} />
                                 </a>
                             )}
                             {socialLinks.twitter && (
-                                <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer"
+                                <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" aria-label="Volt Wave Tech on Twitter"
                                     className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-sky-500 hover:text-white hover:border-sky-500 transition-all">
                                     <Twitter size={16} />
                                 </a>
                             )}
                             {socialLinks.linkedin && (
-                                <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer"
+                                <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" aria-label="Volt Wave Tech on LinkedIn"
                                     className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-blue-700 hover:text-white hover:border-blue-700 transition-all">
                                     <Linkedin size={16} />
                                 </a>
                             )}
                             {socialLinks.youtube && (
-                                <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer"
+                                <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" aria-label="Volt Wave Tech on YouTube"
                                     className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all">
                                     <Youtube size={16} />
                                 </a>
@@ -196,10 +196,10 @@ const Footer = () => {
             {/* Bottom bar */}
             <div className="border-t border-white/5">
                 <div className="container-custom py-6 flex flex-col md:flex-row justify-between items-center gap-4 text-center">
-                    <p className="text-slate-500 text-xs">{footerText}</p>
-                    <div className="flex gap-6">
-                        <Link to="/terms" className="text-slate-500 hover:text-slate-300 text-xs transition-colors">{t('footer.terms')}</Link>
-                        <Link to="/privacy" className="text-slate-500 hover:text-slate-300 text-xs transition-colors">{t('footer.privacy')}</Link>
+                    <p className="text-slate-400 text-xs">{footerText}</p>
+                    <div className="flex items-center gap-6">
+                        <Link to="/terms" className="text-slate-400 hover:text-slate-200 text-xs transition-colors">{t('footer.terms')}</Link>
+                        <Link to="/privacy" className="text-slate-400 hover:text-slate-200 text-xs transition-colors">{t('footer.privacy')}</Link>
                     </div>
                 </div>
             </div>

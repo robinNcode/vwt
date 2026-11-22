@@ -87,8 +87,11 @@ const Navbar = () => {
                     <img
                         src={logoSrc}
                         alt={siteName}
+                        width={509}
+                        height={73}
+                        fetchPriority="high"
                         className={cn(
-                            "h-8 md:h-10 object-contain transition-all duration-300"
+                            "h-8 md:h-10 w-auto object-contain transition-all duration-300"
                         )}
                     />
                 </Link>
@@ -114,15 +117,20 @@ const Navbar = () => {
 
                 {/* Actions */}
                 <div className="hidden md:flex items-center gap-4">
-                    <button className={cn(
-                        "p-2 transition-colors",
-                        scrolled
-                            ? "text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623]"
-                            : "text-white/90 hover:text-white"
-                    )}>
+                    <button
+                        type="button"
+                        aria-label="Search products"
+                        className={cn(
+                            "p-2 transition-colors",
+                            scrolled
+                                ? "text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-[#F5A623]"
+                                : "text-white/90 hover:text-white"
+                        )}>
                         <Search size={16} />
                     </button>
                     <button
+                        type="button"
+                        aria-label="Open shopping cart"
                         onClick={() => setCartOpen(true)}
                         className={cn(
                             "p-2 transition-colors relative",
@@ -206,6 +214,8 @@ const Navbar = () => {
                 {/* Mobile menu button */}
                 <div className="md:hidden flex items-center gap-2">
                     <button
+                        type="button"
+                        aria-label="Open shopping cart"
                         onClick={() => setCartOpen(true)}
                         className={cn(
                             "p-2 relative transition-colors",

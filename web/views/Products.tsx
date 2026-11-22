@@ -291,6 +291,7 @@ const Products: React.FC<{ initialProducts?: Product[] }> = ({ initialProducts }
                         <div className="lg:col-span-4 relative">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={17} />
                             <input
+                                aria-label="Search products"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 onKeyDown={(e) => e.key === 'Enter' && applyQuery()}
@@ -302,6 +303,7 @@ const Products: React.FC<{ initialProducts?: Product[] }> = ({ initialProducts }
                         {/* Category */}
                         <div className="lg:col-span-3">
                             <select
+                                aria-label="Filter by category"
                                 value={selectedCategory}
                                 onChange={(e) => setSelectedCategory(e.target.value)}
                                 className="w-full rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 py-2.5 px-4 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20 text-sm"
@@ -316,6 +318,7 @@ const Products: React.FC<{ initialProducts?: Product[] }> = ({ initialProducts }
                         {/* Min price */}
                         <div className="lg:col-span-2">
                             <input
+                                aria-label="Minimum price"
                                 value={minPrice}
                                 onChange={(e) => setMinPrice(e.target.value)}
                                 type="number"
@@ -328,6 +331,7 @@ const Products: React.FC<{ initialProducts?: Product[] }> = ({ initialProducts }
                         {/* Max price */}
                         <div className="lg:col-span-2">
                             <input
+                                aria-label="Maximum price"
                                 value={maxPrice}
                                 onChange={(e) => setMaxPrice(e.target.value)}
                                 type="number"
@@ -350,6 +354,7 @@ const Products: React.FC<{ initialProducts?: Product[] }> = ({ initialProducts }
                         {/* Sort + Clear row */}
                         <div className="lg:col-span-12 flex flex-col sm:flex-row sm:items-center justify-end gap-3">
                             <select
+                                aria-label="Sort products"
                                 value={sortBy}
                                 onChange={(e) => setSortBy(e.target.value)}
                                 className="rounded-2xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/5 py-2.5 px-4 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500/20 text-sm"
@@ -435,12 +440,14 @@ const Products: React.FC<{ initialProducts?: Product[] }> = ({ initialProducts }
                                                     title={name}
                                                     variant="compact"
                                                 />
-                                                <button className="w-10 h-10 rounded-full bg-white dark:bg-[#1A1E29] shadow-md flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-blue-600 dark:hover:bg-[#F5A623] hover:text-white transition-all">
+                                                <button type="button" aria-label={`Add ${name} to favorites`} className="w-10 h-10 rounded-full bg-white dark:bg-[#1A1E29] shadow-md flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-blue-600 dark:hover:bg-[#F5A623] hover:text-white transition-all">
                                                     <Heart size={18} />
                                                 </button>
                                                 <button
                                                     onClick={() => setSelectedProduct(product)}
                                                     className="w-10 h-10 rounded-full bg-white dark:bg-[#1A1E29] shadow-md flex items-center justify-center text-slate-600 dark:text-slate-400 hover:bg-blue-600 dark:hover:bg-[#F5A623] hover:text-white transition-all"
+                                                    type="button"
+                                                    aria-label={`Preview ${name}`}
                                                 >
                                                     <Eye size={18} />
                                                 </button>

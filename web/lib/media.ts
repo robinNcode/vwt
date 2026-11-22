@@ -1,13 +1,16 @@
 const absoluteUrlPattern = /^https?:\/\//i;
-
-const serverUrl = (process.env.NEXT_PUBLIC_SERVER_URL || '').replace(/\/+$/, '');
+const serverUrl = (process.env.NEXT_PUBLIC_SERVER_URL || '').replace(/\/+$/, '').replace(/\/api\/v1$/i, '');
 
 export const getMediaUrl = (url?: string | null) => {
     if (!url) return '';
-    if (absoluteUrlPattern.test(url)) return url;
-    if (!serverUrl) return url;
 
-    return `${serverUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+    const trimmedUrl = url.trim();
+    if (!trimmedUrl) return '';
+    if (absoluteUrlPattern.test(trimmedUrl)) return trimmedUrl;
+    if (!serverUrl) return trimmedUrl.startsWith('/') ? trimmedUrl : `/${trimmedUrl}`;
+
+    const path = trimmedUrl.replace(/^\/+/, '');
+    return `${serverUrl}/${path}`;
 };
 
 /**

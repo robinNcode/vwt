@@ -5,8 +5,6 @@ import JsonLd from '@/components/JsonLd';
 import { apiFetch } from '@/lib/api';
 import Products, { type Product } from '@/views/Products';
 
-export const dynamic = 'force-dynamic';
-
 type ApiEnvelope<T> = {
     data?: T | { items?: T } | null;
 };

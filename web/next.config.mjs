@@ -16,7 +16,7 @@ const nextConfig = {
             {
                 protocol: 'http',
                 hostname: '127.0.0.1',
-                port: '8000',
+                port: '8083',
             },
         ],
     },
@@ -29,12 +29,12 @@ const nextConfig = {
         return config;
     },
     async rewrites() {
-        const apiUrl = (process.env.API_URL || 'http://127.0.0.1:8000/api/v1').replace(
+        const apiUrl = (process.env.API_URL || 'http://127.0.0.1:8083/api/v1').replace(
             /\/+$/,
             '',
         );
 
-        let apiOrigin = 'http://127.0.0.1:8000';
+        let apiOrigin = 'http://127.0.0.1:8083';
 
         try {
             apiOrigin = new URL(apiUrl).origin;
