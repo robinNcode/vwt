@@ -15,8 +15,14 @@ export default function SiteChrome({ children }: { children: ReactNode }) {
         return <>{children}</>;
     }
 
+    const isHome = pathname === '/';
+
     return (
-        <div className="min-h-screen bg-white font-sans text-slate-900 transition-colors duration-300 selection:bg-blue-100 selection:text-blue-900 dark:bg-[#0D0F14] dark:text-white">
+        <div
+            className={`min-h-screen font-sans text-slate-900 transition-colors duration-300 selection:bg-blue-100 selection:text-blue-900 dark:bg-[#0D0F14] dark:text-white ${
+                isHome ? 'bg-slate-50' : 'bg-white'
+            }`}
+        >
             <Navbar />
             <main>{children}</main>
             <Footer />
